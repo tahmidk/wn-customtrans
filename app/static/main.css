@@ -1,0 +1,142 @@
+/*---------------------------[ General Stylings ]-----------------------*/
+html{
+  scroll-behavior: smooth;
+}
+body{
+  margin:0;
+  padding:0;
+  font-family:sans-serif;
+}
+
+a a:link a:visited{
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.noDecoration{
+  text-decoration: none !important;
+  color: inherit;
+}
+
+section.section_index{
+  position:absolute;
+  width:100%;
+  height:100%;
+  padding:15vh 25vw;
+  background:#f3f3f3;
+  color:#555;
+  box-sizing:border-box;
+
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
+  text-align: justify;
+}
+
+
+
+/*--------------------------[ Main Page Stylings ]----------------------*/
+/* Stylings for the site logo */
+.customtrans_logo_div{
+  height: 20vh;
+  margin-bottom: 5vh;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.customtrans_logo{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Main Page menu button stylings */
+.menu_div{
+  height: 40vh;
+  width: 30vw;
+  padding: 0.4vw;
+  margin: 2.5vh auto;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.menu_button{
+  margin: 0.4vw;
+  float: left;
+  box-shadow: 0 0 0 0.1vw #000;
+  border-radius: 0.4vw;
+  text-align: center;
+  text-decoration: none !important;
+}
+.menu_button_big{
+  width: 14.2vw;
+  height: 14.2vw;
+  font-size: 4vw;
+}
+.menu_button_wide{
+  width: 14.2vw;
+  height: 6.7vw;
+  font-size: 2vw;
+}
+.menu_button_small{
+  width: 6.7vw;
+  height: 6.7vw;
+  font-size: 2vw;
+}
+.button_icon{
+  width: 100%;
+  height: 50%;
+  padding-top: 1em;
+  font-size: 1em;
+  color: inherit;
+  box-sizing: border-box;
+}
+.button_title{
+  width: 100%;
+  height: 50%;
+  padding: 1em 0;
+  font-size: 0.3em;
+  font-variant: all-petite-caps;
+  font-weight: bold;
+  color: inherit;
+  box-sizing: border-box;
+}
+#library{
+  box-shadow: 0 0 0 0.1vw #ff8d8d;
+  color: #ff8d8d;
+}
+#library:hover {
+  background-color: #ff8d8d;
+  color: #fff;
+}
+#dictionaries{
+  box-shadow: 0 0 0 0.1vw #f6b379;
+  color: #f6b379;
+}
+#dictionaries:hover {
+  background-color: #f6b379;
+  color: #fff;
+}
+#tutorial{
+  box-shadow: 0 0 0 0.1vw #c2ffa3;
+  color: #c2ffa3;
+}
+#tutorial:hover {
+  background-color: #c2ffa3;
+  color: #fff;
+}
+#settings{
+  box-shadow: 0 0 0 0.1vw #b4eaff;
+  color: #b4eaff;
+}
+#settings:hover {
+  background-color: #b4eaff;
+  color: #fff;
+}
