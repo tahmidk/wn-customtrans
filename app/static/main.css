@@ -107,10 +107,12 @@ input[type=number] {
   height: 100%;
   padding: 0.75em 0;
   box-sizing: border-box;
-  box-shadow: 0 0 0 0.1vw #000;
-  border-radius: 0.4vw;
+  box-shadow: 0 0 0 0.5rem #000;
+  border-radius: 0.5rem;
   text-align: center;
   text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
   cursor: pointer;
 
   /* Make it unselectable */
@@ -121,15 +123,60 @@ input[type=number] {
   -o-user-select: none;
 }
 .menu_button_big{
-  font-size: 4vw;
+  font-size: 8rem;
 }
 .menu_button_wide{
-  font-size: 2vw;
+  font-size: 4rem;
 }
 .menu_button_small{
-  font-size: 2vw;
+  font-size: 4rem;
 }
+.btn-cust{
+  font-variant: all-small-caps;
+}
+.modal-cust{
+  border-radius: 1rem;
+}
+.modal_header_cust{
+  margin-bottom: 0;
+  font-variant: all-small-caps;
+  font-size: 2rem;
 
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.modal_body_cust{
+  padding: 3rem 2rem;
+}
+.form_group_cust{
+  display: flex;
+}
+.label_cust{
+  font-variant: all-small-caps;
+  white-space: nowrap;
+}
+.input_cust{
+  margin: 0 1rem;
+}
+.input_cust::placeholder{
+  opacity: 0.5;
+}
+.form_input_div{
+  width: -webkit-fill-available;
+  padding: 0 1rem;
+}
+.invalid_feedback_cust{
+  font-size: 90%;
+}
+.invalid_feedback_cust pre{
+  display: contents;
+  font-size: 87.5%;
+  color: inherit;
+}
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
 section.section_index{
@@ -244,15 +291,17 @@ section.section_library{
 }
 /* Sidepanel stuff */
 #menu_library_register{
-  box-shadow: 0 0 0 0.1vw #8dffca;
-  color: #8dffca;
+  box-shadow: 0 0 0 0.1vw #61ff85;
+  background: inherit;
+  color: #61ff85;
 }
 #menu_library_register:hover {
-  background-color: #8dffca;
+  background-color: #61ff85;
   color: #fff;
 }
 #menu_library_update{
   box-shadow: 0 0 0 0.1vw #ffdc8d;
+  background: inherit;
   color: #ffdc8d;
 }
 #menu_library_update:hover {
@@ -265,7 +314,7 @@ section.section_library{
   color: #ff8d8d;
   box-shadow: 0 0 0 0.1em #ff8d8d;
   margin: 0.5em 0;
-  padding: 1em;
+  padding: 1em 2em;
   border-radius: 0.4em;
 
   /* Make it unselectable */
@@ -283,19 +332,36 @@ section.section_library{
   color: #ff8d8d;
   background: #fff;
 }
-.entry_abbr{
+.library_series_entry:hover .entry_updated{
+  color: #8dff98;
+  background: #fff;
+}
+.entry_minibanner{
   position: absolute;
+  display: flex;
+  flex-direction: column;
   right: -0.5em;
   top: 0.5em;
   width: 15%;
+}
+.minibanner{
   padding: 0.2em 1em;
-  color: #fff;
-  background: #ff8d8d;
+  margin: 0.3rem 0;
   border-radius: 0.2em;
   font-variant: all-small-caps;
   font-weight: bold;
   text-align: right;
+}
+.entry_abbr{
+  color: #fff;
+  background: #ff8d8d;
   box-shadow: 0 0 0 0.1em #ff8d8d;
+}
+.entry_updated{
+  display: none;
+  color: #fff;
+  background: #8dff98;
+  box-shadow: 0 0 0 0.1em #8dff98;
 }
 .entry_title{
   width: 80%;
@@ -320,19 +386,29 @@ section.section_library{
   width: fit-content;
   position: absolute;
   display: flex;
+  color: #af4e4e;
   font-size: 1.5rem;
   right: 0.5rem;
   bottom: 0.5rem;
 }
+.entry_action_bar > *:hover{
+  color: #fff;
+}
 .entry_action_bar > *{
   margin: 0 0.5rem;
+}
+.entry_action_button{
+  color: inherit !important;
+  border: none !important;
+  background: none !important;
+  outline: none !important;
 }
 .entry_download_bar{
   position: relative;
   display: flex;
   width: fit-content;
 }
-.download_specific, .download_next{
+.download_btn{
   display: flex;
   flex-direction: column;
   width: 10rem;
@@ -345,18 +421,33 @@ section.section_library{
   font-size: 1.2rem;
   font-variant: all-small-caps;
   border-radius: 0.5rem;
+  cursor: pointer;
 }
-.download_specific:hover, .download_next:hover{
+.download_btn:hover{
+  background: #fff !important;
+  color: #d26969;
+}
+.library_series_entry:hover .download_btn{
   background: #d26969;
-}
-.library_series_entry:hover .download_specific, .library_series_entry:hover .download_next{
-  box-shadow: 0 0 0 0.1rem #d26969;
 }
 .download_specific_input{
   border: none;
   outline: none;
   color: #d26969;
 }
+.library_series_entry:hover .download_specific_input{
+  outline: 1px solid #d26969;
+}
 pre#unbootstrap{
   color: inherit;
+}
+
+
+/*----------------------[ Register Modal stylings ]----------------------*/
+.register_modal_cust{
+  border: 1px solid #40cc60;
+  border-left: 0.5rem solid #40cc60;
+}
+.register_novel_header{
+  color: #40cc60;
 }

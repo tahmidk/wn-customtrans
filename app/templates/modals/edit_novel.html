@@ -1,0 +1,40 @@
+{% macro register_novel_modal(form) %}
+<div class="modal fade" id="register_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-notify modal-info" role="document">
+    <!-- Modal Form Content-->
+    <form class="modal-content text-center modal-cust register_modal_cust" id="form_register">
+      <!--Modal Header-->
+      <div class="modal-header d-flex justify-content-center">
+        <p class="modal_header_cust register_novel_header"> Register a Novel </p>
+      </div>
+
+      <!--Modal Body-->
+      <div class="modal-body">
+          {{ form.hidden_tag() }}
+          <fieldset class="form-group">
+            <div class="form-group form_group_cust">
+              {{ form.title.label(class="form-control-label label_cust") }}
+              {{ form.title(class="form-control input_cust") }}
+            </div>
+            <div class="form-group form_group_cust">
+              {{ form.abbr.label(class="form-control-label label_cust") }}
+              {{ form.abbr(class="form-control input_cust") }}
+            </div>
+            <div class="form-group form_group_cust">
+              {{ form.series_url.label(class="form-control-label label_cust") }}
+              {{ form.series_url(class="form-control input_cust", placeholder="http://ncode.syosetu.com/XXXXXXX") }}
+            </div>
+          </fieldset>
+      </div>
+
+      <!--Modal Footer-->
+      <div class="modal-footer flex-center">
+        {{ form.submit(class="btn btn-outline-secondary btn-cust") }}
+        <button class="btn btn-outline-danger btn-cust" data-dismiss="modal"> Cancel </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endmacro %}

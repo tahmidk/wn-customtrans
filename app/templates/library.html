@@ -1,3 +1,5 @@
+{% from "modals/register_novel.html" import register_novel_modal%}
+
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_library">
@@ -7,6 +9,9 @@
 				Back
 			</div>
 		{% endif%}
+
+		<!-- Set up the modals needed for this  -->
+		{{ register_novel_modal(reg_form) }}
 
 		<!-- Main content -->
 		<div class="banner" id="library_banner">
@@ -19,12 +24,12 @@
 			<div class="library_sidepanel">
 				<!-- Register button -->
 				<div style="padding: 1rem 0;">
-					<div class="menu_button menu_button_small" id="menu_library_register" onclick="location.href='{{url_for('settings')}}';">
+					<button type="button" class="menu_button menu_button_small" id="menu_library_register" data-toggle="modal" data-target="#register_modal_push" title="Add Series">
 						<div class="button_icon">
 							<ion-icon name="add-outline"></ion-icon>
 						</div>
 						<div class="button_title"> Register </div>
-					</div>
+					</button>
 				</div>
 				<!-- Update button -->
 				<div style="padding: 1rem 0;">
@@ -39,7 +44,10 @@
 			<div class="library_mainpanel">
 				{% for novel in series %}
 					<div class="library_series_entry" id="series_{{novel.abbr}}">
-						<div class="entry_abbr"> {{novel.abbr}} </div>
+						<div class="entry_minibanner">
+							<div class="minibanner entry_abbr"> {{novel.abbr}} </div>
+							<div class="minibanner entry_updated"> Updated </div>
+						</div>
 						<div class="entry_title"> {{novel.title}} </div>
 						<div class="entry_details">
 							<div class="entry_current">
@@ -51,25 +59,25 @@
 						</div>
 						<div class="entry_action_bar">
 							<div class="entry_edit">
-								<a class="anch" title="Edit Series" href="#">
+								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#register_modal_push" title="Edit Series">
 									<ion-icon name="create"></ion-icon>
-								</a>
+								</button>
 							</div>
 							<div class="entry_trash">
-								<a class="anch" title="Remove Series" href="#">
+								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#register_modal_push" title="Remove Series">
 									<ion-icon name="trash"></ion-icon>
-								</a>
+								</button>
 							</div>
 						</div>
 						<div class="entry_download_bar">
 							<form method="post">
-								<div class="download_specific" > <!--onclick="this.parentNode.submit();"-->
+								<div class="download_btn download_specific" > <!--onclick="this.parentNode.submit();"-->
 									<span> Read Specific </span>
 									<input type="number" class="download_specific_input" name="num" size="5" placeholder="{{[novel.current, 1]|max}}" min="1" max="{{novel.latest}}">
 								</div>
 							</form>
 							<form method="post">
-								<div class="download_next" > <!--onclick="this.parentNode.submit();"-->
+								<div class="download_btn download_next" > <!--onclick="this.parentNode.submit();"-->
 									<span> Read Next </span>
 									<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="arrow-redo"></ion-icon>
 								</div>
