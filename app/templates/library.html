@@ -1,4 +1,6 @@
 {% from "modals/register_novel.html" import register_novel_modal%}
+{% from "modals/edit_novel.html" import edit_novel_modal%}
+{% from "modals/remove_novel.html" import remove_novel_modal%}
 
 {% extends 'general_layout.html' %}
 {% block content %}
@@ -12,6 +14,8 @@
 
 		<!-- Set up the modals needed for this  -->
 		{{ register_novel_modal(reg_form) }}
+		{{ edit_novel_modal(edit_form)}}
+		{{ remove_novel_modal(rmv_form)}}
 
 		<!-- Main content -->
 		<div class="banner" id="library_banner">
@@ -33,16 +37,17 @@
 				</div>
 				<!-- Update button -->
 				<div style="padding: 1rem 0;">
-					<div class="menu_button menu_button_small" id="menu_library_update" onclick="location.href='{{url_for('settings')}}';">
+					<button type="button" class="menu_button menu_button_small" id="menu_library_update" title="Update Library">
 						<div class="button_icon">
 							<ion-icon name="sync-outline"></ion-icon>
 						</div>
 						<div class="button_title"> Update </div>
-					</div>
+					</button>
 				</div>
 			</div>
 			<div class="library_mainpanel">
 				{% for novel in series %}
+					{% set next_ch = novel.current + 1 %}
 					<div class="library_series_entry" id="series_{{novel.abbr}}">
 						<div class="entry_minibanner">
 							<div class="minibanner entry_abbr"> {{novel.abbr}} </div>
@@ -58,30 +63,34 @@
 							</div>
 						</div>
 						<div class="entry_action_bar">
+							<!-- This div is for convenience in js and is not meant to be displayed-->
+							<div class="entry_info" style="display: none;">
+								<span class="info_title"> {{novel.title}} </span>
+								<span class="info_abbr"> {{novel.abbr}} </span>
+								<span class="info_current"> {{novel.current}} </span>
+								<span class="info_latest"> {{novel.latest}} </span>
+								<span class="info_code"> {{novel.code}} </span>
+							</div>
 							<div class="entry_edit">
-								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#register_modal_push" title="Edit Series">
+								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#edit_modal_push" title="Edit Series" id="edit_{{novel.abbr}}">
 									<ion-icon name="create"></ion-icon>
 								</button>
 							</div>
 							<div class="entry_trash">
-								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#register_modal_push" title="Remove Series">
+								<button type="button" class="entry_action_button" data-toggle="modal" data-target="#remove_modal_push" title="Remove Series" id="rmv_{{novel.abbr}}">
 									<ion-icon name="trash"></ion-icon>
 								</button>
 							</div>
 						</div>
 						<div class="entry_download_bar">
-							<form method="post">
-								<div class="download_btn download_specific" > <!--onclick="this.parentNode.submit();"-->
-									<span> Read Specific </span>
-									<input type="number" class="download_specific_input" name="num" size="5" placeholder="{{[novel.current, 1]|max}}" min="1" max="{{novel.latest}}">
-								</div>
-							</form>
-							<form method="post">
-								<div class="download_btn download_next" > <!--onclick="this.parentNode.submit();"-->
-									<span> Read Next </span>
-									<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="arrow-redo"></ion-icon>
-								</div>
-							</form>
+							<div class="download_btn table_of_contents" onclick="location.href='{{'/library/' ~ novel.abbr}}'">
+								<span> Table of Contents </span>
+								<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="library-outline"></ion-icon>
+							</div>
+							<div class="download_btn download_next" onclick="location.href='{{'/library/' ~ novel.abbr ~ '/' ~ next_ch}}'">
+								<span> Read Next </span>
+								<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="arrow-redo"></ion-icon>
+							</div>
 						</div>
 					</div>
 				{% endfor %}

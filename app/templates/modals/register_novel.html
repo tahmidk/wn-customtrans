@@ -3,7 +3,7 @@
 aria-hidden="true" route="{{ url_for('library') }}">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal-cust register_modal_cust" id="register_novel_form">
+    <form class="modal-content text-center modal-cust register_modal_cust" id="register_novel_form" action="{{ url_for('library_register_novel') }}">
       <!--Modal Header-->
       <div class="modal-header d-flex justify-content-center">
         <p class="modal_header_cust register_novel_header"> Register a Novel </p>

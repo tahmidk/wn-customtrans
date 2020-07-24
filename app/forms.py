@@ -7,8 +7,13 @@
 
 # Flask imports
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, ValidationError
-from wtforms.validators import DataRequired, Length, Regexp
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms import BooleanField
+from wtforms import ValidationError
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+from wtforms.validators import Regexp
 
 # Other imports
 from urllib.request import urlopen
@@ -43,7 +48,7 @@ class RegisterNovelForm(FlaskForm):
 	series_code = StringField('Series Code', validators=series_code_validators)
 
 	# Submit form
-	submit = SubmitField('Register')
+	submit = SubmitField('Register', )
 
 	# Custom validator for series code to make sure url exists
 	def validate_series_code(self, series_code):
@@ -74,9 +79,19 @@ class EditNovelForm(FlaskForm):
 	# Field: abbr - The user's personal abbreviation for this novel
 	abbr_validators = [
 		DataRequired(),
-		Length(min=1, max=15)
+		Length(min=1, max=15),
+		Regexp(r'^[\w]+$', message="Cannot contain spaces or special characters")
 	]
 	abbr = StringField('Abbreviation', validators=abbr_validators)
 
 	# Submit form
-	submit = SubmitField('Submit')
+	submit = SubmitField('Save')
+
+class RemoveNovelForm(FlaskForm):
+	'''
+		Confirmaton form used when user tries to remove a novel from library
+		in the /libraries route
+	'''
+	opt_keep_dict = BooleanField("Keep the dictionary associated with this series?", default=True)
+
+	submit = SubmitField('Remove')
