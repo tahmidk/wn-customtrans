@@ -1,9 +1,8 @@
 {% macro edit_novel_modal(form) %}
-<div class="modal fade" id="edit_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-aria-hidden="true" route="{{ url_for('library') }}">
+<div class="modal fade" id="edit_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal-cust edit_modal_cust" id="edit_novel_form" action="{{ url_for('library_edit_novel') }}">
+    <form class="modal-content text-center modal-cust edit_modal_cust" id="edit_novel_form" action="{{ url_for('library_edit_novel', series_code='UNDEF') }}">
       <!--Modal Header-->
       <div class="modal-header d-flex justify-content-center">
         <p class="modal_header_cust edit_novel_header"> Edit this Novel </p>

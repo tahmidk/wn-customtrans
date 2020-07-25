@@ -1,6 +1,5 @@
 {% macro register_novel_modal(form) %}
-<div class="modal fade" id="register_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-aria-hidden="true" route="{{ url_for('library') }}">
+<div class="modal fade" id="register_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
     <form class="modal-content text-center modal-cust register_modal_cust" id="register_novel_form" action="{{ url_for('library_register_novel') }}">

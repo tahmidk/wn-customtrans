@@ -1,9 +1,8 @@
 {% macro remove_novel_modal(form) %}
-<div class="modal fade" id="remove_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-aria-hidden="true" route="{{ url_for('library') }}">
+<div class="modal fade" id="remove_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal-cust remove_modal_cust" id="remove_novel_form" action="{{ url_for('library_remove_novel') }}">
+    <form class="modal-content text-center modal-cust remove_modal_cust" id="remove_novel_form" action="{{ url_for('library_remove_novel', series_code='UNDEF') }}">
       <!--Modal Header-->
       <div class="modal-header d-flex justify-content-center bg-danger">
         <p class="modal_header_cust remove_novel_header"> Remove this Novel </p>

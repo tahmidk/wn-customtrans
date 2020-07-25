@@ -14,61 +14,20 @@ from flask import send_file
 
 # Internal imports
 from app import app
+from app import db
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.models import SeriesTable
-from app.models import DictionaryFile
+from app.models import DictionariesTable
+from app.models import HostTable
+from app.scripts import utils
 
 # Other imports
 import json
 from io import BytesIO
 
-# Static database to temporarily use
-series=[
-	{
-        "abbr": "Dummy",
-        "title": "This is a Sample Novel Title",
-        "current": 1,
-        "latest": 100,
-        "code": "n7057gi"
-    },
-    {
-        "abbr": "BocchiIdol",
-        "title": "I'm the Best Idol in Japan",
-        "current": 0,
-        "latest": 45,
-        "code": "n9946fx"
-    },
-    {
-        "abbr": "FlagCrush",
-        "title": "The Adventurer Contracted to the Strongest Deity Crushes Flags",
-        "current": 145,
-        "latest": 1206,
-        "code": "n3404fh"
-    },
-    {
-        "abbr": "CHJK",
-        "title": "When My Childhood Friend Becomes JK",
-        "current": 2,
-        "latest": 28,
-        "code": "n4893gi"
-    },
-    {
-        "abbr": "WhiteRabbit",
-        "title": "The Strongest Incompetent Reaches for the Top",
-        "current": 1,
-        "latest": 10,
-        "code": "n0737ga"
-    },
-    {
-        "abbr": "Surrounded",
-        "title": "Surrounded By Four",
-        "current": 50,
-        "latest": 57,
-        "code": "n9450ge"
-    },
-]
+
 
 # This is the route for the main page
 @app.route("/")
@@ -83,6 +42,8 @@ def library():
 	edit_novel_form = EditNovelForm()
 	remove_novel_form = RemoveNovelForm()
 
+	# Fetch series from database
+	series = SeriesTable.query.all()
 	return render_template('library.html',
 		title="Library",
 		back_href=url_for('index'),
@@ -96,44 +57,60 @@ def library():
 def library_register_novel():
 	register_novel_form = RegisterNovelForm()
 	if register_novel_form.validate_on_submit():
+		series_entry = utils.registerSeriesToDatabase(register_novel_form)
 		return jsonify(status='ok')
 
 	data = json.dumps(register_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
 
 # Background route to process edit novel form
-@app.route("/library/edit_novel", methods=["POST"])
-def library_edit_novel():
+@app.route("/library/edit_novel/<series_code>", methods=["POST"])
+def library_edit_novel(series_code):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
+		series_entry = SeriesTable.query.filter_by(code=series_code).first()
+		series_entry.title = edit_novel_form.title.data
+		series_entry.abbr = edit_novel_form.abbr.data
+		db.session.commit()
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
 
 # Background route to process remove novel form
-@app.route("/library/remove_novel", methods=["POST"])
-def library_remove_novel():
+@app.route("/library/remove_novel/<series_code>", methods=["POST"])
+def library_remove_novel(series_code):
 	remove_novel_form = RemoveNovelForm()
 	if remove_novel_form.validate_on_submit():
-		if remove_novel_form.opt_keep_dict:
-			print("Kept dict and removed the series")
-		else:
-			print("Removed the series and dict")
+		series_entry = SeriesTable.query.filter_by(code=series_code).first()
+		if not remove_novel_form.opt_keep_dict.data:
+			dict_entry = DictionariesTable.query.filter_by(id=series_entry.dict_id).first()
+			db.session.delete(dict_entry)
+		db.session.delete(series_entry)
+		db.session.commit()
+
 		return jsonify(status='ok')
 
 	data = json.dumps(remove_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
 
 # Route for the table of content for given 'series'
-@app.route("/library/<series>")
-def library_series_toc(series):
-	return "Displaying Table of Contents for %s" % series
+@app.route("/library/<series_code>")
+def library_series_toc(series_code):
+	series_entry = SeriesTable.query.filter_by(code=series_code).first()
+	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+	series_host_url = host_entry.host_url + series_entry.abbr
+	return render_template('series_toc.html',
+		title=series_entry.abbr,
+		back_href=url_for('library'),
+		series=series_entry,
+		series_host_url=series_host_url)
 
 # Route for a specific translated chapter 'ch' of 'series'
-@app.route("/library/<series>/<ch>")
-def library_series_chapter(series, ch):
-	return "Displaying %s chapter %s" % (series, ch)
+@app.route("/library/<series_code>/<ch>")
+def library_series_chapter(series_code, ch):
+	series_entry = SeriesTable.query.filter_by(code=series_code).first()
+	return "Displaying %s chapter %s" % (series_entry.title, ch)
 
 
 @app.route("/dictionaries")
@@ -144,7 +121,7 @@ def dictionaries():
 # def dictionaries_upload_dict(series):
 # 	dict_file = request.files['inputFile']
 
-# 	db_file = DictionaryFile(name=dict_file.filename, data=dict_file.read())
+# 	db_file = DictionariesTable(name=dict_file.filename, data=dict_file.read())
 # 	db.session.add(db_file)
 # 	db.session.commit()
 
