@@ -22,6 +22,11 @@ class LType(Enum):
 	REG_IMG  = 4 	# Image embedded in the story content section
 	POST_IMG = 5	# Image embedded in afterword section
 
+# Enum for the hosts
+class Host(Enum):
+	Syosetu = 0
+	Biquyun = 1
+	Shu69 	= 2
 
 def createParser(host):
 	"""-------------------------------------------------------------------
@@ -29,15 +34,15 @@ def createParser(host):
 		Description:	Given a host name, creates and returns the
 						appropriate HtmlParser
 		Input:
-		  [host]		Host to create parser for
+		  [host]		Host enum
 		Return:			Concrete HtmlParser-derived object
 		-------------------------------------------------------------------
 	"""
-	if host == "Syosetu":
+	if host == Host.Syosetu:
 		return SyosetuParser()
-	elif host == "Biquyun":
+	elif host == Host.Biquyun:
 		return BiquyunParser()
-	elif host == "69shu":
+	elif host == Host.Shu69:
 		return Shu69Parser()
 
 	return None

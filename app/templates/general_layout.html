@@ -10,7 +10,7 @@
 	<!-- Typeface, Favicon, Stylesheet links -->
 	<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css')}}">
-  	<!--link rel="shortcut icon" href="https://rawcdn.githack.com/tahmidk/Downtrans/d87d65a051b42f49409bbb58ba5ace52f8303fc4/resources/images/pigpanda_icon.ico"-->
+  	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
   	{% if title %}
 		<title>{{ title }}</title>

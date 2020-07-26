@@ -15,6 +15,7 @@ from app.models import SeriesTable
 from app.models import DictionariesTable
 from app.models import HostTable
 from app.models import Language
+from app.scripts.htmlparser import Host
 
 
 test_series = [
@@ -63,6 +64,7 @@ test_series = [
 ]
 hosts = [
 	{
+		"host_type": Host.Syosetu,
 		"host_name": "Syosetu",
 		"host_lang": Language.JP,
 		"host_url": "https://ncode.syosetu.com/"
@@ -76,6 +78,7 @@ def reinitDatabase():
 	# Register all hosts
 	for host in hosts:
 		host_entry = HostTable(
+			host_type=host['host_type'],
 			host_name=host['host_name'],
 			host_lang=host['host_lang'],
 			host_url=host['host_url']

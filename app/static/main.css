@@ -179,6 +179,34 @@ input[type=number] {
   font-size: 87.5%;
   color: inherit;
 }
+.spinner_cust{
+  display: none;
+}
+.flash_msg_div{
+  font-size: 1rem;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.flash_msg_success{
+  color: #009e00;
+  background: #b4ff9e;
+  border-color: #009e00;
+}
+.flash_msg_warning{
+  color: #9e8f00;
+  background: #fff994;
+  border-color: #9e8f00;
+}
+.flash_msg_danger{
+  color: #9e0000;
+  background: #ff988b;
+  border-color: #9e0000;
+}
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
 section.section_index{
@@ -442,12 +470,15 @@ pre#unbootstrap{
 
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
-.register_modal_cust{
+.register_novel_modal_cust{
   border: 1px solid #40cc60;
   border-left: 0.5rem solid #40cc60;
 }
 .register_novel_header{
   color: #40cc60;
+}
+#register_novel_spinner{
+  color: #40cc60 !important;
 }
 
 /*----------------------[ Edit Novel Modal stylings ]----------------------*/
@@ -458,6 +489,9 @@ pre#unbootstrap{
 .edit_novel_header{
   color: #cc406b;
 }
+#edit_novel_spinner{
+  color: #cc406b !important;
+}
 
 /*----------------------[ Remove Novel Modal stylings ]----------------------*/
 .remove_modal_cust{
@@ -466,6 +500,9 @@ pre#unbootstrap{
 }
 .remove_novel_header{
   color: #fff;
+}
+#remove_novel_spinner{
+  color: #9c0000 !important;
 }
 .remove_warning_div{
   width: 80%;

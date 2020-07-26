@@ -29,7 +29,7 @@
 			<div class="library_sidepanel">
 				<!-- Register button -->
 				<div style="padding: 1rem 0;">
-					<button type="button" class="menu_button menu_button_small modal_trigger" id="menu_library_register" data-toggle="modal" data-target="#register_modal_push" title="Add Series">
+					<button type="button" class="menu_button menu_button_small modal_trigger" id="menu_library_register" data-toggle="modal" data-target="#register_novel_modal_push" title="Add Series">
 						<div class="button_icon">
 							<ion-icon name="add-outline"></ion-icon>
 						</div>
@@ -47,9 +47,28 @@
 				</div>
 			</div>
 			<div class="library_mainpanel">
+				<!-- Novel entries -->
 				{% for novel in series %}
 					{{ series_entry(novel) }}
 				{% endfor %}
+
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					<div class="flash_msg_div">
+						{% for category, message in messages %}
+							{% if category == 'success' or category == 'warning' or category == 'danger'%}
+							<div class="alert alert-dismissible fade show flash_msg_{{category}}" role="alert">
+								{{ message }}
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							{% endif %}
+						{% endfor %}
+					</div>
+					{% endif %}
+				{% endwith %}
 			</div>
 		</div>
 	</section>

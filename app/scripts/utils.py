@@ -7,6 +7,11 @@
 
 # Python imports
 from tempfile import TemporaryFile
+from urllib.request import Request
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from time import sleep
+import ssl
 
 # Internal imports
 from app import db
@@ -16,10 +21,46 @@ from app.forms import RemoveNovelForm
 from app.models import SeriesTable
 from app.models import DictionariesTable
 from app.models import HostTable
+from app.models import Language
+from app.scripts import htmlparser
+from app.scripts.htmlparser import Host
 
 
-def getLatestChapter(series_code):
-	return 0
+def fetchHtml(url, lang):
+	"""-------------------------------------------------------------------
+		Function:		[fetchHtml]
+		Description:	Tries to prompt a response url and return the received
+						HTML content as a UTF-8 decoded string
+		Input:
+		  [url]			The url to make the request to
+		  [lang]		The page's language (Language Enum)
+		Return: 		The HTML content of the given website address
+		------------------------------------------------------------------
+	"""
+	try:
+		headers = { 'User-Agent' : 'Mozilla/5.0' }
+		request = Request(url, None, headers)
+		response = urlopen(request, context=ssl._create_unverified_context())
+	except Exception as e:
+		return None
+
+	# Read and decode the response according to series language
+	source = response.read()
+	if lang == Language.JP:
+		data = source.decode('utf8')
+	elif lang == Language.CN:
+		data = source.decode('gbk')
+
+	return data
+
+def getLatestChapter(series_code, host_entry):
+	res = 0
+	source_url = host_entry.host_url + series_code
+	source_html = fetchHtml(source_url, host_entry.host_lang)
+	if source_html is not None:
+		html_parser = htmlparser.createParser(host_entry.host_type)
+		res = html_parser.getLatestChapter(source_html)
+	return res
 
 def registerSeriesToDatabase(reg_form):
 	# Rip relevant information
@@ -27,7 +68,7 @@ def registerSeriesToDatabase(reg_form):
 	series_title = str(reg_form.title.data)
 	series_abbr = str(reg_form.abbr.data)
 
-	host_entry = HostTable.query.filter_by(host_name="Syosetu").first()
+	host_entry = HostTable.query.filter_by(host_type=Host(reg_form.series_host.data)).first()
 
 	# Check database for preexisting dictionary if this series is being re-registered
 	dict_entry = DictionariesTable.query.filter_by(series_code=series_code).first()
@@ -59,7 +100,7 @@ def registerSeriesToDatabase(reg_form):
 		title=series_title,
 		abbr=series_abbr,
 		current_ch=0,
-		latest_ch=getLatestChapter(series_code),
+		latest_ch=getLatestChapter(series_code, host_entry),
 		dict_id=dict_entry.id,
 		host_id=host_entry.id,
 	)

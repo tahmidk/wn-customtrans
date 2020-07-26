@@ -10,12 +10,12 @@ from enum import Enum
 
 # Internal imports
 from app import db
+from app.scripts.htmlparser import Host
 
 # Language enumeration
 class Language(Enum):
     JP = 1
     CN = 2
-
 
 # Database models
 class SeriesTable(db.Model):
@@ -45,6 +45,7 @@ class DictionariesTable(db.Model):
 
 class HostTable(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	host_type = db.Column(db.Enum(Host), unique=True, nullable=False)
 	host_name = db.Column(db.String(), unique=True, nullable=False)
 	host_lang = db.Column(db.Enum(Language), nullable=False)
 	host_url = db.Column(db.String(), unique=True, nullable=False)

@@ -9,8 +9,13 @@ function setupModalForm(btn_id, modal_id, form_id){
 	// Set up the trigger button and error display
 	$(btn_id).click(function (event) {
 		event.preventDefault();
+		// Make spinner visible
+		$(btn_id).prev().css("display", "block");
+
+		// Make a post request to the route responsible for handling the form's backend
 		var url = $(form_id)[0].action;
 		$.post(url, data=$(form_id).serialize(), function(data) {
+			$(btn_id).prev().css("display", "none");
 			if (data.status == 'ok') {
 				$(modal_id).modal('hide');
 				location.reload();
@@ -26,7 +31,7 @@ function setupModalForm(btn_id, modal_id, form_id){
 				var errors_dict = JSON.parse(data);
 				for (var field in errors_dict) {
 					if (errors_dict.hasOwnProperty(field)) {
-						var erroneous_input_id = 'input#' + field;
+						var erroneous_input_id = '#' + field;
 						var erroneous_input = $(modal_id)[0].querySelector(erroneous_input_id);
 						erroneous_input.classList.add('is-invalid');
 						var invalid_feedback_div = document.createElement('div');
@@ -59,7 +64,7 @@ function setupModalForm(btn_id, modal_id, form_id){
 function setupLibrary(){
 	// Register novel components
 	var reg_novel_submit = '#register_novel_submit_btn';
-	var reg_novel_modal = '#register_modal_push';
+	var reg_novel_modal = '#register_novel_modal_push';
 	var reg_novel_form = '#register_novel_form';
 	// Edit novel components
 	var edit_novel_submit = '#edit_novel_submit_btn';

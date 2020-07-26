@@ -11,6 +11,7 @@ from flask import url_for
 from flask import jsonify
 from flask import request
 from flask import send_file
+from flask import flash
 
 # Internal imports
 from app import app
@@ -58,6 +59,10 @@ def library_register_novel():
 	register_novel_form = RegisterNovelForm()
 	if register_novel_form.validate_on_submit():
 		series_entry = utils.registerSeriesToDatabase(register_novel_form)
+		if series_entry.latest_ch == 0:
+			flash("Couldn't pull latest chapter for submitted series from host. \
+				Try hitting \'Update\' later", "warning")
+		flash("%s was successfully registered!" % series_entry.abbr, "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(register_novel_form.errors, ensure_ascii=False)
@@ -72,6 +77,7 @@ def library_edit_novel(series_code):
 		series_entry.title = edit_novel_form.title.data
 		series_entry.abbr = edit_novel_form.abbr.data
 		db.session.commit()
+		flash("Changes have been applied!", "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
@@ -83,12 +89,15 @@ def library_remove_novel(series_code):
 	remove_novel_form = RemoveNovelForm()
 	if remove_novel_form.validate_on_submit():
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
+		series_abbr = series_entry.abbr
 		if not remove_novel_form.opt_keep_dict.data:
 			dict_entry = DictionariesTable.query.filter_by(id=series_entry.dict_id).first()
 			db.session.delete(dict_entry)
+			flash("Removed dictionary associated with %s" % series_abbr, "success")
 		db.session.delete(series_entry)
 		db.session.commit()
 
+		flash("Successfully removed %s!" % series_abbr, "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(remove_novel_form.errors, ensure_ascii=False)
