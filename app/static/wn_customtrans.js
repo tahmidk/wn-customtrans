@@ -63,7 +63,7 @@ function setupModalForm(btn_id, modal_id, form_id){
  * 		message - The message to display
  * 		category - flash message's category
  */
-function createFlashMessage(message, category){
+function createFlashMessage(message, category, flash_loc){
 	var flash_div_wrapper = document.createElement("div");
 	flash_div_wrapper.classList.add("flash_msg_div");
 	var flash_div = document.createElement("div");
@@ -88,7 +88,7 @@ function createFlashMessage(message, category){
 	flash_div.appendChild(message_span);
 	flash_div.appendChild(close_btn);
 	flash_div_wrapper.appendChild(flash_div);
-	$(".library_mainpanel")[0].appendChild(flash_div_wrapper);
+	$(flash_loc)[0].appendChild(flash_div_wrapper);
 }
 
 /*===================================================================*/
@@ -197,7 +197,7 @@ function setupLibrary(){
 			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
 				var msg = "An network error occurred when requesting updates for " + series_abbr;
 				var category = "danger";
-				createFlashMessage(msg, category);
+				createFlashMessage(msg, category, ".library_mainpanel");
 			}
 		}
 	});
@@ -235,16 +235,42 @@ function setupTableOfContents(){
 				}
 			}
 		});
+	});
 
+	// Menu button events
+	$("#jump_to_curr_btn").click(function() {
+		try{
+			$('html, body').animate({
+				scrollTop: $("#current_ch").offset().top - document.documentElement.clientHeight/2
+			}, 500);
+		}
+		catch(err){ /* Do nothing */ }
+	});
+	var update_series_btn_enabled = true;
+	$('#update_series_btn').click(function(){
+		if(!update_series_btn_enabled){
+			return
+		}
+		update_series_btn_enabled = false;
+
+		// Make a post request to the route responsible for handling the form's backend
+		createFlashMessage("Fetching latest chapters... please wait a few seconds", "warning", ".toc_menu_listing");
+		var update_btn = $(this)[0];
+		var url = update_btn.getAttribute('action');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				update_series_btn_enabled = true;
+				location.reload();
+			}
+		});
+	});
+	$('#rmv_all_bkmk_btn').click(function() {
+		var rmv_all_bkmk_btn = $(this)[0];
+		var url = rmv_all_bkmk_btn.getAttribute('action');
+		$.post(url, function(data){
+			if(data.status == 'ok') {
+				location.reload();
+			}
+		});
 	});
 }
-
-// Set AJAX to submit requests with form csrf token
-/*var csrftoken = $('#csrf_token').attr('value');
-$.ajaxSetup({
-	beforeSend: function(xhr, settings) {
-		if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-			xhr.setRequestHeader("X-CSRFToken", csrftoken)
-		}
-	}
-})*/

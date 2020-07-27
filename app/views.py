@@ -141,12 +141,21 @@ def library_series_toc(series_code):
 		series=series_entry,
 		series_host_url=series_host_url)
 
-#@csrf.exempt
+
+# Route for updating a specific 'series'
+@app.route("/library/<series_code>/update", methods=["POST"])
+def library_series_update(series_code):
+	series_entry = SeriesTable.query.filter_by(code=series_code).first()
+	num_updates = utils.updateSeries(series_entry)
+	return jsonify(status='ok')
+
+
+# Route for removing a specific bookmark
 @app.route("/library/<series_code>/bookmark/<ch>", methods=["POST"])
 def library_series_toc_bookmark(series_code, ch):
 	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
-	if(ch in series_entry.bookmarks):
+	if ch in series_entry.bookmarks:
 		series_entry.bookmarks.remove(ch)
 		db.session.add(series_entry)
 		db.session.commit()
@@ -156,6 +165,16 @@ def library_series_toc_bookmark(series_code, ch):
 	db.session.add(series_entry)
 	db.session.commit()
 	return jsonify(status='ok', action='add_bookmark', target_ch=ch)
+
+
+# Route for removing all bookmarks
+@app.route("/library/<series_code>/bookmark/*", methods=["POST"])
+def library_series_toc_bookmark_all(series_code):
+	series_entry = SeriesTable.query.filter_by(code=series_code).first();
+	series_entry.bookmarks = []
+	db.session.add(series_entry)
+	db.session.commit()
+	return jsonify(status='ok')
 
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<ch>")

@@ -575,6 +575,9 @@ pre#unbootstrap{
   width: fit-content;
   cursor: pointer;
 }
+.toc_chapter_text:hover{
+  filter: brightness(2);
+}
 .toc_chapter_bookmark{
   position: absolute;
   display: none;
@@ -586,6 +589,7 @@ pre#unbootstrap{
 }
 .toc_chapter_bookmark:hover {
   color: #ffc946;
+  filter: brightness(1.1);
 }
 .toc_chapter_bookmark_btn {
   border: none;
@@ -597,10 +601,61 @@ pre#unbootstrap{
 .viewed_chapter{
   color: #b71717;
 }
+.current_chapter{
+  color: #63d800;
+}
 .bookmarked_chapter{
   border-bottom: 1px solid #ffc946 !important;
 }
 .active_bookmark{
   display: block;
   color: #ffc946 !important;
+}
+.toc_menu_listing{
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.toc_menu_btn{
+  margin: auto 0.5rem;
+  font-variant: all-petite-caps;
+  font-size: 1.2rem;
+}
+.toc_menu_btn ion-icon{
+  margin: 0 0.2rem -0.2rem 0.2rem;
+}
+#rmv_all_bkmk_btn{
+  float: right;
+}
+#jump_to_curr_btn{
+  float: left;
+}
+#update_series_btn{
+  float: left;
+}
+#series_dictionary_btn{
+  float: left;
+  color: #fb8200;
+  border-color: #fb8200;
+}
+#series_dictionary_btn:hover{
+  color: #fff;
+  background-color: #fb8200;
+  border-color: #fb8200;
+}
+.no_chapters_img_div{
+  margin: 10rem auto 2rem auto;
+  width: fit-content;
+}
+.no_chapters_img{
+  border-radius: 4rem;
+  width: 25rem;
+}
+.no_chapters_text_div{
+  width: fit-content;
+  margin: auto;
+  color: #656565;
+  font-size: 3rem;
+  font-variant: all-petite-caps;
+  font-family: monospace;
 }

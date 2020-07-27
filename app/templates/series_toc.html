@@ -18,21 +18,64 @@
 			<hr style="border-top: 1px solid #000">
 		</div>
 		<div class="toc_body">
-			{% for index in range(series.latest_ch) %}
-				{% set ch = index + 1 %}
-				{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch)  %}
-				{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch)  %}
-				{% set visited = ch < series.current_ch %}
-				{% set bookmarked = ch in series.bookmarks %}
-				<div class="toc_chapter {{'viewed_chapter' if visited}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
-					<div class="toc_chapter_text" onclick="window.open('{{series_base_url}}')">
-						Chapter {{ch}}
-					</div>
-					<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
-						<ion-icon name="bookmark{{'-outline' if not bookmarked}}"></ion-icon>
-					</div>
+			<div class="toc_menu_listing">
+				<div style="width: 100%; margin: 1rem 0;">
+					<button type="button" class="btn btn-outline-success toc_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
+						<ion-icon name="code-download-outline"></ion-icon>
+						<span>Current</span>
+					</button>
+					<button type="button" class="btn btn-outline-warning toc_menu_btn" id="update_series_btn" title="Fetch the latest chapter"
+						action="{{url_for('library_series_update', series_code=series.code)}}">
+						<ion-icon name="sync-outline"></ion-icon>
+						<span>Update</span>
+					</button>
+					<button type="button" class="btn btn-outline-primary toc_menu_btn" id="series_dictionary_btn" title="Open this series' dictionary"
+						action="{{url_for('library_series_update', series_code=series.code)}}">
+						<ion-icon name="reader-outline"></ion-icon>
+						<span>Dictionary</span>
+					</button>
+					<button type="button" class="btn btn-outline-danger toc_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
+						action="{{url_for('library_series_toc_bookmark_all', series_code=series.code)}}">
+						<ion-icon name="bookmarks" style="font-size: 1rem; margin-bottom: -0.1rem;"></ion-icon>
+						<span>Remove All Bookmarks</span>
+					</button>
 				</div>
-			{% endfor %}
+			</div>
+			<div class="toc_main">
+				<div class="toc_chapter_listing">
+					{% if series.latest_ch == 0 %}
+						<!-- No chapters to display -->
+						<div class="no_chapters_img_div">
+							<img src="{{url_for('static', filename='0ee66d20ef99b9ee6753076213df9635.jpg')}}" class="no_chapters_img">
+						</div>
+						<div class="no_chapters_text_div">
+							No chapters here. Try hitting "update"
+						</div>
+					{% else %}
+						<!-- Non-empty chapter directory -->
+						{% for index in range(series.latest_ch) %}
+							{% set ch = index + 1 %}
+							{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch)  %}
+							{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch)  %}
+							{% set visited = ch < series.current_ch %}
+							{% set current = ch == series.current_ch %}
+							{% set bookmarked = ch in series.bookmarks %}
+
+							{% if current %}
+							<div id="current_ch"></div>
+							{% endif %}
+							<div class="toc_chapter {{'viewed_chapter' if visited}} {{'current_chapter' if current}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
+								<div class="toc_chapter_text" onclick="window.open('{{series_base_url}}')">
+									Chapter {{ch}}
+								</div>
+								<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
+									<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
+								</div>
+							</div>
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
 		</div>
 	</section>
 {% endblock %}
