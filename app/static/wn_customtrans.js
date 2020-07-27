@@ -61,11 +61,46 @@ function setupModalForm(btn_id, modal_id, form_id){
 	});
 }
 
+/*
+ *  Creates a client created flash message. JS equivalent of Flask's flash()
+ * 		message - The message to display
+ * 		category - flash message's category
+ */
+function createFlashMessage(message, category){
+	var flash_div_wrapper = document.createElement("div");
+	flash_div_wrapper.classList.add("flash_msg_div");
+	var flash_div = document.createElement("div");
+	flash_div.classList.add("alert");
+	flash_div.classList.add("alert-dismissible");
+	flash_div.classList.add("fade");
+	flash_div.classList.add("show");
+	flash_div.classList.add("flash_msg_" + category);
+	flash_div.setAttribute("role", "alert");
+
+	var message_span = document.createTextNode(message);
+	var close_btn = document.createElement("button");
+	close_btn.classList.add("close");
+	close_btn.setAttribute("type", "button");
+	close_btn.setAttribute("data-dismiss", "alert");
+	close_btn.setAttribute("aria-label", "Close");
+	var close_btn_span = document.createElement("span");
+	close_btn_span.setAttribute("aria-hidden", "true");
+	close_btn_span.innerText = "×";
+
+	close_btn.appendChild(close_btn_span);
+	flash_div.appendChild(message_span);
+	flash_div.appendChild(close_btn);
+	flash_div_wrapper.appendChild(flash_div);
+	$(".library_mainpanel")[0].appendChild(flash_div_wrapper);
+}
+
 function setupLibrary(){
 	// Register novel components
 	var reg_novel_submit = '#register_novel_submit_btn';
 	var reg_novel_modal = '#register_novel_modal_push';
 	var reg_novel_form = '#register_novel_form';
+	// Update library components
+	var update_btn = '#menu_library_update';
 	// Edit novel components
 	var edit_novel_submit = '#edit_novel_submit_btn';
 	var edit_novel_modal = '#edit_modal_push';
@@ -101,6 +136,70 @@ function setupLibrary(){
 
 		// Customize the remove form's action to the specific series
 		$(remove_novel_form)[0].action = remove_novel_action_base + '/' + code;
+	});
+
+	// Update button event sets up an SSE and listens for update progress
+	var update_btn_enabled = true;
+	$(update_btn).click(function(event){
+		// Disable update button while event is finishing up
+		if(!update_btn_enabled)	{ return; }
+		update_btn_enabled = false;
+
+		// Show the progress bar
+		$('#update_progress_bar')[0].setAttribute("style", "width: 0;");
+		$(".progress_bar_display").fadeIn().css("display","flex");
+
+		// Start SSE connection and listen for progress from server
+		var source = new EventSource("/library/update");
+		var ABBR_INDEX = 0;
+		var CH_UPDATES_INDEX = 1;
+		var CH_LATEST_INDEX = 2;
+		source.onmessage = function(event) {
+			progress_data = JSON.parse(event.data)
+
+			// Update the progress bar
+			var len_updated = progress_data['updated'].length;
+			var value = (len_updated / progress_data['num_series']) * 100;
+			var width_attr = "width: "+value+"%;";
+			$('#update_progress_bar')[0].setAttribute("style", width_attr);
+
+			// Close this connection when all entries have been updated
+			if(progress_data['num_series'] == len_updated){
+				source.close();
+				// Show updates on page
+				// progress_data[updated] is packed with info returned from updateSeries() method
+				// Each entry should be in the form (abbr, num_chapter_updates, latest_ch)
+				$.each(progress_data['updated'], function(index, value){
+					var series_abbr = value[ABBR_INDEX];
+					if(value[CH_UPDATES_INDEX] > 0){
+						var update_target = '#series_' + series_abbr + " .entry_minibanner .entry_updated";
+						var update_label = $(update_target);
+						var latest_ch_target = "#series_" + series_abbr + " .entry_details .entry_latest pre";
+						var latest_ch_label = $(latest_ch_target)[0];
+
+						setTimeout(() => {
+							update_label.css("display", "block");
+							latest_ch_label.innerText = " Latest: " + value[CH_LATEST_INDEX];
+						}, 1000);
+					}
+				});
+
+				// Hide progress bar and re-enable this button
+				setTimeout(() => {
+					$(".progress_bar_display").fadeOut();//.css("display", "none");
+					update_btn_enabled = true;
+				}, 1000);
+			}
+
+			// Display errors
+			var last = len_updated - 1;
+			var series_abbr = progress_data['updated'][last][ABBR_INDEX];
+			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
+				var msg = "An network error occurred when requesting updates for " + series_abbr;
+				var category = "danger";
+				createFlashMessage(msg, category);
+			}
+		}
 	});
 
 	// Setup the register novel modal

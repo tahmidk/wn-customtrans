@@ -54,6 +54,15 @@ def fetchHtml(url, lang):
 	return data
 
 def getLatestChapter(series_code, host_entry):
+	"""-------------------------------------------------------------------
+		Function:		[getLatestChapter]
+		Description:	Fetches the latest chapter directly from the series's host
+		Input:
+		  [series_code]	The identifying series code
+		  [host_entry] 	The HostTable entry associated with this series
+		Return:			Latest chapter number
+		------------------------------------------------------------------
+	"""
 	res = 0
 	source_url = host_entry.host_url + series_code
 	source_html = fetchHtml(source_url, host_entry.host_lang)
@@ -63,6 +72,15 @@ def getLatestChapter(series_code, host_entry):
 	return res
 
 def registerSeriesToDatabase(reg_form):
+	"""-------------------------------------------------------------------
+		Function:		[registerSeriesToDatabase]
+		Description:	Pushes user series info to database initializing
+						the associated dictionary as well
+		Input:
+		  [reg_form] 	The Flask novel registration form to process
+		Return:			The new series as a db Table entry
+		------------------------------------------------------------------
+	"""
 	# Rip relevant information
 	series_code = str(reg_form.series_code.data)
 	series_title = str(reg_form.title.data)
@@ -108,3 +126,25 @@ def registerSeriesToDatabase(reg_form):
 	db.session.commit()
 
 	return series_entry
+
+def updateSeries(series_entry):
+	"""-------------------------------------------------------------------
+		Function:		[updateSeries]
+		Description:	Updates a specific series
+		Input:
+		  [reg_form] 	The Flask novel registration form to process
+		Return:			Number of chapter updates on success
+						-1 on error
+		------------------------------------------------------------------
+	"""
+	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+	latest = getLatestChapter(series_entry.code, host_entry)
+	if latest == 0:
+		ret = -1
+	else:
+		ret = latest - series_entry.latest_ch;
+		series_entry.latest_ch = latest
+		db.session.add(series_entry)
+		db.session.commit()
+
+	return ret

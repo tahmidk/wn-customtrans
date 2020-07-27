@@ -12,6 +12,7 @@ from flask import jsonify
 from flask import request
 from flask import send_file
 from flask import flash
+from flask import Response
 
 # Internal imports
 from app import app
@@ -30,11 +31,13 @@ from io import BytesIO
 
 
 
+
 # This is the route for the main page
 @app.route("/")
 def index():
 	return render_template('index.html',
 		title='CustomTrans')
+
 
 # The following 4 routes are the routes for the 4 main page buttons
 @app.route("/library")
@@ -53,6 +56,7 @@ def library():
 		edit_form=edit_novel_form,
 		rmv_form=remove_novel_form)
 
+
 # Background route to process register novel form
 @app.route("/library/register_novel", methods=["POST"])
 def library_register_novel():
@@ -68,6 +72,25 @@ def library_register_novel():
 	data = json.dumps(register_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
 
+
+# Background route to process update
+@app.route("/library/update")
+def library_update():
+	def update_streamer():
+		# Since context is lost in request, test_request_context() is needed to preserve it
+		with app.test_request_context("/library"):
+			data = {}
+			all_series = SeriesTable.query.all()
+			data['num_series'] = len(all_series)
+			data['updated'] = []
+			for index in range(0, len(all_series)):
+				series_entry = all_series[index]
+				num_updates = utils.updateSeries(series_entry)
+				data['updated'].append((series_entry.abbr, num_updates, series_entry.latest_ch))
+				yield 'data: %s\n\n' % json.dumps(data)
+	return Response(update_streamer(), mimetype="text/event-stream")
+
+
 # Background route to process edit novel form
 @app.route("/library/edit_novel/<series_code>", methods=["POST"])
 def library_edit_novel(series_code):
@@ -82,6 +105,7 @@ def library_edit_novel(series_code):
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
+
 
 # Background route to process remove novel form
 @app.route("/library/remove_novel/<series_code>", methods=["POST"])
@@ -103,6 +127,7 @@ def library_remove_novel(series_code):
 	data = json.dumps(remove_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
 
+
 # Route for the table of content for given 'series'
 @app.route("/library/<series_code>")
 def library_series_toc(series_code):
@@ -115,6 +140,7 @@ def library_series_toc(series_code):
 		series=series_entry,
 		series_host_url=series_host_url)
 
+
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<ch>")
 def library_series_chapter(series_code, ch):
@@ -122,9 +148,12 @@ def library_series_chapter(series_code, ch):
 	return "Displaying %s chapter %s" % (series_entry.title, ch)
 
 
+# Route for Dictionaries view
 @app.route("/dictionaries")
 def dictionaries():
 	return "TODO: Implement Dictionaries Page"
+
+
 
 # @app.route("/dictionaries/upload/<series>", methods=["POST"])
 # def dictionaries_upload_dict(series):
@@ -136,6 +165,8 @@ def dictionaries():
 
 # 	return 'Saved %s to the database!' % dict_file.filename
 
+
+
 # @app.route("/dictionaries/download/<series>", methods=["POST"])
 # def dictionaries_download_dict(series):
 # 	dict_file = Query SQLAlchemy
@@ -143,6 +174,7 @@ def dictionaries():
 # 	return send_file(BytesIO(dict_file.file_data), attachment_filename=fname, as_attachment=True)
 
 
+# Route for Tutorial page
 @app.route("/tutorial")
 def tutorial():
 	register_novel_form = RegisterNovelForm()
@@ -150,6 +182,8 @@ def tutorial():
 		title="Tutorial",
 		reg_form=register_novel_form)
 
+
+# Route for user settings
 @app.route("/settings")
 def settings():
 	return "TODO: Implement Settings Page"

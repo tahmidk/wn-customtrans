@@ -57,8 +57,8 @@ test_series = [
 	{
 		"title": "Surrounded By Four",
 		"abbr": "Surrounded",
-		"current": 50,
-		"latest": 57,
+		"current": 0,
+		"latest": 0,
 		"code": "n9450ge"
 	},
 ]

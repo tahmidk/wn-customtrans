@@ -207,6 +207,31 @@ input[type=number] {
   background: #ff988b;
   border-color: #9e0000;
 }
+.progress_bar_display{
+  position: fixed;
+  z-index: 1;
+  display: none;
+  left: 30%;
+  bottom: 1rem;
+  width: 40%;
+  background: #ffdd9a;
+  padding: 2rem 4rem;
+  border: 1px solid #fbbc3f;
+  border-radius: 1rem;
+  box-sizing: border-box;
+}
+.progress_bar_label{
+  width: fit-content;
+  font-size: 1.5rem;
+  font-variant: all-petite-caps;
+  color: #c1891a;
+  margin-right: 2rem;
+}
+.progress_bar_container{
+  width: -webkit-fill-available;
+  height: fit-content;
+  margin: auto;
+}
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
 section.section_index{
@@ -321,7 +346,7 @@ section.section_library{
 }
 /* Sidepanel stuff */
 #menu_library_register{
-  box-shadow: 0 0 0 0.1vw #61ff85;
+  box-shadow: 0 0 0 0.2rem #61ff85;
   background: inherit;
   color: #61ff85;
 }
@@ -330,7 +355,7 @@ section.section_library{
   color: #fff;
 }
 #menu_library_update{
-  box-shadow: 0 0 0 0.1vw #ffdc8d;
+  box-shadow: 0 0 0 0.2rem #ffdc8d;
   background: inherit;
   color: #ffdc8d;
 }
