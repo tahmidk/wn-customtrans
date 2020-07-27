@@ -115,6 +115,7 @@ def reinitDatabase():
 				abbr=series['abbr'],
 				current_ch=series['current'],
 				latest_ch=series['latest'],
+				bookmarks=[1, 3],
 				dict_id=dict_entry.id,
 				host_id=host_entry.id
 			)

@@ -11,7 +11,7 @@
 		<!-- Main content -->
 		<div class="toc_header">
 			<div class="toc_series_title_div" onclick="window.open('{{series_host_url}}');">
-				<span style="cursor: pointer;"> The Long Long Series Title Goes Right Here in this DIV </span>
+				<span style="cursor: pointer;"> {{series.title}} </span>
 			</div>
 		</div>
 		<div style="width: 60%; margin: auto;">
@@ -21,19 +21,24 @@
 			{% for index in range(series.latest_ch) %}
 				{% set ch = index + 1 %}
 				{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch)  %}
-				{% if ch < series.current_ch %}
-					<div class="toc_chapter viewed_chapter" id="{{ch}}">
-				{% else %}
-					<div class="toc_chapter" id="{{ch}}">
-				{% endif %}
-						<div class="toc_chapter_text" onclick="window.open('{{series_base_url ~ ch}}')">
-							Chapter {{ch}}
-						</div>
-						<div class="toc_chapter_bookmark">
-							<ion-icon name="bookmark"></ion-icon>
-						</div>
+				{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch)  %}
+				{% set visited = ch < series.current_ch %}
+				{% set bookmarked = ch in series.bookmarks %}
+				<div class="toc_chapter {{'viewed_chapter' if visited}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
+					<div class="toc_chapter_text" onclick="window.open('{{series_base_url}}')">
+						Chapter {{ch}}
 					</div>
+					<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
+						<ion-icon name="bookmark{{'-outline' if not bookmarked}}"></ion-icon>
+					</div>
+				</div>
 			{% endfor %}
 		</div>
 	</section>
 {% endblock %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupTableOfContents();
+	});
+{% endblock%}

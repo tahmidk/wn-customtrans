@@ -21,7 +21,6 @@ from wtforms.validators import Length
 from wtforms.validators import Regexp
 
 # Internal imports
-from app import db
 from app.models import SeriesTable
 from app.models import HostTable
 from app.scripts.htmlparser import Host
@@ -50,7 +49,7 @@ class RegisterNovelForm(FlaskForm):
 	# Field: series_host - The host configuration for this series
 	host_entries = HostTable.query.all()
 	host_selection = [(host.host_type.value, host.host_name) for host in host_entries]
-	series_host = SelectField("Host", choices=host_selection, default=host_selection[0], coerce=int)
+	series_host = SelectField("Host", choices=host_selection, coerce=int, default=host_selection[0])
 
 	# Field: series_code - The identifying code for this series
 	series_code_validators = [

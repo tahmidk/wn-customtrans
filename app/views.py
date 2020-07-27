@@ -15,8 +15,9 @@ from flask import flash
 from flask import Response
 
 # Internal imports
-from app import app
 from app import db
+from app import app
+from app import csrf
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
@@ -133,13 +134,28 @@ def library_remove_novel(series_code):
 def library_series_toc(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
-	series_host_url = host_entry.host_url + series_entry.abbr
+	series_host_url = host_entry.host_url + series_entry.code
 	return render_template('series_toc.html',
 		title=series_entry.abbr,
 		back_href=url_for('library'),
 		series=series_entry,
 		series_host_url=series_host_url)
 
+#@csrf.exempt
+@app.route("/library/<series_code>/bookmark/<ch>", methods=["POST"])
+def library_series_toc_bookmark(series_code, ch):
+	ch = int(ch)
+	series_entry = SeriesTable.query.filter_by(code=series_code).first();
+	if(ch in series_entry.bookmarks):
+		series_entry.bookmarks.remove(ch)
+		db.session.add(series_entry)
+		db.session.commit()
+		return jsonify(status='ok', action='rmv_bookmark', target_ch=ch)
+
+	series_entry.bookmarks.append(ch)
+	db.session.add(series_entry)
+	db.session.commit()
+	return jsonify(status='ok', action='add_bookmark', target_ch=ch)
 
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<ch>")

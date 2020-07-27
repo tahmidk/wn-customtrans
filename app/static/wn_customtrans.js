@@ -49,9 +49,6 @@ function setupModalForm(btn_id, modal_id, form_id){
 		})
 	});
 
-	// Dynamically set action on form
-	//$()
-
 	// Clear any errors from previous displays when being redisplayed
 	$(modal_id).on('hidden.bs.modal', function (event) {
 		$('.invalid-feedback').remove();
@@ -94,6 +91,9 @@ function createFlashMessage(message, category){
 	$(".library_mainpanel")[0].appendChild(flash_div_wrapper);
 }
 
+/*===================================================================*/
+/*======================[ Page Setup Functions]======================*/
+/*===================================================================*/
 function setupLibrary(){
 	// Register novel components
 	var reg_novel_submit = '#register_novel_submit_btn';
@@ -147,7 +147,7 @@ function setupLibrary(){
 
 		// Show the progress bar
 		$('#update_progress_bar')[0].setAttribute("style", "width: 0;");
-		$(".progress_bar_display").fadeIn().css("display","flex");
+		$(".progress_bar_display").fadeIn()//.css("display","flex");
 
 		// Start SSE connection and listen for progress from server
 		var source = new EventSource("/library/update");
@@ -212,12 +212,39 @@ function setupLibrary(){
 	setupModalForm(remove_novel_submit, remove_novel_modal, remove_novel_form);
 }
 
+function setupTableOfContents(){
+	// Bookmark events
+	$('.toc_chapter_bookmark').click(function(event){
+		// Make a post request to the route responsible for handling the form's backend
+		var bookmark_btn = $(this)[0];
+		var url = bookmark_btn.getAttribute('action');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				var ch_div = $('#'+data.target_ch)[0];
+				var bkmk_btn = ch_div.querySelector(".toc_chapter_bookmark");
+				var bkmk_ico = bkmk_btn.querySelector("ion-icon");
+				if(data.action == 'add_bookmark'){
+					ch_div.classList.add("bookmarked_chapter");
+					bkmk_btn.classList.add("active_bookmark");
+					bkmk_ico.setAttribute("name", "bookmark");
+				}
+				else if(data.action == 'rmv_bookmark'){
+					ch_div.classList.remove("bookmarked_chapter");
+					bkmk_btn.classList.remove("active_bookmark");
+					bkmk_ico.setAttribute("name", "bookmark-outline");
+				}
+			}
+		});
+
+	});
+}
+
 // Set AJAX to submit requests with form csrf token
-var csrftoken = $('#csrf_token').attr('value');
+/*var csrftoken = $('#csrf_token').attr('value');
 $.ajaxSetup({
 	beforeSend: function(xhr, settings) {
 		if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
 			xhr.setRequestHeader("X-CSRFToken", csrftoken)
 		}
 	}
-})
+})*/

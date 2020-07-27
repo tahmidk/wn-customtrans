@@ -18,6 +18,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wnct_database.db'
 db = SQLAlchemy(app)
 
 # Secure web app forms against CSRF
-CsrfProtect(app)
+csrf = CsrfProtect(app)
 
 from app import views

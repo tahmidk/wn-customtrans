@@ -211,21 +211,22 @@ input[type=number] {
   position: fixed;
   z-index: 1;
   display: none;
-  left: 30%;
+  left: 50%;
   bottom: 1rem;
-  width: 40%;
-  background: #ffdd9a;
-  padding: 2rem 4rem;
-  border: 1px solid #fbbc3f;
+  margin-left: -25rem;
+  width: 50rem;
+  background: #fff0d9;
+  padding: 1.5rem 4rem;
+  border: 2px solid #fbbc3f;
   border-radius: 1rem;
   box-sizing: border-box;
 }
 .progress_bar_label{
   width: fit-content;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-variant: all-petite-caps;
   color: #c1891a;
-  margin-right: 2rem;
+  margin: auto;
 }
 .progress_bar_container{
   width: -webkit-fill-available;
@@ -563,11 +564,12 @@ pre#unbootstrap{
 .toc_chapter{
   position: relative;
   margin: 1.5rem 1rem;
+  padding: 0.1rem 0;
   font-size: 1.7rem;
   font-variant: all-petite-caps;
 }
 .toc_chapter:hover{
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #828282;
 }
 .toc_chapter_text{
   width: fit-content;
@@ -576,13 +578,29 @@ pre#unbootstrap{
 .toc_chapter_bookmark{
   position: absolute;
   display: none;
-  color: #000;
+  cursor: pointer;
+  color: #828282;
   right: 0;
   top: 0;
+
+}
+.toc_chapter_bookmark:hover {
+  color: #ffc946;
+}
+.toc_chapter_bookmark_btn {
+  border: none;
+  color: inherit;
 }
 .toc_chapter:hover > .toc_chapter_bookmark{
   display: block;
 }
 .viewed_chapter{
-  color: #dc6060;
+  color: #b71717;
+}
+.bookmarked_chapter{
+  border-bottom: 1px solid #ffc946 !important;
+}
+.active_bookmark{
+  display: block;
+  color: #ffc946 !important;
 }
