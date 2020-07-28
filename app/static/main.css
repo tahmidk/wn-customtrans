@@ -1,6 +1,34 @@
 /*---------------------------[ General Stylings ]-----------------------*/
 html{
   scroll-behavior: smooth;
+
+  /* Color definitions */
+  --back_btn_color: #828282;
+  --white_contrast_font_color: #828282;
+
+  /* Main page palette */
+  --library_color_primary: #ef6565;
+  --dictionary_color_primary: #efa05d;
+  --tutorial_color_primary: #aaff77;
+  --settings_color_primary: #97ecff;
+
+  /* Library palette */
+  --update_library_button_color: #ffdc8d;
+  --register_novel_button_color: #61ff85;
+  --register_novel_modal_color: #40cc60;
+  --remove_novel_modal_color_primary: #9c0000;
+  --remove_novel_modal_color_secondary: #dc3545;
+  --edit_novel_modal_color: #cc406b;
+
+  --series_entry_btn_color: #c73939;
+  --series_entry_hover_color: #dc6060;
+  --series_entry_text_color: #9c2929;
+  --series_updated_tag_color: #8dff98;
+  --series_updated_tag_hover_color: #8cd630;
+
+  /* TOC palette */
+  --toc_dictionary_btn_color: #fb8200;
+  --toc_bookmarked_highlight: #ffc946;
 }
 body{
   margin:0;
@@ -76,7 +104,7 @@ input[type=number] {
   padding: 0.5em 0.5em;
   margin: 0.2em 0 0.2em 0.2em;
   color: #fff;
-  background: #ef6565;
+  background: var(--library_color_primary);
   border-radius: 0.1em;
   font-size: 2em;
 }
@@ -86,7 +114,7 @@ input[type=number] {
   top: 0;
   width: fit-content;
   padding: 0.5rem 1rem;
-  box-shadow: 0 0 0 0.1rem #828282;
+  box-shadow: 0 0 0 0.1rem var(--back_btn_color);
   border-radius: 0.4rem;
   font-variant: all-petite-caps;
   font-weight: bold;
@@ -100,7 +128,7 @@ input[type=number] {
   -o-user-select: none;
 }
 .back_button:hover{
-  background: #828282;
+  background: var(--back_btn_color);
   color: #fff;
 }
 .menu_button{
@@ -286,35 +314,35 @@ section.section_index{
   box-sizing: border-box;
 }
 #menu_library{
-  box-shadow: 0 0 0 0.2rem #ef6565;
-  color: #ef6565;
+  box-shadow: 0 0 0 0.2rem var(--library_color_primary);
+  color: var(--library_color_primary);
 }
 #menu_library:hover {
-  background-color: #ef6565;
+  background-color: var(--library_color_primary);
   color: #fff;
 }
 #menu_dictionaries{
-  box-shadow: 0 0 0 0.2rem #efa05d;
-  color: #efa05d;
+  box-shadow: 0 0 0 0.2rem var(--dictionary_color_primary);
+  color: var(--dictionary_color_primary);
 }
 #menu_dictionaries:hover {
-  background-color: #efa05d;
+  background-color: var(--dictionary_color_primary);
   color: #fff;
 }
 #menu_tutorial{
-  box-shadow: 0 0 0 0.2rem #aaff77;
-  color: #aaff77;
+  box-shadow: 0 0 0 0.2rem var(--tutorial_color_primary);
+  color: var(--tutorial_color_primary);
 }
 #menu_tutorial:hover {
-  background-color: #aaff77;
+  background-color: var(--tutorial_color_primary);
   color: #fff;
 }
 #menu_settings{
-  box-shadow: 0 0 0 0.2rem #97ecff;
-  color: #97ecff;
+  box-shadow: 0 0 0 0.2rem var(--settings_color_primary);
+  color: var(--settings_color_primary);
 }
 #menu_settings:hover {
-  background-color: #97ecff;
+  background-color: var(--settings_color_primary);
   color: #fff;
 }
 
@@ -325,7 +353,7 @@ section.section_library{
   padding: 1em;
 }
 #library_title{
-  color: #ef6565;
+  color: var(--library_color_primary);
 }
 .library_body{
   display: flex;
@@ -347,28 +375,28 @@ section.section_library{
 }
 /* Sidepanel stuff */
 #menu_library_register{
-  box-shadow: 0 0 0 0.2rem #61ff85;
+  box-shadow: 0 0 0 0.2rem var(--register_novel_button_color);
   background: inherit;
-  color: #61ff85;
+  color: var(--register_novel_button_color);
 }
 #menu_library_register:hover {
-  background-color: #61ff85;
+  background-color: var(--register_novel_button_color);
   color: #fff;
 }
 #menu_library_update{
-  box-shadow: 0 0 0 0.2rem #ffdc8d;
+  box-shadow: 0 0 0 0.2rem var(--update_library_button_color);
   background: inherit;
-  color: #ffdc8d;
+  color: var(--update_library_button_color);
 }
 #menu_library_update:hover {
-  background-color: #ffdc8d;
+  background-color: var(--update_library_button_color);
   color: #fff;
 }
 /* Mainpanel stuff */
 .library_series_entry{
   position: relative;
-  color: #9c2929;
-  box-shadow: 0 0 0 0.1em #ef6565;
+  color: var(--series_entry_text_color);
+  box-shadow: 0 0 0 0.1em var(--library_color_primary);
   margin: 0.5em 0;
   padding: 1em 2em;
   border-radius: 0.4em;
@@ -382,14 +410,14 @@ section.section_library{
 }
 .library_series_entry:hover{
   color: #fff;
-  background: #dc6060;
+  background: var(--series_entry_hover_color);
 }
 .library_series_entry:hover .entry_abbr{
-  color: #dc6060;
+  color: var(--series_entry_hover_color);
   background: #fff;
 }
 .library_series_entry:hover .entry_updated{
-  color: #8cd630;
+  color: var(--series_updated_tag_hover_color);
   background: #fff;
 }
 .entry_minibanner{
@@ -410,14 +438,14 @@ section.section_library{
 }
 .entry_abbr{
   color: #fff;
-  background: #ef6565;
-  box-shadow: 0 0 0 0.1em #ef6565;
+  background: var(--library_color_primary);
+  box-shadow: 0 0 0 0.1em var(--library_color_primary);
 }
 .entry_updated{
   display: none;
   color: #fff;
-  background: #8dff98;
-  box-shadow: 0 0 0 0.1em #8dff98;
+  background: var(--series_updated_tag_color);
+  box-shadow: 0 0 0 0.1em var(--series_updated_tag_color);
 }
 .entry_title{
   width: 80%;
@@ -430,9 +458,6 @@ section.section_library{
   padding: 0.5em 0;
   border-bottom: 1px solid;
 }
-.library_series_entry:hover .entry_title{
-  /*color: #c15656;*/
-}
 .entry_details{
   line-height: 1em;
   font-size: 1em;
@@ -442,7 +467,7 @@ section.section_library{
   width: fit-content;
   position: absolute;
   display: flex;
-  color: #9c2929;
+  color: var(--series_entry_text_color);
   font-size: 1.5rem;
   right: 0.5rem;
   bottom: 0.5rem;
@@ -464,26 +489,26 @@ section.section_library{
   display: flex;
   width: fit-content;
 }
-.download_btn{
+.series_entry_btn{
   display: flex;
   flex-direction: column;
   height: 100%;
   margin: 0 0.5rem;
   padding: 1.5rem;
   color: #fff;
-  background: #ef6565;
+  background: var(--library_color_primary);
   text-align: center;
   font-size: 1.2rem;
   font-variant: all-small-caps;
   border-radius: 0.5rem;
   cursor: pointer;
 }
-.download_btn:hover{
+.series_entry_btn:hover{
   background: #fff !important;
-  color: #c73939;
+  color: var(--series_entry_btn_color);
 }
-.library_series_entry:hover .download_btn{
-  background: #c73939;
+.library_series_entry:hover .series_entry_btn{
+  background: var(--series_entry_btn_color);
 }
 #opt_keep_dict{
   width: 1.5rem;
@@ -497,44 +522,44 @@ pre#unbootstrap{
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
 .register_novel_modal_cust{
-  border: 1px solid #40cc60;
-  border-left: 0.5rem solid #40cc60;
+  border: 1px solid var(--register_novel_modal_color);
+  border-left: 0.5rem solid var(--register_novel_modal_color);
 }
 .register_novel_header{
-  color: #40cc60;
+  color: var(--register_novel_modal_color);
 }
 #register_novel_spinner{
-  color: #40cc60 !important;
+  color: var(--register_novel_modal_color) !important;
 }
 
 /*----------------------[ Edit Novel Modal stylings ]----------------------*/
 .edit_modal_cust{
-  border: 1px solid #cc406b;
-  border-left: 0.5rem solid #cc406b;
+  border: 1px solid var(--edit_novel_modal_color);
+  border-left: 0.5rem solid var(--edit_novel_modal_color);
 }
 .edit_novel_header{
-  color: #cc406b;
+  color: var(--edit_novel_modal_color);
 }
 #edit_novel_spinner{
-  color: #cc406b !important;
+  color: var(--edit_novel_modal_color) !important;
 }
 
 /*----------------------[ Remove Novel Modal stylings ]----------------------*/
 .remove_modal_cust{
-  border: 1px solid #9c0000;
-  border-left: 0.5rem solid #9c0000;
+  border: 1px solid var(--remove_novel_modal_color_primary);
+  border-left: 0.5rem solid var(--remove_novel_modal_color_primary);
 }
 .remove_novel_header{
   color: #fff;
 }
 #remove_novel_spinner{
-  color: #9c0000 !important;
+  color: var(--remove_novel_modal_color_primary) !important;
 }
 .remove_warning_div{
   width: 80%;
   margin: 0 auto 3rem auto;
   padding: 1rem;
-  border: 2px solid #dc3545;
+  border: 2px solid var(--remove_novel_modal_color_secondary);
   border-radius: 1rem;
   font-size: 1.4rem;
 }
@@ -569,7 +594,7 @@ pre#unbootstrap{
   font-variant: all-petite-caps;
 }
 .toc_chapter:hover{
-  border-bottom: 1px solid #828282;
+  border-bottom: 1px solid var(--white_contrast_font_color);
 }
 .toc_chapter_text{
   width: fit-content;
@@ -582,18 +607,25 @@ pre#unbootstrap{
   position: absolute;
   display: none;
   cursor: pointer;
-  color: #828282;
+  color: var(--white_contrast_font_color);
   right: 0;
   top: 0;
 
 }
 .toc_chapter_bookmark:hover {
-  color: #ffc946;
+  color: var(--toc_bookmarked_highlight);
   filter: brightness(1.1);
 }
 .toc_chapter_bookmark_btn {
   border: none;
   color: inherit;
+}
+.bookmarked_chapter{
+  border-bottom: 1px solid var(--toc_bookmarked_highlight) !important;
+}
+.active_bookmark{
+  display: block;
+  color: var(--toc_bookmarked_highlight) !important;
 }
 .toc_chapter:hover > .toc_chapter_bookmark{
   display: block;
@@ -603,13 +635,6 @@ pre#unbootstrap{
 }
 .current_chapter{
   color: #63d800;
-}
-.bookmarked_chapter{
-  border-bottom: 1px solid #ffc946 !important;
-}
-.active_bookmark{
-  display: block;
-  color: #ffc946 !important;
 }
 .toc_menu_listing{
   overflow: auto;
@@ -635,13 +660,13 @@ pre#unbootstrap{
 }
 #series_dictionary_btn{
   float: left;
-  color: #fb8200;
-  border-color: #fb8200;
+  color: var(--toc_dictionary_btn_color);
+  border-color: var(--toc_dictionary_btn_color);
 }
 #series_dictionary_btn:hover{
   color: #fff;
-  background-color: #fb8200;
-  border-color: #fb8200;
+  background-color: var(--toc_dictionary_btn_color);
+  border-color: var(--toc_dictionary_btn_color);
 }
 .no_chapters_img_div{
   margin: 10rem auto 2rem auto;
@@ -654,8 +679,33 @@ pre#unbootstrap{
 .no_chapters_text_div{
   width: fit-content;
   margin: auto;
-  color: #656565;
+  color: var(--white_contrast_font_color);
   font-size: 3rem;
   font-variant: all-petite-caps;
   font-family: monospace;
+}
+
+
+/*---------------------[ Chapter Stylings ]-----------------------*/
+.section_chapter{
+  padding: 10rem 3rem;
+  max-width: 75rem;
+}
+.chapter_series_title_div{
+  width: fit-content;
+  margin: auto;
+  color: var(--white_contrast_font_color);
+  padding: 0.5rem 2rem;
+  text-align: center;
+  font-size: 3rem;
+  font-variant: small-caps;
+  line-height: 3.5rem;
+}
+.chapter_chapter_div{
+  width: fit-content;
+  margin: auto;
+  font-size: 1.5rem;
+  font-variant: all-petite-caps;
+  font-weight: bold;
+  color: #4e4e4e;
 }

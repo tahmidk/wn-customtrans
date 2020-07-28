@@ -15,7 +15,7 @@ from app.models import SeriesTable
 from app.models import DictionariesTable
 from app.models import HostTable
 from app.models import Language
-from app.scripts.htmlparser import Host
+from app.scripts.hostmanager import Host
 
 
 test_series = [

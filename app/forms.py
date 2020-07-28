@@ -23,7 +23,7 @@ from wtforms.validators import Regexp
 # Internal imports
 from app.models import SeriesTable
 from app.models import HostTable
-from app.scripts.htmlparser import Host
+from app.scripts.hostmanager import Host
 
 class RegisterNovelForm(FlaskForm):
 	'''

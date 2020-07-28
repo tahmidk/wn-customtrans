@@ -6,7 +6,7 @@
 #  Licensed under the BSD 3-Clause license found in the LICENSE file
 #=======================================================================
 
-# =========================[ Imports ]==========================
+# Python imports
 from abc import ABC, abstractmethod		# Pythonic abstract inheritance
 from enum import Enum 					# Pythonic enumerators
 import bs4 as soup 						# Python HTML query tool
@@ -28,38 +28,42 @@ class Host(Enum):
 	Biquyun = 1
 	Shu69 	= 2
 
-def createParser(host):
+def createManager(host):
 	"""-------------------------------------------------------------------
-		Function:		[createParser]
+		Function:		[createManager]
 		Description:	Given a host name, creates and returns the
-						appropriate HtmlParser
+						appropriate HostManager
 		Input:
 		  [host]		Host enum
-		Return:			Concrete HtmlParser-derived object
+		Return:			Concrete HostManager-derived object
 		-------------------------------------------------------------------
 	"""
 	if host == Host.Syosetu:
-		return SyosetuParser()
+		return SyosetuManager()
 	elif host == Host.Biquyun:
-		return BiquyunParser()
+		return BiquyunManager()
 	elif host == Host.Shu69:
-		return Shu69Parser()
+		return Shu69Manager()
 
 	return None
 
 #==========================================================================
-#	[HtmlParser]
+#	[HostManager]
 #	Generic abstract super class requiring children to implement a
-#	parseTitle and parseContent method. All parsers MUST inherit from
+#	parseTitle and parseContent method. All host managers MUST inherit from
 # 	this class.
 #==========================================================================
-class HtmlParser(ABC):
-	def __init__(self, table_needed):
-		# Is a page table needed for this parser
-		self.table_needed = table_needed
+class HostManager(ABC):
+	def __init__(self, base_url, host_type):
+		self.base_url = base_url
+		self.host_type = host_type
 
-	def needsPageTable(self):
-		return self.table_needed
+	# Accessor methods
+	def getBaseUrl():
+		return self.base_url
+
+	def getHostType():
+		return self.host_type
 
 	"""-------------------------------------------------------------------
 		Function:		[parseTitle]
@@ -95,13 +99,27 @@ class HtmlParser(ABC):
 		Return:			A list where the string at index i represents the url
 						chapter code of the (i+1)th chapter of this series
 
-		Note: 	Not required by all parsers. Only if chapters of the series
+		Note: 	Not required by all managers. Only if chapters of the series
 				have chapter codes in the URL that DOES NOT monotonically
 				increment by 1 from one chapter to the next
 		-------------------------------------------------------------------
 	"""
 	@abstractmethod
 	def parsePageTableFromWeb(self, html): pass
+
+	"""-------------------------------------------------------------------
+		Function:		[generateChapterUrl]
+		Description:	Generates the url to access chapter ch of the given
+						series from the host website this
+						manager object represents
+		Input:
+		  [series_code] The series code
+		  [ch] 			The integer chapter to download
+		Return:			The url to access chapter ch of the given series
+		-------------------------------------------------------------------
+	"""
+	@abstractmethod
+	def generateChapterUrl(self, series_code, ch): pass
 
 	"""-------------------------------------------------------------------
 		Function:		[getLatestChapter]
@@ -116,14 +134,16 @@ class HtmlParser(ABC):
 	def getLatestChapter(self, html): pass
 
 #==========================================================================
-#	[SyosetuParser]
-#	HtmlParser specialized for parsing html chapters taken from the
+#	[SyosetuManager]
+#	HostManager specialized for parsing html chapters taken from the
 #	https://ncode.syosetu.com domain
 #==========================================================================
-class SyosetuParser(HtmlParser):
+class SyosetuManager(HostManager):
 	def __init__(self):
 		# Page table not needed for Syosetu domain
-		super(SyosetuParser, self).__init__(False)
+		super(SyosetuManager, self).__init__(
+			"https://ncode.syosetu.com/",
+			Host.Syosetu)
 
 	def parseTitle(self, html):
 		title = re.findall(r'<p class="novel_subtitle">(.*?)</p>', html)
@@ -183,9 +203,12 @@ class SyosetuParser(HtmlParser):
 	#   https://ncode.syosetu.com/<ncode>/1 = Chapter 1
 	#   https://ncode.syosetu.com/<ncode>/2 = Chapter 2
 	#   ...
-	# So page table is not needed
+	# So page table is trivial
 	def parsePageTableFromWeb(self, html):
-		return None
+		return range(1, self.getLatestChapter(html)+1)
+
+	def generateChapterUrl(self, series_code, ch):
+		return self.base_url + series_code + "/" + str(ch)
 
 	def getLatestChapter(self, html):
 		pattern = re.compile(r"<dl class=\"novel_sublist2\">")
@@ -193,14 +216,16 @@ class SyosetuParser(HtmlParser):
 		return latest
 
 #==========================================================================
-#	[BiquyunParser]
-#	HtmlParser specialized for parsing html chapters taken from the
+#	[BiquyunManager]
+#	HostManager specialized for parsing html chapters taken from the
 #	https://www.biquyun.com/ domain
 #==========================================================================
-class BiquyunParser(HtmlParser):
+class BiquyunManager(HostManager):
 	def __init__(self):
 		# Page table needed for Biquyun domain
-		super(BiquyunParser, self).__init__(True)
+		super(BiquyunManager, self).__init__(
+			"https://www.biquyun.com/",
+			Host.Biquyun)
 
 	def parseTitle(self, html):
 		title = re.findall(r'<div class="bookname">\r\n\t\t\t\t\t<h1>(.*?)\
@@ -224,18 +249,23 @@ class BiquyunParser(HtmlParser):
 		page_table = re.findall(r'<a href="/.*?/(.*?)\.html">', html)
 		return page_table
 
+	def generateChapterUrl(self, series_code, ch):
+		return self.base_url + series_code + "/" + parsePageTableFromWeb()[ch-1]
+
 	def getLatestChapter(self, html):
 		return len(self.parsePageTableFromWeb(html))
 
 #==========================================================================
-#	[Shu69Parser]
-#	HtmlParser specialized for parsing html chapters taken from the
+#	[Shu69Manager]
+#	HostManager specialized for parsing html chapters taken from the
 #	https://www.69shu.org/book/ domain
 #==========================================================================
-class Shu69Parser(HtmlParser):
+class Shu69Manager(HostManager):
 	def __init__(self):
 		# Page table needed for Biquyun domain
-		super(Shu69Parser, self).__init__(True)
+		super(Shu69Manager, self).__init__(
+			"https://www.69shu.org/book/",
+			Host.Shu69)
 
 	def parseTitle(self, html):
 		html_soup = soup.BeautifulSoup(html, 'lxml')
@@ -266,6 +296,9 @@ class Shu69Parser(HtmlParser):
 				page_table.append(ch_html)
 
 		return page_table
+
+	def generateChapterUrl(self, series_code, ch):
+		return self.base_url + series_code + "/" + parsePageTableFromWeb()[ch-1]
 
 	def getLatestChapter(self, html):
 		return len(self.parsePageTableFromWeb(html))

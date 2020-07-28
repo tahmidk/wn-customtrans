@@ -262,6 +262,9 @@ function setupTableOfContents(){
 				update_series_btn_enabled = true;
 				location.reload();
 			}
+			else{
+				createFlashMessage("We encountered an error fetching latest chapters. Try again later", "danger", ".toc_menu_listing");
+			}
 		});
 	});
 	$('#rmv_all_bkmk_btn').click(function() {
@@ -272,5 +275,30 @@ function setupTableOfContents(){
 				location.reload();
 			}
 		});
+	});
+}
+
+function setupChapter(){
+	// Add functionality to day/night mode button
+	$('ul').click(function(){
+		$('ul').toggleClass('active')
+		$('section').toggleClass('dark')
+		$('.word').toggleClass('dark')
+		$('.fade_div').toggleClass('dark')
+		$('.ui_div_bottom').toggleClass('dark')
+		$('.content_raw').toggleClass('dark')
+		$('.scroll_bar').toggleClass('dark')
+		$('.scroll_notch').toggleClass('dark')
+	})
+
+	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
+	$(window).scroll(function() {
+		var winTop = $(window).scrollTop();
+		var docHeight = $(document).height();
+		var winHeight = $(window).height();
+
+		var percent_scrolled = (winTop / (docHeight - winHeight))*100;
+		$('.scroll_bar').css('height', percent_scrolled + '%');
+		document.querySelector('.scroll_notch').innerText = Math.round(percent_scrolled) + '%';
 	});
 }

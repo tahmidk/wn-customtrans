@@ -22,8 +22,8 @@ from app.models import SeriesTable
 from app.models import DictionariesTable
 from app.models import HostTable
 from app.models import Language
-from app.scripts import htmlparser
-from app.scripts.htmlparser import Host
+from app.scripts import hostmanager
+from app.scripts.hostmanager import Host
 
 
 def fetchHtml(url, lang):
@@ -67,7 +67,7 @@ def getLatestChapter(series_code, host_entry):
 	source_url = host_entry.host_url + series_code
 	source_html = fetchHtml(source_url, host_entry.host_lang)
 	if source_html is not None:
-		html_parser = htmlparser.createParser(host_entry.host_type)
+		html_parser = hostmanager.createParser(host_entry.host_type)
 		res = html_parser.getLatestChapter(source_html)
 	return res
 
@@ -148,3 +148,30 @@ def updateSeries(series_entry):
 		db.session.commit()
 
 	return ret
+
+def customTrans(series_entry, ch):
+	"""-------------------------------------------------------------------
+		Function:		[customTrans]
+		Description:	Generates the pre-processed data necessary to populate
+						the chapter template
+		Input:
+		  [series_entry]The series db entry to generate the customtrans chapter for
+		  [ch]			The integer indicating the chapter number
+		Return:
+		------------------------------------------------------------------
+	"""
+	import pdb; pdb.set_trace()
+	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+
+	# Write the raw file
+	host_manager = hostmanager.createManager(host_entry.host_type)
+	url = host_manager.generateChapterUrl(series_entry.code, ch)
+	html = fetchHtml(url, host_entry.host_lang)
+	if html is None:
+		return None
+
+	# Parse out relevant content from the website source code
+	title = host_manager.parseTitle(html)
+	content = [(hostmanager.LType.TITLE, title)] + host_manager.parseContent(html)
+
+	return None

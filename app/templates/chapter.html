@@ -1,0 +1,56 @@
+{% extends 'general_layout.html' %}
+{% block content %}
+<section class="section_chapter">
+	<!-- Back button -->
+	{% if back_href is defined %}
+		<div class="back_button" onclick="location.href='{{back_href}}'">
+			Back
+		</div>
+	{% endif%}
+
+	<!-- The chapter title and number -->
+	<div class="header_div">
+		<div class="chapter_series_title_div">
+			<a class="noDecoration" href="{{series_link}}" target="_blank">{{series.title}}</a>
+		</div>
+		<div style="width: 60%; margin: auto;">
+			<hr style="border-top: 1px solid #000">
+		</div>
+		<div class="chapter_chapter_div">
+			<a class="noDecoration" href="{{chapter_link}}" target="_blank">Chapter {{ch}}</a>
+		</div>
+	</div>
+
+	<!-- <div class="content">
+		<div class="content_prescript">
+			<--END_OF_PRESCRIPT->
+		</div>
+		<div class="content_main">
+			<--END_OF_BODY->
+		</div>
+		<div class="content_afterword">
+			<--END_OF_AFTERWORD->
+		</div>
+	</div> -->
+</section>
+
+<!-- Scroll indicator -->
+<!-- <div class="sidebar">
+	<div class="toggle_mini_div">
+		<ul class="toggle_mini">
+			<li>
+				<span>☾</span>
+				<span>☼</span>
+			</li>
+		</ul>
+	</div>
+	<div class="scroll_indicator">
+		<div class="scroll_bar"></div>
+		<div class="scroll_bar" id="bg"></div>
+		<div class="scroll_notch notranslate">0%</div>
+	</div>
+</div> -->
+
+<!-- Fade outs on smaller screens-->
+<!-- <div class="fade_div"> </div> -->
+{% endblock %}

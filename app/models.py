@@ -13,7 +13,7 @@ from enum import Enum
 
 # Internal imports
 from app import db
-from app.scripts.htmlparser import Host
+from app.scripts.hostmanager import Host
 
 # Language enumeration
 class Language(Enum):

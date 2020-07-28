@@ -13,6 +13,7 @@ from flask import request
 from flask import send_file
 from flask import flash
 from flask import Response
+from flask import abort
 
 # Internal imports
 from app import db
@@ -133,6 +134,9 @@ def library_remove_novel(series_code):
 @app.route("/library/<series_code>")
 def library_series_toc(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
+	if series_entry is None:
+		abort(404)
+
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	series_host_url = host_entry.host_url + series_entry.code
 	return render_template('series_toc.html',
@@ -147,6 +151,9 @@ def library_series_toc(series_code):
 def library_series_update(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
 	num_updates = utils.updateSeries(series_entry)
+	if num_updates < 0:
+		return jsonify(status='error')
+
 	return jsonify(status='ok')
 
 
@@ -179,8 +186,17 @@ def library_series_toc_bookmark_all(series_code):
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<ch>")
 def library_series_chapter(series_code, ch):
+	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
-	return "Displaying %s chapter %s" % (series_entry.title, ch)
+	if series_entry is None or ch > series_entry.latest_ch:
+		abort(404)
+
+	utils.customTrans(series_entry, ch)
+	return render_template("chapter.html",
+		title="chapter title",
+		series=series_entry,
+		ch=ch,
+		back_href=url_for('library_series_toc', series_code=series_code))
 
 
 # Route for Dictionaries view
@@ -212,10 +228,8 @@ def dictionaries():
 # Route for Tutorial page
 @app.route("/tutorial")
 def tutorial():
-	register_novel_form = RegisterNovelForm()
 	return render_template('tutorial.html',
-		title="Tutorial",
-		reg_form=register_novel_form)
+		title="Tutorial")
 
 
 # Route for user settings
