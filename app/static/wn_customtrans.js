@@ -142,7 +142,9 @@ function setupLibrary(){
 	var update_btn_enabled = true;
 	$(update_btn).click(function(event){
 		// Disable update button while event is finishing up
-		if(!update_btn_enabled)	{ return; }
+		if(!update_btn_enabled)	{
+			return;
+		}
 		update_btn_enabled = false;
 
 		// Show the progress bar
@@ -290,6 +292,16 @@ function setupChapter(){
 		document.querySelector('.scroll_notch').innerText = Math.round(percent_scrolled) + '%';
 	});*/
 
+	// Initialize the correct icon
+	var html = document.documentElement;
+	var day_night_toggle_class = ".chapter_day_night_toggle_btn";
+	$(day_night_toggle_class).each(function(){
+		var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+		var icon = $(this)[0].querySelector('ion-icon');
+		icon.setAttribute('name', icon_name);
+	});
+
+	// Add functionality of prev, toc, and next buttons
 	var url = this.location.href;
 	var ch = $('#mdata_ch').data("value");
 	var latest_ch = $('#mdata_latest_ch').data("value");
@@ -305,4 +317,28 @@ function setupChapter(){
 			location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
 		});
 	}
+
+	// Add functionality to toggle day and night UIs
+	$(day_night_toggle_class).click(function(){
+		html.classList.add('transition');
+		window.setTimeout(function(){
+			html.classList.remove('transition');
+		}, 2000);
+
+		// Toggle the theme
+		if(html.getAttribute('data-theme') == "light"){
+			html.setAttribute('data-theme', 'dark');
+		}
+		else{
+			html.setAttribute('data-theme', 'light');
+		}
+
+		// Change the toggle button
+		$(day_night_toggle_class).each(function(){
+			var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+			var icon = $(this)[0].querySelector('ion-icon');
+			icon.setAttribute('name', icon_name);
+		});
+
+	});
 }

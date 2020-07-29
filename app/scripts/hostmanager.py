@@ -275,7 +275,7 @@ class SyosetuManager(HostManager):
 							content.append(self.generateImgData(ltype, img))
 					else:
 						# Skip breaks and blanks
-						line = p.getText()
+						line = p.getText().strip()
 						if re.fullmatch(r'\s*<br\s*/>\s*', line) or re.fullmatch(r'\s*', line):
 							continue
 						content.append(self.generateLineData(ltype, line))

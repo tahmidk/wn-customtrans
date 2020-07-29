@@ -204,7 +204,6 @@ def library_series_chapter(series_code, ch):
 		dummy_text = u"假"
 	return render_template("chapter.html",
 		title="%s %d" % (series_entry.abbr, ch),
-		back_href=url_for('library_series_toc', series_code=series_code),
 		series=series_entry,
 		ch=ch,
 		dummy_text=dummy_text,
