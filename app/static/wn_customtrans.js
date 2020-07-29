@@ -262,7 +262,15 @@ function setupTableOfContents(){
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				update_series_btn_enabled = true;
-				location.reload();
+				if(data.updates > 0){
+					createFlashMessage("Success! Fetched " + data.updates + " new chapters!", "success", ".toc_menu_listing");
+				}
+				else{
+					createFlashMessage("Success! This series is already up-to-date", "success", ".toc_menu_listing");
+				}
+				window.setTimeout(function(){
+					location.reload();
+				}, 1000);
 			}
 			else{
 				createFlashMessage("We encountered an error fetching latest chapters. Try again later", "danger", ".toc_menu_listing");
@@ -282,15 +290,17 @@ function setupTableOfContents(){
 
 function setupChapter(){
 	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
-	/*$(window).scroll(function() {
+	$(window).scroll(function() {
 		var winTop = $(window).scrollTop();
 		var docHeight = $(document).height();
 		var winHeight = $(window).height();
 
 		var percent_scrolled = (winTop / (docHeight - winHeight))*100;
-		$('.scroll_bar').css('height', percent_scrolled + '%');
-		document.querySelector('.scroll_notch').innerText = Math.round(percent_scrolled) + '%';
-	});*/
+		var display = (percent_scrolled < 0.01) ? 'none' : 'block';
+		$('.chapter_scroll_bar#bar').css('display', display);
+		$('.chapter_scroll_bar').css('height', percent_scrolled + '%');
+		document.querySelector('.chapter_scroll_notch').innerText = Math.round(percent_scrolled) + '%';
+	});
 
 	// Initialize the correct icon
 	var html = document.documentElement;
@@ -341,4 +351,8 @@ function setupChapter(){
 		});
 
 	});
+}
+
+function setupDictionary(){
+
 }

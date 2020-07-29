@@ -64,27 +64,20 @@
 	<div class="chapter_toolbelt" id="chapter_toolbelt_south">
 		{{ render_toolbelt() }}
 	</div>
+
+	<!-- Fade outs on smaller screens-->
+	<div class="fade_div"> </div>
 </section>
 
 <!-- Scroll indicator -->
-<!-- <div class="sidebar">
-	<div class="toggle_mini_div">
-		<ul class="toggle_mini">
-			<li>
-				<span>☾</span>
-				<span>☼</span>
-			</li>
-		</ul>
+<div class="chapter_sidebar">
+	<div class="chapter_scroll_indicator">
+		<div class="chapter_scroll_bar" id="bar"></div>
+		<div class="chapter_scroll_bar" id="bg"></div>
+		<div class="chapter_scroll_notch notranslate">0%</div>
 	</div>
-	<div class="scroll_indicator">
-		<div class="scroll_bar"></div>
-		<div class="scroll_bar" id="bg"></div>
-		<div class="scroll_notch notranslate">0%</div>
-	</div>
-</div> -->
+</div>
 
-<!-- Fade outs on smaller screens-->
-<!-- <div class="fade_div"> </div> -->
 {% endblock %}
 
 {% block script_area %}

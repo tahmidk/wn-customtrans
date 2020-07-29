@@ -156,7 +156,7 @@ def library_series_update(series_code):
 	if num_updates < 0:
 		return jsonify(status='error')
 
-	return jsonify(status='ok')
+	return jsonify(status='ok', updates=num_updates)
 
 
 # Route for removing a specific bookmark
@@ -191,7 +191,7 @@ def library_series_toc_bookmark_all(series_code):
 def library_series_chapter(series_code, ch):
 	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
-	if series_entry is None or ch > series_entry.latest_ch:
+	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
 
 	chapter_data = utils.customTrans(series_entry, ch)
@@ -215,7 +215,9 @@ def library_series_chapter(series_code, ch):
 # Route for Dictionaries view
 @app.route("/dictionaries")
 def dictionaries():
-	return "TODO: Implement Dictionaries Page"
+	return render_template("dictionary.html",
+		title="Dictionary",
+		back_href=url_for('index'))
 
 
 

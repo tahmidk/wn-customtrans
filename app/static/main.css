@@ -1,14 +1,10 @@
 /*---------------------------[ General Stylings ]-----------------------*/
 html{
   scroll-behavior: smooth;
-  /* Enable hardware acceleration to fix laggy transitions */
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  transform: translateZ(0);
+  background: var(--html_background_color);
 
   /* Color definitions */
+  --html_background_color: #fff;
   --back_btn_color: #828282;
   --white_contrast_font_color: #828282;
 
@@ -19,7 +15,7 @@ html{
   --settings_color_primary: #97ecff;
 
   /* Library palette */
-  --update_library_button_color: #ffdc8d;
+  --update_library_button_color: #f5c760;
   --register_novel_button_color: #61ff85;
   --register_novel_modal_color: #40cc60;
   --remove_novel_modal_color_primary: #9c0000;
@@ -29,8 +25,7 @@ html{
   --series_entry_btn_color: #c73939;
   --series_entry_hover_color: #dc6060;
   --series_entry_text_color: #9c2929;
-  --series_updated_tag_color: #8dff98;
-  --series_updated_tag_hover_color: #8cd630;
+  --series_updated_tag_color: #8cd630;
 
   /* TOC palette */
   --toc_dictionary_btn_color: #fb8200;
@@ -40,12 +35,14 @@ html{
   --chapter_maintxt_color: #828282;
   --chapter_subtxt_color: #adadad;
   --chapter_day_night_toggle_btn_color: #572a80;
+  --chapter_scroll_bar_color: #181818;
 }
 html[data-theme='dark']{
-  background: #181818;
+  --html_background_color: #181818;
   --chapter_maintxt_color: #d0d0d0;
   --chapter_subtxt_color: #505050;
   --chapter_day_night_toggle_btn_color: #bea140;
+  --chapter_scroll_bar_color: #ffffff;
 }
 html.transition,
 html.transition *,
@@ -123,13 +120,12 @@ input[type=number] {
   font-variant: petite-caps;
   font-size: 2em;
 }
-.banner_ico{
+.banner_icon{
   width: fit-content;
   height: fit-content;
   padding: 0.5em 0.5em;
   margin: 0.2em 0 0.2em 0.2em;
   color: #fff;
-  background: var(--library_color_primary);
   border-radius: 0.1em;
   font-size: 2em;
 }
@@ -377,6 +373,9 @@ section.section_index{
 section.section_library{
   padding: 1em;
 }
+#library_icon{
+  background: var(--library_color_primary);
+}
 #library_title{
   color: var(--library_color_primary);
 }
@@ -442,7 +441,7 @@ section.section_library{
   background: #fff;
 }
 .library_series_entry:hover .entry_updated{
-  color: var(--series_updated_tag_hover_color);
+  color: var(--series_updated_tag_color);
   background: #fff;
 }
 .entry_minibanner{
@@ -793,4 +792,73 @@ pre#unbootstrap{
 }
 .chapter_day_night_toggle_btn:hover{
   filter: brightness(1.2);
+}
+
+/* Side progress indicator */
+.chapter_sidebar{
+  position: fixed;
+  left: 10rem;
+  top: 30vh;
+  width: 3rem;
+  height: 40vh;
+}
+.chapter_scroll_indicator{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.chapter_scroll_bar{
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 1px;
+  height: 0%;
+  background: var(--chapter_scroll_bar_color);
+  box-shadow: 0 0 5px 1px var(--chapter_scroll_bar_color);
+
+  /* Make this unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.chapter_scroll_bar#bar{
+  display: none;
+}
+.chapter_scroll_bar#bg{
+  height: 100% !important;
+  background: rgba(127, 127, 127, 0.4);
+  box-shadow: none;
+}
+.chapter_scroll_notch{
+  position: absolute;
+  top: 19vh;
+  width: 100%;
+  color: var(--chapter_maintxt_color);
+  background: var(--html_background_color);
+  text-align: center;
+  line-height: 2rem;
+  font-family: 'Courier', sans-serif;
+  font-size: 1rem;
+  border: 1px solid var(--chapter_maintxt_color);
+
+  /* Make this unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+
+
+/* Dictionary page stylings */
+.section_dictionary{
+  padding: 1em;
+}
+#dictionary_icon{
+  background: var(--dictionary_color_primary);
+}
+#dictionary_title{
+  color: var(--dictionary_color_primary);
 }

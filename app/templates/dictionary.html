@@ -1,0 +1,26 @@
+{% extends 'general_layout.html' %}
+{% block content %}
+	<section class="section_dictionary">
+		<!-- Back button -->
+		{% if back_href is defined %}
+			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+		{% endif%}
+
+		<!-- Main content -->
+		<div class="banner" id="dictionary_banner">
+			<div class="banner_icon" id="dictionary_icon">
+				<ion-icon name="book"></ion-icon>
+			</div>
+			<div class="banner_title" id="dictionary_title">Dictionary</div>
+		</div>
+		<div class="dictionary_body">
+
+		</div>
+	</section>
+{% endblock %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupDictionary();
+	});
+{% endblock%}
