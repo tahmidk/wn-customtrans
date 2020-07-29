@@ -3,14 +3,12 @@
 	<section class="section_toc">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'">
-				Back
-			</div>
+			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
 		{% endif%}
 
 		<!-- Main content -->
 		<div class="toc_header">
-			<div class="toc_series_title_div" onclick="window.open('{{series_host_url}}');">
+			<div class="toc_series_title_div" onclick="window.open('{{series_url}}');">
 				<span style="cursor: pointer;"> {{series.title}} </span>
 			</div>
 		</div>
@@ -19,7 +17,7 @@
 		</div>
 		<div class="toc_body">
 			<div class="toc_menu_listing">
-				<div style="width: 100%; margin: 1rem 0;">
+				<div class="toc_menu_options">
 					<button type="button" class="btn btn-outline-success toc_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
 						<ion-icon name="code-download-outline"></ion-icon>
 						<span>Current</span>
@@ -65,9 +63,9 @@
 							<div id="current_ch"></div>
 							{% endif %}
 							<div class="toc_chapter {{'viewed_chapter' if visited}} {{'current_chapter' if current}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
-								<div class="toc_chapter_text" onclick="window.open('{{series_base_url}}')">
+								<a class="toc_chapter_text" href="{{series_base_url}}" target="_blank">
 									Chapter {{ch}}
-								</div>
+								</a>
 								<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
 									<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
 								</div>

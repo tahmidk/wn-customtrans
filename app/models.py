@@ -14,11 +14,7 @@ from enum import Enum
 # Internal imports
 from app import db
 from app.scripts.hostmanager import Host
-
-# Language enumeration
-class Language(Enum):
-    JP = 1
-    CN = 2
+from app.scripts.hostmanager import Language
 
 # Database models
 class SeriesTable(db.Model):

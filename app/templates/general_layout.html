@@ -14,6 +14,10 @@
 
 	<title>{{ title }}</title>
 
+	<!-- Meta variables (jinja2 vars available to JS) -->
+	{% block metavars %}
+	{% endblock metavars %}
+
 </head>
 <body>
 	<!-- Page content -->
@@ -46,3 +50,7 @@
 
 </body>
 </html>
+
+{% macro define_metavar(id, value) %}
+	<meta id="mdata_{{id}}" data-value="{{value}}">
+{% endmacro %}

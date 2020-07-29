@@ -8,9 +8,7 @@
 	<section class="section_library">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'">
-				Back
-			</div>
+			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
 		{% endif%}
 
 		<!-- Set up the modals needed for this  -->
@@ -47,7 +45,8 @@
 			<div class="library_sidepanel">
 				<!-- Register button -->
 				<div style="padding: 1rem 0;">
-					<button type="button" class="menu_button menu_button_small modal_trigger" id="menu_library_register" data-toggle="modal" data-target="#register_novel_modal_push" title="Add Series">
+					<button type="button" class="menu_button menu_button_small modal_trigger" id="menu_library_register" data-toggle="modal"
+						data-target="#register_novel_modal_push" title="Add Series">
 						<div class="button_icon">
 							<ion-icon name="add-outline"></ion-icon>
 						</div>

@@ -1,37 +1,69 @@
 {% extends 'general_layout.html' %}
+{% from "general_layout.html" import define_metavar%}
+
+{% block metavars %}
+	{{ define_metavar('ch', ch) }}
+	{{ define_metavar('latest_ch', series.latest_ch) }}
+{% endblock %}
+
 {% block content %}
 <section class="section_chapter">
 	<!-- Back button -->
 	{% if back_href is defined %}
-		<div class="back_button" onclick="location.href='{{back_href}}'">
-			Back
-		</div>
+		<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
 	{% endif%}
 
 	<!-- The chapter title and number -->
 	<div class="header_div">
 		<div class="chapter_series_title_div">
-			<a class="noDecoration" href="{{series_link}}" target="_blank">{{series.title}}</a>
+			<a class="no_decoration" href="{{series_url}}" target="_blank">{{series.title}}</a>
 		</div>
 		<div style="width: 60%; margin: auto;">
 			<hr style="border-top: 1px solid #000">
 		</div>
 		<div class="chapter_chapter_div">
-			<a class="noDecoration" href="{{chapter_link}}" target="_blank">Chapter {{ch}}</a>
+			<a class="no_decoration" href="{{chapter_url}}" target="_blank">Chapter {{ch}}</a>
 		</div>
 	</div>
 
-	<!-- <div class="content">
+	<!-- Top toolbelt -->
+	<div class="chapter_toolbelt">
+		{{ render_toolbelt() }}
+	</div>
+
+	<div class="content">
+		<p class="dummy" id="d0">{{dummy_text}}</p>
+		<div class="content_title">
+			{{ line_entry(chapter_data.title) }}
+		</div>
+		<p class="dummy" id="d1">{{dummy_text}}</p>
+		{% if chapter_data.prescript|length > 0 %}
 		<div class="content_prescript">
-			<--END_OF_PRESCRIPT->
+		{% for data in chapter_data.prescript %}
+			{{ line_entry(data) }}
+		{% endfor %}
 		</div>
+		{% endif %}
+		{% if chapter_data.main|length > 0 %}
 		<div class="content_main">
-			<--END_OF_BODY->
+		{% for data in chapter_data.main %}
+			{{ line_entry(data) }}
+		{% endfor %}
 		</div>
+		{% endif %}
+		{% if chapter_data.postscript|length > 0 %}
 		<div class="content_afterword">
-			<--END_OF_AFTERWORD->
+		{% for data in chapter_data.postscript %}
+			{{ line_entry(data) }}
+		{% endfor %}
 		</div>
-	</div> -->
+		{% endif %}
+	</div>
+
+	<!-- Bottom toolbelt -->
+	<div class="chapter_toolbelt">
+		{{ render_toolbelt() }}
+	</div>
 </section>
 
 <!-- Scroll indicator -->
@@ -54,3 +86,48 @@
 <!-- Fade outs on smaller screens-->
 <!-- <div class="fade_div"> </div> -->
 {% endblock %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupChapter({{series.latest_ch}});
+	});
+{% endblock%}
+
+<!-- Creates a line entry in the content section of the chapter html -->
+{% macro line_entry(data) %}
+	<div class="chapter_content">
+	{% if data.type == "text" %}
+		<div class="chapter_line_div">
+			<p class="chapter_line" id="l{{data.line_id}}">
+				{{data.text}}
+			</p>
+			<a href="{{data.gt_link}}" class="no_decoration" target="_blank">
+				<p class="content_raw notranslate" id="r{{data.line_id}}">
+					{{data.subtext}}
+				</p>
+			</a>
+		</div>
+		<p class="dummy" id="d{{data.line_id}}">{{dummy_text}}</p>
+	{% elif data.type == "image" %}
+		<div class="chapter_image_div">
+			<img class="chapter_image" src="{{data.img_src}}" id="i{{data.img_id}}">
+		</div>
+	{% endif %}
+	</div>
+{% endmacro %}
+
+<!-- Macro to render the toolbelt -->
+{% macro render_toolbelt() %}
+	<div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 100%;">
+		{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
+		<button type="button" class="btn btn-dark chapter_prev_btn">
+			<ion-icon name="return-up-back-outline"></ion-icon>
+		</button>
+		<button type="button" class="btn btn-secondary chapter_toc_btn" onclick="location.href='{{series_toc_url}}'">
+			<ion-icon name="library-outline"></ion-icon>
+		</button>
+		<button type="button" class="btn btn-dark chapter_next_btn">
+			<ion-icon name="return-up-forward-outline"></ion-icon>
+		</button>
+	</div>
+{% endmacro %}

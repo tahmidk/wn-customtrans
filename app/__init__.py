@@ -13,6 +13,9 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'e0d41ebf1910b2ba'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wnct_database.db'
+# Trim excess whitespace when rendering with jinja2
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 
 # Create database instance connected to webapp
 db = SQLAlchemy(app)

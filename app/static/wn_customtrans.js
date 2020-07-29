@@ -279,20 +279,8 @@ function setupTableOfContents(){
 }
 
 function setupChapter(){
-	// Add functionality to day/night mode button
-	$('ul').click(function(){
-		$('ul').toggleClass('active')
-		$('section').toggleClass('dark')
-		$('.word').toggleClass('dark')
-		$('.fade_div').toggleClass('dark')
-		$('.ui_div_bottom').toggleClass('dark')
-		$('.content_raw').toggleClass('dark')
-		$('.scroll_bar').toggleClass('dark')
-		$('.scroll_notch').toggleClass('dark')
-	})
-
 	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
-	$(window).scroll(function() {
+	/*$(window).scroll(function() {
 		var winTop = $(window).scrollTop();
 		var docHeight = $(document).height();
 		var winHeight = $(window).height();
@@ -300,5 +288,21 @@ function setupChapter(){
 		var percent_scrolled = (winTop / (docHeight - winHeight))*100;
 		$('.scroll_bar').css('height', percent_scrolled + '%');
 		document.querySelector('.scroll_notch').innerText = Math.round(percent_scrolled) + '%';
-	});
+	});*/
+
+	var url = this.location.href;
+	var ch = $('#mdata_ch').data("value");
+	var latest_ch = $('#mdata_latest_ch').data("value");
+	if(ch > 1){
+		$('.chapter_prev_btn').click(function() {
+			var prev = ch - 1;
+			location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
+		});
+	}
+	if(ch < latest_ch){
+		$('.chapter_next_btn').click(function() {
+			var next = ch + 1;
+			location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
+		});
+	}
 }

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #=======================================================================
 #  Copyright (c) 2020, Tahmid Khan
 #  All rights reserved.
@@ -26,6 +27,7 @@ from app.models import SeriesTable
 from app.models import DictionariesTable
 from app.models import HostTable
 from app.scripts import utils
+from app.scripts import hostmanager
 
 # Other imports
 import json
@@ -138,12 +140,12 @@ def library_series_toc(series_code):
 		abort(404)
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
-	series_host_url = host_entry.host_url + series_entry.code
+	host_mgr = hostmanager.createManager(host_entry.host_type)
 	return render_template('series_toc.html',
 		title=series_entry.abbr,
 		back_href=url_for('library'),
 		series=series_entry,
-		series_host_url=series_host_url)
+		series_url=host_mgr.generateSeriesUrl(series_entry.code))
 
 
 # Route for updating a specific 'series'
@@ -183,6 +185,7 @@ def library_series_toc_bookmark_all(series_code):
 	db.session.commit()
 	return jsonify(status='ok')
 
+
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<ch>")
 def library_series_chapter(series_code, ch):
@@ -191,12 +194,23 @@ def library_series_chapter(series_code, ch):
 	if series_entry is None or ch > series_entry.latest_ch:
 		abort(404)
 
-	utils.customTrans(series_entry, ch)
+	chapter_data = utils.customTrans(series_entry, ch)
+
+	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+	host_mgr = hostmanager.createManager(host_entry.host_type)
+	if host_entry.host_lang == hostmanager.Language.JP:
+		dummy_text = u"ダミー"
+	elif host_entry.host_lang == hostmanager.Language.CN:
+		dummy_text = u"假"
 	return render_template("chapter.html",
-		title="chapter title",
+		title="%s %d" % (series_entry.abbr, ch),
+		back_href=url_for('library_series_toc', series_code=series_code),
 		series=series_entry,
 		ch=ch,
-		back_href=url_for('library_series_toc', series_code=series_code))
+		dummy_text=dummy_text,
+		series_url=host_mgr.generateSeriesUrl(series_entry.code),
+		chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch),
+		chapter_data=chapter_data)
 
 
 # Route for Dictionaries view

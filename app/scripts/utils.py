@@ -67,7 +67,7 @@ def getLatestChapter(series_code, host_entry):
 	source_url = host_entry.host_url + series_code
 	source_html = fetchHtml(source_url, host_entry.host_lang)
 	if source_html is not None:
-		html_parser = hostmanager.createParser(host_entry.host_type)
+		html_parser = hostmanager.createManager(host_entry.host_type)
 		res = html_parser.getLatestChapter(source_html)
 	return res
 
@@ -160,18 +160,21 @@ def customTrans(series_entry, ch):
 		Return:
 		------------------------------------------------------------------
 	"""
-	import pdb; pdb.set_trace()
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 
-	# Write the raw file
+	# First fetch the html
 	host_manager = hostmanager.createManager(host_entry.host_type)
-	url = host_manager.generateChapterUrl(series_entry.code, ch)
-	html = fetchHtml(url, host_entry.host_lang)
-	if html is None:
+	chapter_url = host_manager.generateChapterUrl(series_entry.code, ch)
+	chapter_html = fetchHtml(chapter_url, host_entry.host_lang)
+	if chapter_html is None:
 		return None
 
 	# Parse out relevant content from the website source code
-	title = host_manager.parseTitle(html)
-	content = [(hostmanager.LType.TITLE, title)] + host_manager.parseContent(html)
-
-	return None
+	chapter_content = host_manager.parseChapterContent(chapter_html)
+	chapter_data = {
+		"title": 		next(datum for datum in chapter_content if datum['ltype'] == hostmanager.LType.TITLE),
+		"prescript": 	[datum for datum in chapter_content if datum['ltype'] == hostmanager.LType.PRESCRIPT],
+		"main": 		[datum for datum in chapter_content if datum['ltype'] == hostmanager.LType.MAIN],
+		"postscript": 	[datum for datum in chapter_content if datum['ltype'] == hostmanager.LType.POSTSCRIPT]
+	}
+	return chapter_data
