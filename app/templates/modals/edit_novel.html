@@ -1,0 +1,42 @@
+{% macro edit_novel_modal(form) %}
+<div class="modal fade" id="edit_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
+    <!-- Modal Form Content-->
+    <form class="modal-content text-center modal-cust edit_modal_cust" id="edit_novel_form" action="{{ url_for('library_edit_novel', series_code='UNDEF') }}">
+      <!--Modal Header-->
+      <div class="modal-header d-flex justify-content-center">
+        <p class="modal_header_cust edit_novel_header"> Edit this Novel </p>
+      </div>
+
+      <!--Modal Body-->
+      <div class="modal-body modal_body_cust">
+          {{ form.hidden_tag() }}
+          <fieldset class="form-group">
+            <div class="form-group form_group_cust">
+              {{ form.title.label(class="form-control-label label_cust") }}
+              <div class="form_input_div">
+                {{ form.title(class="form-control input_cust") }}
+              </div>
+            </div>
+            <div class="form-group form_group_cust">
+              {{ form.abbr.label(class="form-control-label label_cust") }}
+              <div class="form_input_div">
+                {{ form.abbr(class="form-control input_cust") }}
+              </div>
+            </div>
+          </fieldset>
+      </div>
+
+      <!--Modal Footer-->
+      <div class="modal-footer flex-center">
+        <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="edit_novel_spinner">
+          <span class="sr-only"></span>
+        </div>
+        {{ form.submit(class="btn btn-success btn-cust", id="edit_novel_submit_btn") }}
+        <button class="btn btn-outline-danger btn-cust" data-dismiss="modal"> Cancel </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endmacro %}

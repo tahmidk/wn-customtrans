@@ -5,30 +5,42 @@
 			<img class="customtrans_logo" src="{{url_for('static', filename='customtrans_logo.png')}}"/>
 		</div>
 		<div class="menu_div">
-			<a class="menu_button menu_button_big" id="library" href="{{url_for('library')}}">
-				<div class="button_icon">
-					<ion-icon name="book"></ion-icon>
+			<div style="padding: 1rem; width: 50%;">
+				<div class="menu_button menu_button_big" id="menu_library" onclick="location.href='{{url_for('library')}}';">
+					<div class="button_icon">
+						<ion-icon name="book"></ion-icon>
+					</div>
+					<div class="button_title"> Library </div>
 				</div>
-				<div class="button_title"> Library </div>
-			</a>
-			<a class="menu_button menu_button_wide" id="dictionaries" href="{{url_for('dictionaries')}}">
-				<div class="button_icon">
-					<ion-icon name="reader"></ion-icon>
+			</div>
+			<div style="display: flex; flex-direction: column; width: 50%;">
+				<div style="padding: 1rem;">
+					<div class="menu_button menu_button_wide" id="menu_dictionaries" onclick="location.href='{{url_for('dictionaries')}}';">
+						<div class="button_icon">
+							<ion-icon name="reader"></ion-icon>
+						</div>
+						<div class="button_title"> Dictionaries </div>
+					</div>
 				</div>
-				<div class="button_title"> Dictionaries </div>
-			</a>
-			<a class="menu_button menu_button_small" id="tutorial" href="{{url_for('tutorial')}}">
-				<div class="button_icon">
-					<ion-icon name="help"></ion-icon>
+				<div style="display: flex; width: 100%">
+					<div style="padding: 1rem; width: 50%;">
+						<div class="menu_button menu_button_small" id="menu_tutorial" onclick="location.href='{{url_for('tutorial')}}';">
+							<div class="button_icon">
+								<ion-icon name="help"></ion-icon>
+							</div>
+							<div class="button_title"> Tutorial </div>
+						</div>
+					</div>
+					<div style="padding: 1rem; width: 50%;">
+						<div class="menu_button menu_button_small" id="menu_settings" onclick="location.href='{{url_for('settings')}}';">
+							<div class="button_icon">
+								<ion-icon name="settings"></ion-icon>
+							</div>
+							<div class="button_title"> Settings </div>
+						</div>
+					</div>
 				</div>
-				<div class="button_title"> Tutorial </div>
-			</a>
-			<a class="menu_button menu_button_small" id="settings" href="{{url_for('settings')}}">
-				<div class="button_icon">
-					<ion-icon name="settings"></ion-icon>
-				</div>
-				<div class="button_title"> Settings </div>
-			</a>
+			</div>
 		</div>
 	</section>
 {% endblock %}

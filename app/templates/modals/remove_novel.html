@@ -1,0 +1,38 @@
+{% macro remove_novel_modal(form) %}
+<div class="modal fade" id="remove_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
+    <!-- Modal Form Content-->
+    <form class="modal-content text-center modal-cust remove_modal_cust" id="remove_novel_form" action="{{ url_for('library_remove_novel', series_code='UNDEF') }}">
+      <!--Modal Header-->
+      <div class="modal-header d-flex justify-content-center bg-danger">
+        <p class="modal_header_cust remove_novel_header"> Remove this Novel </p>
+      </div>
+
+      <!--Modal Body-->
+      <div class="modal-body modal_body_cust">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            <div class="text-danger text-center remove_warning_div">
+              <ion-icon name="warning-outline"></ion-icon>
+              This action cannot be reversed! You will need to re-register this novel by its code!
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              {{ form.opt_keep_dict.label(class="form-control-label") }}
+              {{ form.opt_keep_dict(class="form-control") }}
+            </div>
+          </div>
+      </div>
+
+      <!--Modal Footer-->
+      <div class="modal-footer flex-center">
+        <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="remove_novel_spinner">
+          <span class="sr-only"></span>
+        </div>
+        {{ form.submit(class="btn btn-danger btn-cust", id="remove_novel_submit_btn") }}
+        <button class="btn btn-outline-danger btn-cust" data-dismiss="modal"> Cancel </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endmacro %}

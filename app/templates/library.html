@@ -1,0 +1,98 @@
+{% from "series_entry.html" import series_entry%}
+{% from "modals/register_novel.html" import register_novel_modal%}
+{% from "modals/edit_novel.html" import edit_novel_modal%}
+{% from "modals/remove_novel.html" import remove_novel_modal%}
+
+{% extends 'general_layout.html' %}
+{% block content %}
+	<section class="section_library">
+		<!-- Back button -->
+		{% if back_href is defined %}
+			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+		{% endif%}
+
+		<!-- Set up the modals needed for this  -->
+		{{ register_novel_modal(reg_form) }}
+		{{ edit_novel_modal(edit_form)}}
+		{{ remove_novel_modal(rmv_form)}}
+
+		<!-- Progress bar -->
+		<div class="progress_bar_display">
+			<div class="progress_bar_label">
+				<div class="spinner-border text-warning" role="status">
+					<span class="sr-only"></span>
+				</div>
+				<span>
+					Updating...
+				</span>
+			</div>
+			<div class="progress_bar_container">
+				<div class="progress" style="height: 0.5rem; background: #ffe26e;">
+					<div class="progress-bar bg-warning" id="update_progress_bar"
+						role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main content -->
+		<div class="banner" id="library_banner">
+			<div class="banner_icon" id="library_icon">
+				<ion-icon name="book"></ion-icon>
+			</div>
+			<div class="banner_title" id="library_title">Library</div>
+		</div>
+		<div class="library_body">
+			<div class="library_sidepanel">
+				<!-- Register button -->
+				<div style="padding: 1rem 0;">
+					<button type="button" class="menu_button menu_button_small modal_trigger" id="menu_library_register" data-toggle="modal"
+						data-target="#register_novel_modal_push" title="Add Series">
+						<div class="button_icon">
+							<ion-icon name="add-outline"></ion-icon>
+						</div>
+						<div class="button_title"> Register </div>
+					</button>
+				</div>
+				<!-- Update button -->
+				<div style="padding: 1rem 0;">
+					<button type="button" class="menu_button menu_button_small" id="menu_library_update" title="Update Library">
+						<div class="button_icon">
+							<ion-icon name="sync-outline"></ion-icon>
+						</div>
+						<div class="button_title"> Update </div>
+					</button>
+				</div>
+			</div>
+			<div class="library_mainpanel">
+				<!-- Novel entries -->
+				{% for novel in series %}
+					{{ series_entry(novel) }}
+				{% endfor %}
+
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					<div class="flash_msg_div">
+						{% for category, message in messages %}
+							{% if category == 'success' or category == 'warning' or category == 'danger'%}
+							<div class="alert alert-dismissible fade show flash_msg_{{category}}" role="alert">
+								{{ message }}
+								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							{% endif %}
+						{% endfor %}
+					</div>
+					{% endif %}
+				{% endwith %}
+			</div>
+		</div>
+	</section>
+{% endblock %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupLibrary();
+	});
+{% endblock%}
