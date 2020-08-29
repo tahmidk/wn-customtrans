@@ -18,7 +18,7 @@ from app.scripts.hostmanager import Language
 
 # Database models
 class SeriesTable(db.Model):
-	code = db.Column(db.String(7), primary_key=True)
+	code = db.Column(db.String(), primary_key=True)
 	title = db.Column(db.String(80), nullable=False)
 	abbr = db.Column(db.String(15), unique=True, nullable=False)
 	current_ch = db.Column(db.Integer, nullable=False)
@@ -35,7 +35,8 @@ class SeriesTable(db.Model):
 
 class DictionariesTable(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	series_code = db.Column(db.String(7), nullable=False) # The series code this dict belongs to
+	series_host = db.Column(db.Integer(), nullable=False) # The host id that hosts the series this dict belongs to
+	series_code = db.Column(db.String(), nullable=False) # The series code this dict belongs to
 	filename = db.Column(db.String, nullable=False)
 	data = db.Column(db.String, nullable=False)
 

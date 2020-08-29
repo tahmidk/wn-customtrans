@@ -42,7 +42,7 @@ class RegisterNovelForm(FlaskForm):
 	abbr_validators = [
 		DataRequired(),
 		Length(min=1, max=15),
-		Regexp(r'^[\w]+$', message="Cannot contain spaces or special characters")
+		Regexp(r'^[^\W_]*$', message="Cannot contain spaces or special characters")
 	]
 	abbr = StringField('Abbreviation', validators=abbr_validators)
 

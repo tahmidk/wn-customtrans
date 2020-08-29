@@ -102,6 +102,7 @@ def reinitDatabase():
 			tmp_dict.seek(0)
 			dict_entry = DictionariesTable(
 				filename=dict_fname,
+				series_host=host_entry.id,
 				series_code=series['code'],
 				data=tmp_dict.read()
 			)

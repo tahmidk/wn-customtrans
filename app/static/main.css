@@ -862,3 +862,14 @@ pre#unbootstrap{
 #dictionary_title{
   color: var(--dictionary_color_primary);
 }
+.dict_header{
+  width: fit-content;
+  padding: 0.5rem 3rem;
+  margin: 0.5rem;
+  color: #fff;
+  background: var(--dictionary_color_primary);
+  font-variant: all-small-caps;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 0.5rem;
+}
