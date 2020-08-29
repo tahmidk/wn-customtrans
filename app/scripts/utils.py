@@ -6,7 +6,6 @@
 #=======================================================================
 
 # Python imports
-from tempfile import TemporaryFile
 from urllib.request import Request
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -19,7 +18,6 @@ from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.models import SeriesTable
-from app.models import DictionariesTable
 from app.models import HostTable
 from app.models import Language
 from app.scripts import hostmanager
@@ -89,28 +87,7 @@ def registerSeriesToDatabase(reg_form):
 	host_entry = HostTable.query.filter_by(host_type=Host(reg_form.series_host.data)).first()
 
 	# Check database for preexisting dictionary if this series is being re-registered
-	dict_entry = DictionariesTable.query.filter_by(series_code=series_code).first()
-	if dict_entry is None:
-		# No dict exists, create a new one
-		dict_fname = "%s_%s.dict" % (series_abbr, series_code)
-		with TemporaryFile(mode='w+', encoding='utf-8') as tmp_dict:
-			tmp_dict.write("// Title: %s\n" % series_title)
-			tmp_dict.write("// Abbr: %s\n" % series_abbr)
-			tmp_dict.write("// Series Link: %s%s\n" % (host_entry.host_url, series_code))
-			tmp_dict.write("\n// Example comment (starts w/ \'//\''). Example entries below...")
-			tmp_dict.write(u'\n@name{ナルト, Naruto}')
-			tmp_dict.write(u'\n@name{うずまき, Uzumaki}')
-			tmp_dict.write(u'\n九尾の狐 --> Nine Tailed Fox')
-			tmp_dict.write("\n\n// END OF FILE")
-			tmp_dict.seek(0)
 
-			dict_entry = DictionariesTable(
-				filename=dict_fname,
-				series_code=series_code,
-				data=tmp_dict.read()
-			)
-			db.session.add(dict_entry)
-			db.session.commit()
 
 	# Finally build the table for the series
 	series_entry = SeriesTable(
@@ -119,7 +96,6 @@ def registerSeriesToDatabase(reg_form):
 		abbr=series_abbr,
 		current_ch=0,
 		latest_ch=getLatestChapter(series_code, host_entry),
-		dict_id=dict_entry.id,
 		host_id=host_entry.id,
 	)
 	db.session.add(series_entry)

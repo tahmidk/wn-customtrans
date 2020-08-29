@@ -35,16 +35,16 @@
 			</div>
 		</div>
 		<div class="entry_download_bar">
-			<div class="series_entry_btn table_of_contents" onclick="location.href='{{url_for('library_series_toc',series_code=novel.code)}}'"
-				title="Go to Table of Contents">
+			<a class="series_entry_btn table_of_contents" href="{{url_for('library_series_toc',series_code=novel.code)}}"
+				title="Go to Table of Contents" style="margin-left: 0;">
 				<span> Table of Contents </span>
 				<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="library-outline"></ion-icon>
-			</div>
-			<div class="series_entry_btn download_next" onclick="location.href='{{url_for('library_series_chapter', series_code=novel.code, ch=resume_ch)}}'"
+			</a>
+			<a class="series_entry_btn download_next" href="{{url_for('library_series_chapter', series_code=novel.code, ch=resume_ch)}}"
 				title="Read chapter {{resume_ch}}">
 				<span> Resume </span>
 				<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="arrow-redo"></ion-icon>
-			</div>
+			</a>
 		</div>
 	</div>
 {% endmacro %}
