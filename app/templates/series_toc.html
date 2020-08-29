@@ -18,21 +18,21 @@
 		<div class="toc_body">
 			<div class="toc_menu_listing">
 				<div class="toc_menu_options">
-					<button type="button" class="btn btn-outline-success toc_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
+					<button type="button" class="btn btn-outline-success superpanel_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
 						<ion-icon name="code-download-outline"></ion-icon>
 						<span>Current</span>
 					</button>
-					<button type="button" class="btn btn-outline-warning toc_menu_btn" id="update_series_btn" title="Fetch the latest chapter"
+					<button type="button" class="btn btn-outline-warning superpanel_menu_btn" id="update_series_btn" title="Fetch the latest chapter"
 						action="{{url_for('library_series_update', series_code=series.code)}}">
 						<ion-icon name="sync-outline"></ion-icon>
 						<span>Update</span>
 					</button>
-					<button type="button" class="btn btn-outline-primary toc_menu_btn" id="series_dictionary_btn" title="Open this series' dictionary"
+					<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="series_dictionary_btn" title="Open this series' dictionary"
 						action="{{url_for('library_series_update', series_code=series.code)}}">
 						<ion-icon name="reader-outline"></ion-icon>
 						<span>Dictionary</span>
 					</button>
-					<button type="button" class="btn btn-outline-danger toc_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
+					<button type="button" class="btn btn-outline-danger superpanel_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
 						action="{{url_for('library_series_toc_bookmark_all', series_code=series.code)}}">
 						<ion-icon name="bookmarks" style="font-size: 1rem; margin-bottom: -0.1rem;"></ion-icon>
 						<span>Remove All Bookmarks</span>
