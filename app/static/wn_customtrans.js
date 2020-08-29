@@ -100,7 +100,7 @@ function setupLibrary(){
 	var reg_novel_modal = '#register_novel_modal_push';
 	var reg_novel_form = '#register_novel_form';
 	// Update library components
-	var update_btn = '#menu_library_update';
+	var update_btn = '#menu_library_update_btn';
 	// Edit novel components
 	var edit_novel_submit = '#edit_novel_submit_btn';
 	var edit_novel_modal = '#edit_modal_push';

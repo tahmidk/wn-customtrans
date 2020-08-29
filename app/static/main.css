@@ -9,22 +9,22 @@ html{
   --white_contrast_font_color: #828282;
 
   /* Main page palette */
-  --library_color_primary: #ef6565;
+  --library_color_primary: #d83939;
   --dictionary_color_primary: #efa05d;
   --tutorial_color_primary: #aaff77;
   --settings_color_primary: #97ecff;
 
   /* Library palette */
-  --update_library_button_color: #f5c760;
-  --register_novel_button_color: #61ff85;
+  --update_library_button_color: #ffc545;
+  --register_novel_button_color: #68d629;
   --register_novel_modal_color: #40cc60;
   --remove_novel_modal_color_primary: #9c0000;
   --remove_novel_modal_color_secondary: #dc3545;
   --edit_novel_modal_color: #cc406b;
 
-  --series_entry_btn_color: #c73939;
-  --series_entry_hover_color: #dc6060;
-  --series_entry_text_color: #9c2929;
+  --series_entry_btn_color: #9e1111;
+  --series_entry_hover_color: #d83939;
+  --series_entry_text_color: #940d0d;
   --series_updated_tag_color: #8cd630;
 
   /* TOC palette */
@@ -380,14 +380,9 @@ section.section_library{
   color: var(--library_color_primary);
 }
 .library_body{
-  display: flex;
 }
-.library_sidepanel{
-  display: flex;
-  width: 15rem;
-  height: auto;
-  flex-direction: column;
-  margin: 1em;
+.library_superpanel{
+  margin: 3rem 0 1rem 0;
 }
 .library_mainpanel{
   display: flex;
@@ -395,42 +390,34 @@ section.section_library{
   width: 100%;
   height: auto;
   box-sizing: border-box;
-  padding: 1em;
 }
-/* Sidepanel stuff */
-#menu_library_register{
-  box-shadow: 0 0 0 0.2rem var(--register_novel_button_color);
-  background: inherit;
+/* Library superpanel stuff */
+#menu_library_register_btn{
+  margin-left: 0;
   color: var(--register_novel_button_color);
+  border-color: var(--register_novel_button_color);
 }
-#menu_library_register:hover {
+#menu_library_register_btn:hover{
+  color: #fff;
   background-color: var(--register_novel_button_color);
-  color: #fff;
+  border-color: var(--register_novel_button_color);
 }
-#menu_library_update{
-  box-shadow: 0 0 0 0.2rem var(--update_library_button_color);
-  background: inherit;
+#menu_library_update_btn{
   color: var(--update_library_button_color);
+  border-color: var(--update_library_button_color);
 }
-#menu_library_update:hover {
-  background-color: var(--update_library_button_color);
+#menu_library_update_btn:hover{
   color: #fff;
+  background-color: var(--update_library_button_color);
+  border-color: var(--update_library_button_color);
 }
 /* Mainpanel stuff */
 .library_series_entry{
   position: relative;
   color: var(--series_entry_text_color);
-  box-shadow: 0 0 0 0.1em var(--library_color_primary);
+  box-shadow: 0 0 0 0.07rem var(--library_color_primary);
   margin: 0.5em 0;
   padding: 1em 2em;
-  border-radius: 0.4em;
-
-  /* Make it unselectable */
-  user-select: none;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
 }
 .library_series_entry:hover{
   color: #fff;
@@ -474,6 +461,7 @@ section.section_library{
 .entry_title{
   width: 80%;
   line-height: 0.75em;
+  text-align: left;
   font-variant: all-small-caps;
   font-weight: bold;
   font-size: 1.5em;
@@ -519,17 +507,24 @@ section.section_library{
   height: 100%;
   margin: 0 0.5rem;
   padding: 1.5rem;
-  color: #fff;
+  color: #fff !important;
   background: var(--library_color_primary);
   text-align: center;
   font-size: 1.2rem;
   font-variant: all-small-caps;
   border-radius: 0.5rem;
   cursor: pointer;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
 }
 .series_entry_btn:hover{
   background: #fff !important;
-  color: var(--series_entry_btn_color);
+  color: var(--series_entry_btn_color) !important;
 }
 .library_series_entry:hover .series_entry_btn{
   background: var(--series_entry_btn_color);
@@ -671,12 +666,13 @@ pre#unbootstrap{
   padding: 1rem 0;
   border-bottom: 1px solid #d2d2d2;
 }
-.toc_menu_btn{
+.superpanel_menu_btn{
   margin: auto 0.5rem;
   font-variant: all-petite-caps;
   font-size: 1.2rem;
+  box-shadow: none !important;
 }
-.toc_menu_btn ion-icon{
+.superpanel_menu_btn ion-icon{
   margin: 0 0.2rem -0.2rem 0.2rem;
 }
 #rmv_all_bkmk_btn{
@@ -687,6 +683,13 @@ pre#unbootstrap{
 }
 #update_series_btn{
   float: left;
+  color: var(--update_library_button_color);
+  border-color: var(--update_library_button_color);
+}
+#update_series_btn:hover{
+  color: #fff;
+  background-color: var(--update_library_button_color);
+  border-color: var(--update_library_button_color);
 }
 #series_dictionary_btn{
   float: left;
@@ -789,6 +792,7 @@ pre#unbootstrap{
   color: #fff;
   background-color: var(--chapter_day_night_toggle_btn_color);
   border-color: var(--chapter_day_night_toggle_btn_color);
+  box-shadow: none !important;
 }
 .chapter_day_night_toggle_btn:hover{
   filter: brightness(1.2);

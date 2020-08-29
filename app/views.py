@@ -24,7 +24,6 @@ from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.models import SeriesTable
-from app.models import DictionariesTable
 from app.models import HostTable
 from app.scripts import utils
 from app.scripts import hostmanager
@@ -119,8 +118,7 @@ def library_remove_novel(series_code):
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
 		series_abbr = series_entry.abbr
 		if not remove_novel_form.opt_keep_dict.data:
-			dict_entry = DictionariesTable.query.filter_by(id=series_entry.dict_id).first()
-			db.session.delete(dict_entry)
+			# Delete associated dict file
 			flash("Removed dictionary associated with %s" % series_abbr, "success")
 		db.session.delete(series_entry)
 		db.session.commit()
