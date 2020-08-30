@@ -25,6 +25,11 @@ from app.models import SeriesTable
 from app.models import HostTable
 from app.scripts.hostmanager import Host
 
+
+# Global constants
+COMMON_DICT_ABBR = "Common"
+
+
 class RegisterNovelForm(FlaskForm):
 	'''
 		This form is used when displaying the "Register Novel" modal to the user
@@ -62,6 +67,9 @@ class RegisterNovelForm(FlaskForm):
 
 	# Custom validator for series code
 	def validate_abbr(self, abbr):
+		if abbr.data == COMMON_DICT_ABBR:
+			raise ValidationError("The abbreviation \'%s\' is illegal" % abbr.data)
+
 		# Validation: this abbreviation must not already be taken
 		series_entry = SeriesTable.query.filter_by(abbr=abbr.data).first()
 		if series_entry is not None:

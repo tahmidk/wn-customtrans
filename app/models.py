@@ -24,6 +24,8 @@ class SeriesTable(db.Model):
 	current_ch = db.Column(db.Integer, nullable=False)
 	latest_ch = db.Column(db.Integer, nullable=False)
 	bookmarks = db.Column(MutableList.as_mutable(db.PickleType))
+	# Foreign key for the associated dictionary
+	dict_id = db.Column(db.Integer, nullable=False)
 	# Foreign key for the host website
 	host_id = db.Column(db.Integer, nullable=False)
 
@@ -31,12 +33,20 @@ class SeriesTable(db.Model):
 		return "Novel(code=%s, abbr=%s, current_ch=%s, latest_ch=%s)" % \
 			(self.code, self.abbr, self.current_ch, self.latest_ch)
 
+class DictionaryTable(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	fname = db.Column(db.String, unique=True, nullable=False)
+	enabled = db.Column(db.Boolean, default=True)
+
+	def __repr__(self):
+		return "Dict(fname=%s, enabled=%s)" % (self.fname, self.enabled)
+
 class HostTable(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	host_type = db.Column(db.Enum(Host), unique=True, nullable=False)
-	host_name = db.Column(db.String(), unique=True, nullable=False)
+	host_name = db.Column(db.String, unique=True, nullable=False)
 	host_lang = db.Column(db.Enum(Language), nullable=False)
-	host_url = db.Column(db.String(), unique=True, nullable=False)
+	host_url = db.Column(db.String, unique=True, nullable=False)
 
 	def __repr__(self):
 		return "Host(id=%s, host_name=%s, host_lang=%s, host_url=%s)" % \

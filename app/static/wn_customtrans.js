@@ -199,7 +199,7 @@ function setupLibrary(){
 			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
 				var msg = "An network error occurred when requesting updates for " + series_abbr;
 				var category = "danger";
-				createFlashMessage(msg, category, ".library_mainpanel");
+				createFlashMessage(msg, category, "#library_flashpanel");
 			}
 		}
 	});
@@ -354,5 +354,18 @@ function setupChapter(){
 }
 
 function setupDictionary(){
-
+	$('.action_toggle_enable').click(function() {
+		var url = this.getAttribute('action');
+		var dict_entry = this.closest('.dictionary_entry');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				$(dict_entry).toggleClass('dictionary_entry_disabled');
+			}
+			else{
+				var msg = "An unexpected error occurred while trying to toggle dictionary: " + series_abbr;
+				var category = "danger";
+				createFlashMessage(msg, category, "#dictionary_flashpanel");
+			}
+		})
+	});
 }

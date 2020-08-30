@@ -86,7 +86,7 @@ def registerSeriesToDatabase(reg_form):
 
 	host_entry = HostTable.query.filter_by(host_type=Host(reg_form.series_host.data)).first()
 
-	# Check database for preexisting dictionary if this series is being re-registered
+	# Check for preexisting dictionary if this series is being re-registered
 
 
 	# Finally build the table for the series

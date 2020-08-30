@@ -42,7 +42,7 @@
 			<div class="banner_title" id="library_title">Library</div>
 		</div>
 		<div class="library_body">
-			<div class="library_superpanel">
+			<div class="superpanel" id="library_superpanel">
 				<!-- Register button -->
 				<button type="button" class="btn btn-outline-primary superpanel_menu_btn modal_trigger" id="menu_library_register_btn" data-toggle="modal"
 					data-target="#register_novel_modal_push" title="Add Series">
@@ -55,12 +55,7 @@
 					<span> Update </span>
 				</button>
 			</div>
-			<div class="library_mainpanel">
-				<!-- Novel entries -->
-				{% for novel in series %}
-					{{ series_entry(novel) }}
-				{% endfor %}
-
+			<div class="flashpanel" id="library_flashpanel">
 				<!-- Flashed messages -->
 				{% with messages = get_flashed_messages(with_categories=true) %}
 					{% if messages %}
@@ -78,6 +73,12 @@
 					</div>
 					{% endif %}
 				{% endwith %}
+			</div>
+			<div class="mainpanel" id="library_mainpanel">
+				<!-- Novel entries -->
+				{% for novel in series %}
+					{{ series_entry(novel) }}
+				{% endfor %}
 			</div>
 		</div>
 	</section>

@@ -1,0 +1,29 @@
+{% macro dictionary_entry(dictionary) %}
+	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="{{dictionary.abbr}}">
+		<div class="dictionary_entry_abbr">
+			<div class="dictionary_entry_abbr_text">
+				{{dictionary.abbr}}
+			</div>
+		</div>
+		<div class="dictionary_entry_body">
+			<div class="dictionary_entry_filename">
+				{{dictionary.fname}}
+			</div>
+			<div class="dictionary_entry_action_bar">
+				<div class="dictionary_entry_action_div action_download" title="Download dict">
+					<ion-icon name="arrow-down-circle-outline"></ion-icon>
+				</div>
+				<div class="dictionary_entry_action_div action_upload" title="Upload and Replace dict">
+					<ion-icon name="arrow-up-circle-outline"></ion-icon>
+				</div>
+				<div class="dictionary_entry_action_div action_edit" title="Edit dict contents">
+					<ion-icon name="create-outline"></ion-icon>
+				</div>
+				<div class="dictionary_entry_action_div action_toggle_enable" title="Enable/Disable dict"
+					action="{{url_for('dictionaries_toggle_entry',dict_abbr=dictionary.abbr)}}">
+					<ion-icon name="checkbox-outline"></ion-icon>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}

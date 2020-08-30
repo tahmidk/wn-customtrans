@@ -10,7 +10,7 @@ html{
 
   /* Main page palette */
   --library_color_primary: #d83939;
-  --dictionary_color_primary: #efa05d;
+  --dictionary_color_primary: #f58e38;
   --tutorial_color_primary: #aaff77;
   --settings_color_primary: #97ecff;
 
@@ -36,6 +36,10 @@ html{
   --chapter_subtxt_color: #adadad;
   --chapter_day_night_toggle_btn_color: #572a80;
   --chapter_scroll_bar_color: #181818;
+
+  /* Dictionary palette */
+  --dictionary_dlall_button_color: #b9d200;
+  --dictionary_entry_color_primary: #ffb43d;
 }
 html[data-theme='dark']{
   --html_background_color: #181818;
@@ -282,6 +286,16 @@ input[type=number] {
   height: fit-content;
   margin: auto;
 }
+.superpanel{
+  margin: 3rem 0 1rem 0;
+}
+.mainpanel{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
 section.section_index{
@@ -379,18 +393,6 @@ section.section_library{
 #library_title{
   color: var(--library_color_primary);
 }
-.library_body{
-}
-.library_superpanel{
-  margin: 3rem 0 1rem 0;
-}
-.library_mainpanel{
-  display: flex;
-  flex-direction: column-reverse;
-  width: 100%;
-  height: auto;
-  box-sizing: border-box;
-}
 /* Library superpanel stuff */
 #menu_library_register_btn{
   margin-left: 0;
@@ -469,6 +471,9 @@ section.section_library{
   margin-bottom: 0.5em;
   padding: 0.5em 0;
   border-bottom: 1px solid;
+}
+.update_badge{
+  font-size: 1rem;
 }
 .entry_details{
   line-height: 1em;
@@ -876,4 +881,84 @@ pre#unbootstrap{
   font-size: 1.5rem;
   font-weight: bold;
   border-radius: 0.5rem;
+}
+#menu_dictionary_dlall_btn{
+  margin-left: 0;
+  color: var(--dictionary_dlall_button_color);
+  border-color: var(--dictionary_dlall_button_color);
+}
+#menu_dictionary_dlall_btn:hover{
+  color: #fff;
+  background-color: var(--dictionary_dlall_button_color);
+  border-color: var(--dictionary_dlall_button_color);
+}
+#Common{
+  filter: hue-rotate(220deg);
+  margin: 2rem 0;
+}
+.dictionary_entry_disabled{
+  filter: grayscale(1) !important;
+}
+.dictionary_entry{
+  position: relative;
+  display: flex;
+  /*border: solid 1px var(--dictionary_entry_color_primary);*/
+  background: #ff9c0024;
+  border-right: none;
+  margin: 0.75rem 0;
+  box-sizing: border-box;
+  height: 4rem;
+}
+.dictionary_entry_abbr{
+  width: 20rem;
+  color: #fff;
+  font-weight: bolder;
+  font-size: 1.5rem;
+  font-family: monospace;
+  border-bottom: 4rem solid var(--dictionary_entry_color_primary);
+  border-right: 1.5rem solid transparent;
+}
+.dictionary_entry_abbr_text{
+  padding: 0.5rem 2rem;
+  height: 4rem;
+  line-height: 3rem;
+}
+.dictionary_entry_body{
+  display: flex;
+  width: -webkit-fill-available;
+  padding-left: 1rem;
+}
+.dictionary_entry_filename{
+  width: -webkit-fill-available;
+  margin: auto 0;
+  color: #d88400;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1rem;
+}
+.dictionary_entry_action_bar{
+  width: fit-content;
+  display: flex;
+  color: var(--series_entry_text_color);
+  font-size: 1.5rem;
+}
+.dictionary_entry_action_bar > *:hover{
+  filter: brightness(1.1);
+}
+.dictionary_entry_action_div{
+  width: 4rem;
+  text-align: center;
+  margin: 0 1px;
+  background: #ffad64;
+  color: #fff;
+  cursor: pointer;
+}
+.dictionary_entry_action_div ion-icon{
+  height: 100%;
+}
+.action_upload{
+  background: #ffa14e;
+}
+.action_toggle_enable{
+  width: 6rem;
+  background: #ff8f2c;
 }

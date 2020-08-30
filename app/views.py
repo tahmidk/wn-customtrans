@@ -23,7 +23,9 @@ from app import csrf
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
+from app.forms import COMMON_DICT_ABBR
 from app.models import SeriesTable
+from app.models import DictionaryTable
 from app.models import HostTable
 from app.scripts import utils
 from app.scripts import hostmanager
@@ -34,6 +36,8 @@ from io import BytesIO
 
 
 
+# Global constants
+COMMON_DICT_FNAME = "common_dict.dict"
 
 # This is the route for the main page
 @app.route("/")
@@ -50,7 +54,7 @@ def library():
 	remove_novel_form = RemoveNovelForm()
 
 	# Fetch series from database
-	series = SeriesTable.query.all()
+	series = SeriesTable.query.order_by(SeriesTable.title).all();
 	return render_template('library.html',
 		title="Library",
 		back_href=url_for('index'),
@@ -213,17 +217,50 @@ def library_series_chapter(series_code, ch):
 # Route for Dictionaries view
 @app.route("/dictionaries")
 def dictionaries():
+	series = SeriesTable.query.all()
+	dictionaries = []
+	for entry in series:
+		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
+		dictionaries.append({
+			"abbr": entry.abbr,
+			"fname": dict_entry.fname,
+			"enabled": dict_entry.enabled
+		})
+	dictionaries = sorted(dictionaries, key=lambda k: k['abbr'])
+
+	# Add common_dict
+	dict_entry = DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first()
+	dictionaries.insert(0, {
+		"abbr": COMMON_DICT_ABBR,
+		"fname": dict_entry.fname,
+		"enabled": dict_entry.enabled
+	})
+
 	return render_template("dictionary.html",
 		title="Dictionary",
+		dictionaries=dictionaries,
 		back_href=url_for('index'))
 
 
+# Route for enabling/disabling dictionaries
+@app.route("/dictionaries/toggle/<dict_abbr>", methods=["POST"])
+def dictionaries_toggle_entry(dict_abbr):
+	if dict_abbr == "Common":
+		dict_entry = DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first()
+	else:
+		series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
+		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+
+	dict_entry.enabled = not dict_entry.enabled
+	db.session.add(dict_entry)
+	db.session.commit()
+	return jsonify(status='ok')
 
 # @app.route("/dictionaries/upload/<series>", methods=["POST"])
 # def dictionaries_upload_dict(series):
 # 	dict_file = request.files['inputFile']
 
-# 	db_file = DictionariesTable(name=dict_file.filename, data=dict_file.read())
+# 	db_file = DictionaryTable(name=dict_file.filename, data=dict_file.read())
 # 	db.session.add(db_file)
 # 	db.session.commit()
 
