@@ -23,7 +23,7 @@ class SeriesTable(db.Model):
 	abbr = db.Column(db.String(15), unique=True, nullable=False)
 	current_ch = db.Column(db.Integer, nullable=False)
 	latest_ch = db.Column(db.Integer, nullable=False)
-	bookmarks = db.Column(MutableList.as_mutable(db.PickleType))
+	bookmarks = db.Column(MutableList.as_mutable(db.PickleType), nullable=False)
 	# Foreign key for the associated dictionary
 	dict_id = db.Column(db.Integer, nullable=False)
 	# Foreign key for the host website

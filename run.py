@@ -6,16 +6,21 @@
 #=======================================================================
 
 # Python imports
-from tempfile import TemporaryFile
+import io
 
 # Internal imports
+from flask import url_for
+
 from app import app
 from app import db
+
 from app.models import SeriesTable
 from app.models import DictionaryTable
 from app.models import HostTable
 from app.models import Language
+
 from app.scripts.hostmanager import Host
+from app.scripts.hostmanager import createManager
 
 
 test_series = [
@@ -103,6 +108,26 @@ def reinitDatabase():
 		series_host = HostTable.query.filter_by(host_type=series['host']).first();
 		# Create dictionary entry in database
 		dict_fname = "%s_%s_%s.dict" % (series['abbr'], series_host.host_name, series['code'])
+		# dict_path = 'user/default/' + dict_fname
+		# dict_url = url_for('static', filename=dict_path)
+		# with io.open(dict_url, mode='w', encoding='utf8') as dict_file:
+		# 	host_manager = createManager(series_host.host_type)
+
+		# 	dict_file.write("// Series Title :  %s\n" % series['title'])
+		# 	dict_file.write("// Abbreviation :  %s\n" % series['abbr'])
+		# 	dict_file.write("// Series Link  :  %s\n" % host_manager.generateSeriesUrl(series))
+		# 	dict_file.write("\n\n//=============================[ Names ]==================================")
+		# 	dict_file.write(u'\n@name{ナルト, Naruto}')
+		# 	dict_file.write(u'\n@name{うずまき, Uzumaki}')
+		# 	dict_file.write("\n\n//=============================[ Places ]=================================")
+		# 	dict_file.write("\n\n//=============================[ Skills ]=================================")
+		# 	dict_file.write("\n\n//============================[ Monsters ]================================")
+		# 	dict_file.write("\n\n//===========================[ Terminology ]==============================")
+		# 	dict_file.write(u'\n九尾の狐 --> Nine Tailed Fox')
+		# 	dict_file.write("\n\n//==============================[ Misc ]==================================")
+		# 	dict_file.write("\n\n// END OF FILE")
+
+		# Submit dictionary to database
 		dict_entry = DictionaryTable(
 			fname=dict_fname,
 		)

@@ -5,7 +5,7 @@
  * 		modal_id - the id of the bootstrap modal itself (should have role="dialog" attribute)
  * 		form_id - the id of the <form> being hosted on this modal
  */
-function setupModalForm(btn_id, modal_id, form_id){
+function setupLibraryModalForm(btn_id, modal_id, form_id){
 	// Set up the trigger button and error display
 	$(btn_id).click(function (event) {
 		event.preventDefault();
@@ -19,6 +19,10 @@ function setupModalForm(btn_id, modal_id, form_id){
 			if (data.status == 'ok') {
 				$(modal_id).modal('hide');
 				location.reload();
+			}
+			else if (data.status == 'error') {
+				createFlashMessage(data.msg, data.severity, "#library_flashpanel");
+				$(modal_id).modal('hide');
 			}
 			else{
 				// First erase any feedback/invalid stylings that may exist from previous submissions
@@ -71,7 +75,7 @@ function createFlashMessage(message, category, flash_loc){
 	flash_div.classList.add("alert-dismissible");
 	flash_div.classList.add("fade");
 	flash_div.classList.add("show");
-	flash_div.classList.add("flash_msg_" + category);
+	flash_div.classList.add("alert-" + category);
 	flash_div.setAttribute("role", "alert");
 
 	var message_span = document.createTextNode(message);
@@ -191,13 +195,18 @@ function setupLibrary(){
 					$(".progress_bar_display").fadeOut();//.css("display", "none");
 					update_btn_enabled = true;
 				}, 1000);
+				setTimeout(() => {
+					var msg = "Successfully fetched updates for all series in the library!";
+					var category = "success";
+					createFlashMessage(msg, category, '#library_flashpanel')
+				}, 1000);
 			}
 
 			// Display errors
 			var last = len_updated - 1;
 			var series_abbr = progress_data['updated'][last][ABBR_INDEX];
 			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
-				var msg = "An network error occurred when requesting updates for " + series_abbr;
+				var msg = "A network error occurred when requesting updates for " + series_abbr;
 				var category = "danger";
 				createFlashMessage(msg, category, "#library_flashpanel");
 			}
@@ -205,13 +214,13 @@ function setupLibrary(){
 	});
 
 	// Setup the register novel modal
-	setupModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form);
+	setupLibraryModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form);
 
 	// Setup the edit novel modal
-	setupModalForm(edit_novel_submit, edit_novel_modal, edit_novel_form);
+	setupLibraryModalForm(edit_novel_submit, edit_novel_modal, edit_novel_form);
 
 	//Setup the remove novel modal
-	setupModalForm(remove_novel_submit, remove_novel_modal, remove_novel_form);
+	setupLibraryModalForm(remove_novel_submit, remove_novel_modal, remove_novel_form);
 }
 
 function setupTableOfContents(){
@@ -357,9 +366,15 @@ function setupDictionary(){
 	$('.action_toggle_enable').click(function() {
 		var url = this.getAttribute('action');
 		var dict_entry = this.closest('.dictionary_entry');
+		var toggle = this.querySelector('ion-icon');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				$(dict_entry).toggleClass('dictionary_entry_disabled');
+				if(data.toggle == 0){
+					toggle.setAttribute("name", "square-outline");
+				}else{
+					toggle.setAttribute("name", "checkbox-outline");
+				}
 			}
 			else{
 				var msg = "An unexpected error occurred while trying to toggle dictionary: " + series_abbr;

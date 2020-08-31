@@ -6,6 +6,11 @@
 #  Licensed under the BSD 3-Clause license found in the LICENSE file
 #=======================================================================
 
+# Python imports
+import json
+from io import BytesIO
+import os
+
 # Flask imports
 from flask import render_template
 from flask import url_for
@@ -20,24 +25,22 @@ from flask import abort
 from app import db
 from app import app
 from app import csrf
+
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.forms import COMMON_DICT_ABBR
+
 from app.models import SeriesTable
 from app.models import DictionaryTable
 from app.models import HostTable
+
 from app.scripts import utils
+from app.scripts import dictionary
 from app.scripts import hostmanager
-
-# Other imports
-import json
-from io import BytesIO
+from app.scripts.custom_errors import *
 
 
-
-# Global constants
-COMMON_DICT_FNAME = "common_dict.dict"
 
 # This is the route for the main page
 @app.route("/")
@@ -69,12 +72,16 @@ def library():
 def library_register_novel():
 	register_novel_form = RegisterNovelForm()
 	if register_novel_form.validate_on_submit():
-		series_entry = utils.registerSeriesToDatabase(register_novel_form)
-		if series_entry.latest_ch == 0:
-			flash("Couldn't pull latest chapter for submitted series from host. \
-				Try hitting \'Update\' later", "warning")
-		flash("%s was successfully registered!" % series_entry.abbr, "success")
-		return jsonify(status='ok')
+		try:
+			series_entry = utils.registerSeriesToDatabase(register_novel_form)
+			if series_entry.latest_ch == 0:
+				flash("Couldn't pull latest chapter for submitted series from host. \
+					Try hitting \'Update\' later", "warning")
+			flash("%s was successfully registered!" % series_entry.abbr, "success")
+			return jsonify(status='ok')
+		except CustomException as err:
+			return jsonify(status='error', msg=str(err), severity=err.severity)
+
 
 	data = json.dumps(register_novel_form.errors, ensure_ascii=False)
 	return jsonify(data)
@@ -92,7 +99,10 @@ def library_update():
 			data['updated'] = []
 			for index in range(0, len(all_series)):
 				series_entry = all_series[index]
-				num_updates = utils.updateSeries(series_entry)
+				try:
+					num_updates = utils.updateSeries(series_entry)
+				except:
+					num_updates = -1
 				data['updated'].append((series_entry.abbr, num_updates, series_entry.latest_ch))
 				yield 'data: %s\n\n' % json.dumps(data)
 	return Response(update_streamer(), mimetype="text/event-stream")
@@ -104,10 +114,32 @@ def library_edit_novel(series_code):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
-		series_entry.title = edit_novel_form.title.data
-		series_entry.abbr = edit_novel_form.abbr.data
+		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+
+		new_title = edit_novel_form.title.data
+		new_abbr  = edit_novel_form.abbr.data
+
+		# Rename the associated dict according to new abbreviation
+		fname_new = dictionary.generateDictFilename(
+			edit_novel_form.abbr.data,
+			host_entry.host_name,
+			series_entry.code
+		)
+		dictionary.renameDictFile(dict_entry.fname, fname_new)
+		# If the dict exists but is empty, repopulate it with the dictionary skeleton text
+		dict_path = url_for('dict', filename=fname_new)[1:]
+		if os.path.getsize(dict_path) == 0:
+			host_manager = hostmanager.createManager(host_entry.host_type)
+			createDictFile(fname_new, series_title, series_abbr, host_manager.generateSeriesUrl(series_code))
+		dictionary.updateDictMetaHeader(fname_new, new_title, new_abbr)
+
+		# Change the series entry itself
+		series_entry.title = new_title
+		series_entry.abbr = new_abbr
 		db.session.commit()
-		flash("Changes have been applied!", "success")
+
+		flash("Successfully applied changes!", "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
@@ -122,8 +154,15 @@ def library_remove_novel(series_code):
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
 		series_abbr = series_entry.abbr
 		if not remove_novel_form.opt_keep_dict.data:
-			# Delete associated dict file
-			flash("Removed dictionary associated with %s" % series_abbr, "success")
+			dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+			# Remove physical dict file
+			dictionary.removeDictFile(dict_entry.fname)
+			# Remove dict from database
+			db.session.delete(dict_entry)
+			db.session.commit()
+			flash("Successfully removed dictionary associated with %s" % series_abbr, "success")
+
+		# Remove series from database
 		db.session.delete(series_entry)
 		db.session.commit()
 
@@ -154,8 +193,9 @@ def library_series_toc(series_code):
 @app.route("/library/<series_code>/update", methods=["POST"])
 def library_series_update(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
-	num_updates = utils.updateSeries(series_entry)
-	if num_updates < 0:
+	try:
+		num_updates = utils.updateSeries(series_entry)
+	except:
 		return jsonify(status='error')
 
 	return jsonify(status='ok', updates=num_updates)
@@ -196,7 +236,10 @@ def library_series_chapter(series_code, ch):
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
 
-	chapter_data = utils.customTrans(series_entry, ch)
+	try:
+		chapter_data = utils.customTrans(series_entry, ch)
+	except CustomException as err:
+		return str(err)
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
@@ -229,7 +272,7 @@ def dictionaries():
 	dictionaries = sorted(dictionaries, key=lambda k: k['abbr'])
 
 	# Add common_dict
-	dict_entry = DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first()
+	dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
 	dictionaries.insert(0, {
 		"abbr": COMMON_DICT_ABBR,
 		"fname": dict_entry.fname,
@@ -246,15 +289,19 @@ def dictionaries():
 @app.route("/dictionaries/toggle/<dict_abbr>", methods=["POST"])
 def dictionaries_toggle_entry(dict_abbr):
 	if dict_abbr == "Common":
-		dict_entry = DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first()
+		dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
 	else:
 		series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
-
 	dict_entry.enabled = not dict_entry.enabled
 	db.session.add(dict_entry)
 	db.session.commit()
-	return jsonify(status='ok')
+
+	data = {
+		"status": "ok",
+		"toggle": int(dict_entry.enabled)
+	}
+	return jsonify(data)
 
 # @app.route("/dictionaries/upload/<series>", methods=["POST"])
 # def dictionaries_upload_dict(series):

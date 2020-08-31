@@ -5,7 +5,7 @@ html{
 
   /* Color definitions */
   --html_background_color: #fff;
-  --back_btn_color: #828282;
+  --back_btn_color: #292929;
   --white_contrast_font_color: #828282;
 
   /* Main page palette */
@@ -39,6 +39,7 @@ html{
 
   /* Dictionary palette */
   --dictionary_dlall_button_color: #b9d200;
+  --dictionary_honorifics_button_color: #d20091;
   --dictionary_entry_color_primary: #ffb43d;
 }
 html[data-theme='dark']{
@@ -140,7 +141,8 @@ input[type=number] {
   width: fit-content;
   padding: 0.5rem 1rem;
   box-shadow: 0 0 0 0.1rem var(--back_btn_color);
-  border-radius: 0.4rem;
+  border-radius: 0.2rem;
+  font-size: 0.9rem;
   font-variant: all-petite-caps;
   font-weight: bold;
   cursor: pointer;
@@ -245,7 +247,7 @@ input[type=number] {
   -webkit-user-select: none;
   -o-user-select: none;
 }
-.flash_msg_success{
+/*.flash_msg_success{
   color: #009e00;
   background: #b4ff9e;
   border-color: #009e00;
@@ -259,7 +261,7 @@ input[type=number] {
   color: #9e0000;
   background: #ff988b;
   border-color: #9e0000;
-}
+}*/
 .progress_bar_display{
   position: fixed;
   z-index: 1;
@@ -599,8 +601,8 @@ pre#unbootstrap{
   margin-bottom: 3rem;
 }
 .toc_series_title_div{
-  font-variant: all-petite-caps;
-  font-size: 4rem;
+  font-variant: petite-caps;
+  font-size: 3rem;
   text-align: center;
   line-height: 3.5rem;
   color: #dc6060;
@@ -672,7 +674,7 @@ pre#unbootstrap{
   border-bottom: 1px solid #d2d2d2;
 }
 .superpanel_menu_btn{
-  margin: auto 0.5rem;
+  margin: auto 0.2rem;
   font-variant: all-petite-caps;
   font-size: 1.2rem;
   box-shadow: none !important;
@@ -892,9 +894,22 @@ pre#unbootstrap{
   background-color: var(--dictionary_dlall_button_color);
   border-color: var(--dictionary_dlall_button_color);
 }
-#Common{
-  filter: hue-rotate(220deg);
+#menu_dictionary_honorifics_btn{
+  color: var(--dictionary_honorifics_button_color);
+  border-color: var(--dictionary_honorifics_button_color);
+}
+#menu_dictionary_honorifics_btn:hover{
+  color: #fff;
+  background-color: var(--dictionary_honorifics_button_color);
+  border-color: var(--dictionary_honorifics_button_color);
+
+}
+#dict_Common{
+  filter: hue-rotate(125deg);
   margin: 2rem 0;
+}
+#dict_Common:hover{
+  filter: hue-rotate(125deg) brightness(1.05);
 }
 .dictionary_entry_disabled{
   filter: grayscale(1) !important;
@@ -902,12 +917,14 @@ pre#unbootstrap{
 .dictionary_entry{
   position: relative;
   display: flex;
-  /*border: solid 1px var(--dictionary_entry_color_primary);*/
   background: #ff9c0024;
   border-right: none;
   margin: 0.75rem 0;
   box-sizing: border-box;
   height: 4rem;
+}
+.dictionary_entry:hover{
+  filter: brightness(1.05);
 }
 .dictionary_entry_abbr{
   width: 20rem;
@@ -954,9 +971,7 @@ pre#unbootstrap{
 }
 .dictionary_entry_action_div ion-icon{
   height: 100%;
-}
-.action_upload{
-  background: #ffa14e;
+  font-size: 1.3rem;
 }
 .action_toggle_enable{
   width: 6rem;

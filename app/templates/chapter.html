@@ -31,6 +31,27 @@
 		{{ render_toolbelt() }}
 	</div>
 
+	<!-- Flashpanel -->
+	<div class="flashpanel" id="dictionary_flashpanel">
+		<!-- Flashed messages -->
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+			<div class="flash_msg_div">
+				{% for category, message in messages %}
+					{% if category == 'success' or category == 'warning' or category == 'danger'%}
+					<div class="alert alert-dismissible fade show alert-{{category}}" role="alert">
+						{{ message }}
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+			{% endif %}
+		{% endwith %}
+	</div>
+
 	<div class="content">
 		<p class="dummy" id="d0">{{dummy_text}}</p>
 		<div class="content_title_div content_section">
@@ -92,7 +113,7 @@
 	{% if data.type == "text" %}
 		<div class="content_line_div">
 			<p class="content_line" id="l{{data.line_id}}">
-				{{data.text}}
+				{{data.text|safe}}
 			</p>
 			<p class="content_raw notranslate" id="r{{data.line_id}}">
 				<a href="{{data.gt_link}}" class="no_decoration" target="_blank">

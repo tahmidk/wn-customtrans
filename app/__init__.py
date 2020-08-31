@@ -17,6 +17,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wnct_database.db'
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
+# Add user directory
+app.add_url_rule('/user/default/dicts/<path:filename>', endpoint='dict',
+                 view_func=app.send_static_file)
+app.add_url_rule('/user/default/<path:filename>', endpoint='user',
+                 view_func=app.send_static_file)
+
 # Create database instance connected to webapp
 db = SQLAlchemy(app)
 
