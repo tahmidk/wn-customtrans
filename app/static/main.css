@@ -291,6 +291,10 @@ input[type=number] {
 .superpanel{
   margin: 3rem 0 1rem 0;
 }
+.flashpanel{
+  display: flex;
+  flex-direction: column-reverse;
+}
 .mainpanel{
   display: flex;
   flex-direction: column;

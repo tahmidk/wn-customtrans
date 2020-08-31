@@ -20,19 +20,26 @@ from flask import url_for
 # Internal imports
 from app import db
 
-from app.models import SeriesTable
-from app.models import DictionaryTable
-from app.models import HostTable
+from app.models import *
 
 from app.scripts.custom_errors import *
 from app.scripts.hostmanager import Language
 from app.scripts import hostmanager
 
 
-# Some global constants
+
+#===============================================================
+#  Globals
+#===============================================================
+# Standard name for the common dictionary file
 COMMON_DICT_FNAME = "common_dict.dict"
+# Common tokens used to seperate first and last names in raw chapters
+NAME_SEPERATORS = ["", " ", "・"]
+# Syntactic seperator used to seperate first, last names in the @name dictionary syntax
 DICT_NAME_DIVIDER = r'|'
+# Syntactic seperator used for individual definitions in the dictionary syntac
 DICT_DEF_DIVIDER = r'-->'
+
 
 def spliceDictName(dict_fname):
 	"""-------------------------------------------------------------------
@@ -152,8 +159,62 @@ def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 		# Failed to rewrite metadata, but this isn't fatal
 		return
 
-def generateNameVariants(raws, trans, lang):
-	return None
+def generateNameVariants(rn, tn, lang):
+	"""-------------------------------------------------------------------
+		Function:		[generateNameVariants]
+		Description:	Generates all variants of rName --> tName dictionary
+						entries using the honorifics indicated in honorifics.json
+		Input:
+		  [rn]		List consisting of the raw components of the name
+		  [tn] 		List consisting of the translated components of the name
+		  [lang] 	Enum.Language representing language of the raw component
+		Return:			List of tuples of raw name variants to translated name
+						variants in the form (raw_variant, (trans_variant, comment))
+						None if definition is invalid
+		------------------------------------------------------------------
+	"""
+	# rn and tn should be one-to-one and equal size
+	if len(rn) != len(tn):
+		return None
+
+	variants = []
+	name_len = len(rn)
+	honorifics = HonorificsTable.query.filter_by(
+		lang=lang,
+		enabled=True )
+
+	# First generate non-honorific individual entries
+	# e.g. for @name{X|Y, Naruto|Uzumaki}, generate X --> Naruto and Y --> Uzumaki
+	individual_variants = [(rn[i], (tn[i], None)) for i in range(0, name_len)]
+
+	# Next generate non-honorific combined variants using name seperators commonly found in raw chapters
+	# e.g. for @name{X|Y, Naruto|Uzumaki}, generate XY --> Naruto Uzumaki, X Y --> Naruto Uzumaki, etc...
+	combined_variants = [(sep.join(rn), (sep.join(tn), None)) for sep in NAME_SEPERATORS ]
+
+	# Finally generate all honorific variants of this name entry
+	honorific_variants = []
+	for honorific_entry in honorifics:
+		# Extract honorifics data
+		h_raw = honorific_entry.raw
+		h_trans = honorific_entry.trans
+
+		# Helper function to generate honorific'ed name translations
+		def gen_trans(t_name):
+			if honorific_entry.opt_affix == HonorificAffix.SUFFIX:
+				# Process suffixed honorific translation
+				t_processed = ("-" if honorific_entry.opt_with_dash else "").join([t_name, h_trans])
+			else:
+				# Process prefixed honorific translation
+				t_processed = h_trans + t_name
+			return t_processed
+
+		# Process the honorific
+		rn_processed = [r_name + h_raw for r_name in rn]
+		tn_processed = [gen_trans(t_name) for t_name in tn]
+		honorific_variants.extend([(rn_processed[i], (tn_processed[i], None)) for i in range(0, name_len)])
+
+	all_variants = individual_variants + combined_variants + honorific_variants
+	return all_variants
 
 def processDictFile(dict_fname, series_lang):
 	"""-------------------------------------------------------------------
@@ -170,44 +231,56 @@ def processDictFile(dict_fname, series_lang):
 	dict_path = url_for('dict', filename=dict_fname)[1:]
 	dict_list = []
 
+	# Sanity checks
+	if not os.path.exists(dict_path):
+		raise DictFileDNEOnProcessException(dict_fname)
+	if os.path.getsize(dict_path) == 0:
+		raise DictFileEmptyOnProcessException(dict_fname)
+
 	try:
 		with io.open(dict_path, mode='r', encoding='utf8') as dict_file:
 			name_pattern = re.compile(r"\s*@name\{(.+), (.+)\}.*")
-			for line in dict_file:
+			dict_contents = dict_file.readlines()
+			for index in range(0, len(dict_contents)):
+				line = dict_contents[index]
 				line = line.strip()
-				line = line[:-1]	# Ignore newline '\n' at the end of the line
 
 				# Skip comment lines and unformatted/misformatted lines
 				name_match = name_pattern.fullmatch(line)
 				if line[0:2] == "//" or len(line) == 0 or line.isspace():
 					continue
 				elif name_match is not None:
-					# Process name tagged lines: '@name{name_raw, name_trans}', '@name{first_name_raw|last_name_raw, first_name_trans|last_name_trans}', etc...
+					# Process name tagged lines: '@name{name_raw, name_trans}',
+					#  '@name{first_name_raw|last_name_raw, first_name_trans|last_name_trans}', etc...
 					raw_component = name_match[1].strip().split(DICT_NAME_DIVIDER)
 					trans_component = name_match[2].strip().split(DICT_NAME_DIVIDER)
-					variants = generateNameVariants(
-						raw_component,
-						trans_component,
-						series_lang)
+					if len(raw_component) != len(trans_component):
+						# Line is a misbalanced name tag
+						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
+						continue
 
+					# Generate and append name variants to the dict
+					variants = generateNameVariants(raw_component, trans_component, series_lang)
 					if variants is not None:
-						for variant in variants:
-							dict_list.append(variant)
+						dict_list.extend(variants)
 				else:
 					# Process single definition lines: 'X_raw --> X_trans // comment'
 					if DICT_DEF_DIVIDER not in line:
 						# This line is either misformatted or not a definition, skip
+						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
 						continue
 
 					divider_split = [entry.strip() for entry in line.split(DICT_DEF_DIVIDER)]
 					if len(divider_split) != 2:
 						# Misformatted definition along divider, skip
+						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
 						continue
 
 					raw_component = divider_split[0]
 					trans_component = divider_split[1]
 					if len(raw_component) == 0 or len(trans_component) == 0:
 						# Empty definition on either side of the definition divider, skip
+						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
 						continue
 
 					# Split the translation component via // to seperate translation from comment
@@ -246,35 +319,33 @@ def initSeriesDict(series_abbr):
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	lang = host_entry.host_lang
 
-	dict_path = url_for('dict', filename=dict_entry.fname)[1:]
-	if not os.path.exists(dict_path) or os.path.getsize(dict_path) == 0:
-		host_manager = hostmanager.createManager(host_entry.host_type)
-		createDictFile( dict_fname, title, abbr, host_manager.generateSeriesUrl(code))
-
 	# Parse the mappings into a list
 	dict_list = []
 
 	# First add standalone honorifics
-	# with io.open(HONORIFICS_PATH, mode='r', encoding='utf8') as hon_file:
-	# 	try:
-	# 		honorifics = json.loads(hon_file.read())
-	# 		for entry in honorifics[config_data.getSeriesLang(series)]:
-	# 			if entry['standalone']:
-	# 				dict_list.append((entry['h_raw'], entry['h_trans']))
-	# 	except:
-	# 		print("\n[Error] There seems to be a syntax issue with your "
-	# 			+ "honorifics.json... Please correct it and try again")
-	# 		sys.exit(1)
+	standalone_honorifics = HonorificsTable.query.filter_by(
+		lang=lang,
+		opt_standalone=True,
+		enabled=True )
+	for honorific_entry in standalone_honorifics:
+		dict_list.append((honorific_entry.raw, (honorific_entry.trans, None)))
 
-	# Process common_dict
+	# Next, process the common_dict
 	try:
-		dict_list.extend(processDictFile(COMMON_DICT_FNAME, lang))
+		common_dict_entry = DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first()
+		if common_dict_entry.enabled:
+			dict_list.extend(processDictFile(COMMON_DICT_FNAME, lang))
 	except CustomException as err:
 		flash(str(err), err.severity)
 
-	# Process series specific dict
+	# Finally, process the series specific dict
 	try:
-		dict_list.extend(processDictFile(dict_fname, lang))
+		if dict_entry.enabled:
+			dict_list.extend(processDictFile(dict_fname, lang))
+	except (DictFileDNEOnProcessException, DictFileEmptyOnProcessException) as err:
+		host_manager = hostmanager.createManager(host_entry.host_type)
+		createDictFile( dict_fname, title, abbr, host_manager.generateSeriesUrl(code))
+		flash(str(err), err.severity)
 	except CustomException as err:
 		flash(str(err), err.severity)
 

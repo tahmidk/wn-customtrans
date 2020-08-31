@@ -27,7 +27,7 @@ class DictFileCreationException(CustomException):
 # Encountered when dictionary file could not be renamed
 class DictFileRenameException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Abort: Error renaming dictionary \'%s\'" % dict_file
+		msg = "Aborted: Error renaming dictionary \'%s\'" % dict_file
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be read
@@ -36,10 +36,22 @@ class DictFileReadException(CustomException):
 		msg = "Encountered an error reading dictionary \'%s\'. Dictionary ignored" % dict_file
 		super().__init__(msg, WARNING)
 
+# Encountered when attempting to physically delete a dict file
 class DictFileDeletionException(CustomException):
 	def __init__(self, dict_file):
 		msg = "Encountered an error while attempting to delete dictionary \'%s\'" % dict_file
 		super().__init__(msg, CRITICAL)
+
+# Encountered when dictionary file for a series does not exist
+class DictFileDNEOnProcessException(CustomException):
+	def __init__(self, dict_file):
+		msg = "No dictionary found for this series. Created new dictionary \'%s\'" % dict_file
+		super().__init__(msg, WARNING)
+
+class DictFileEmptyOnProcessException(CustomException):
+	def __init__(self, dict_file):
+		msg = "Series dictionary was found to be empty. Reinitialized dictionary \'%s\'" % dict_file
+		super().__init__(msg, WARNING)
 
 #=====================================================
 #  Web Issue Handling Errors

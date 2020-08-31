@@ -25,9 +25,7 @@ from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 
-from app.models import SeriesTable
-from app.models import DictionaryTable
-from app.models import HostTable
+from app.models import *
 
 from app.scripts.hostmanager import *
 from app.scripts.custom_errors import *

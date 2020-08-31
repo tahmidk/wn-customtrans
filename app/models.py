@@ -16,6 +16,13 @@ from app import db
 from app.scripts.hostmanager import Host
 from app.scripts.hostmanager import Language
 
+
+# Honorific affix descriptor
+class HonorificAffix(Enum):
+    PREFIX = 1
+    SUFFIX = 2
+
+
 # Database models
 class SeriesTable(db.Model):
 	code = db.Column(db.String(7), primary_key=True)
@@ -40,6 +47,20 @@ class DictionaryTable(db.Model):
 
 	def __repr__(self):
 		return "Dict(fname=%s, enabled=%s)" % (self.fname, self.enabled)
+
+class HonorificsTable(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	lang = db.Column(db.Enum(Language), nullable=False)
+	raw = db.Column(db.String, unique=True, nullable=False)
+	trans = db.Column(db.String, nullable=False)
+	opt_affix = db.Column(db.Enum(HonorificAffix), default=HonorificAffix.SUFFIX)
+	opt_standalone = db.Column(db.Boolean, default=False)
+	opt_with_dash = db.Column(db.Boolean, default=True)
+	enabled = db.Column(db.Boolean, default=True)
+
+	def __repr__(self):
+		return "Honorific(raw=%s, trans=%s, lang=%s)" % \
+			(self.raw, self.trans, self.lang)
 
 class HostTable(db.Model):
 	id = db.Column(db.Integer, primary_key=True)

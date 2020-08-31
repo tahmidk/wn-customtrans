@@ -31,9 +31,7 @@ from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.forms import COMMON_DICT_ABBR
 
-from app.models import SeriesTable
-from app.models import DictionaryTable
-from app.models import HostTable
+from app.models import *
 
 from app.scripts import utils
 from app.scripts import dictionary

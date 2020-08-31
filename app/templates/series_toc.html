@@ -18,7 +18,7 @@
 		<div class="toc_body">
 			<div class="toc_menu_listing">
 				<div class="toc_menu_options">
-					<button type="button" class="btn btn-outline-success superpanel_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
+					<button type="button" class="btn btn-outline-success superpanel_menu_btn" id="jump_to_curr_btn" title="Jump to the chapter you left off">
 						<ion-icon name="code-download-outline"></ion-icon>
 						<span>Current</span>
 					</button>
@@ -27,7 +27,7 @@
 						<ion-icon name="sync-outline"></ion-icon>
 						<span>Update</span>
 					</button>
-					<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="series_dictionary_btn" title="Open this series' dictionary"
+					<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="series_dictionary_btn" title="Edit this series' dictionary"
 						action="{{url_for('library_series_update', series_code=series.code)}}">
 						<ion-icon name="reader-outline"></ion-icon>
 						<span>Dictionary</span>
