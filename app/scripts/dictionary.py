@@ -10,6 +10,7 @@
 import re
 import io
 import os
+import html
 import errno
 from collections import OrderedDict
 
@@ -107,14 +108,14 @@ def createDictFile(dict_fname, series_title, series_abbr, series_link):
 			return
 	except Exception as err:
 		# OS error creating the file
-		raise DictFileCreationException(dict_path)
+		raise DictFileCreationException(dict_fname)
 
 def removeDictFile(dict_fname):
 	dict_path = url_for('dict', filename=dict_fname)[1:]
 	try:
 		os.remove(dict_path)
 	except Exception as err:
-		raise DictFileDeletionException(dict_path)
+		raise DictFileDeletionException(dict_fname)
 
 def renameDictFile(old_dict_fname, new_dict_fname):
 	"""-------------------------------------------------------------------
@@ -134,7 +135,7 @@ def renameDictFile(old_dict_fname, new_dict_fname):
 			os.rename(old_path, new_path)
 		except Exception as err:
 			# OS error renaming the file
-			raise DictFileRenameException(old_path)
+			raise DictFileRenameException(old_dict_fname)
 
 def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 	"""-------------------------------------------------------------------
@@ -159,7 +160,7 @@ def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 		# Failed to rewrite metadata, but this isn't fatal
 		return
 
-def generateNameVariants(rn, tn, lang):
+def generateNameVariants(rn, tn, comment, lang):
 	"""-------------------------------------------------------------------
 		Function:		[generateNameVariants]
 		Description:	Generates all variants of rName --> tName dictionary
@@ -185,11 +186,11 @@ def generateNameVariants(rn, tn, lang):
 
 	# First generate non-honorific individual entries
 	# e.g. for @name{X|Y, Naruto|Uzumaki}, generate X --> Naruto and Y --> Uzumaki
-	individual_variants = [(rn[i], (tn[i], None)) for i in range(0, name_len)]
+	individual_variants = [(rn[i], (tn[i], comment)) for i in range(0, name_len)]
 
 	# Next generate non-honorific combined variants using name seperators commonly found in raw chapters
 	# e.g. for @name{X|Y, Naruto|Uzumaki}, generate XY --> Naruto Uzumaki, X Y --> Naruto Uzumaki, etc...
-	combined_variants = [(sep.join(rn), (sep.join(tn), None)) for sep in NAME_SEPERATORS ]
+	combined_variants = [(sep.join(rn), (' '.join(tn), comment)) for sep in NAME_SEPERATORS ]
 
 	# Finally generate all honorific variants of this name entry
 	honorific_variants = []
@@ -211,10 +212,26 @@ def generateNameVariants(rn, tn, lang):
 		# Process the honorific
 		rn_processed = [r_name + h_raw for r_name in rn]
 		tn_processed = [gen_trans(t_name) for t_name in tn]
-		honorific_variants.extend([(rn_processed[i], (tn_processed[i], None)) for i in range(0, name_len)])
+		honorific_variants.extend([(rn_processed[i], (tn_processed[i], comment)) for i in range(0, name_len)])
 
 	all_variants = individual_variants + combined_variants + honorific_variants
 	return all_variants
+
+def sanitizeDictEntry(entry):
+	"""-------------------------------------------------------------------
+		Function:		[sanitizeDictEntry]
+		Description:	Sanitizes all components of a dictionary entry and
+						returns an html safe version of the entry
+		Input:
+		  [entry]	Dictionary entry in the form (raw, (translation, comment))
+		Return:			Entry with html-sanitized components
+		------------------------------------------------------------------
+	"""
+	(raw, (translation, comment)) = entry
+	raw = html.escape(raw)
+	translation = html.escape(translation)
+	comment = html.escape(comment) if comment is not None else None
+	return (raw, (translation, comment))
 
 def processDictFile(dict_fname, series_lang):
 	"""-------------------------------------------------------------------
@@ -237,16 +254,23 @@ def processDictFile(dict_fname, series_lang):
 	if os.path.getsize(dict_path) == 0:
 		raise DictFileEmptyOnProcessException(dict_fname)
 
+	# Helper function to flash misformatted lines
+	def flashMisformattedLine(line, linenum):
+		flash("Misformatted line <strong>\"%s\"</strong> at location <span class=\"mono\">[%s:%d]</span>" % \
+			(line, dict_fname, linenum), "warning")
+
 	try:
 		with io.open(dict_path, mode='r', encoding='utf8') as dict_file:
-			name_pattern = re.compile(r"\s*@name\{(.+), (.+)\}.*")
+			name_pattern = re.compile(r"\s*@name\{(.+), (.+)\}\s*(?:\/\/(.*))?")
 			dict_contents = dict_file.readlines()
 			for index in range(0, len(dict_contents)):
 				line = dict_contents[index]
 				line = line.strip()
+				# Double quotations in the google translate anchor mess up the link
+				line = line.replace("\"", "\'")
 
 				# Skip comment lines and unformatted/misformatted lines
-				name_match = name_pattern.fullmatch(line)
+				name_match = name_pattern.match(line)
 				if line[0:2] == "//" or len(line) == 0 or line.isspace():
 					continue
 				elif name_match is not None:
@@ -254,33 +278,34 @@ def processDictFile(dict_fname, series_lang):
 					#  '@name{first_name_raw|last_name_raw, first_name_trans|last_name_trans}', etc...
 					raw_component = name_match[1].strip().split(DICT_NAME_DIVIDER)
 					trans_component = name_match[2].strip().split(DICT_NAME_DIVIDER)
+					comment = name_match[3].strip() if name_match[3] is not None else None
 					if len(raw_component) != len(trans_component):
 						# Line is a misbalanced name tag
-						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
+						flashMisformattedLine(line, index+1)
 						continue
 
 					# Generate and append name variants to the dict
-					variants = generateNameVariants(raw_component, trans_component, series_lang)
+					variants = generateNameVariants(raw_component, trans_component, comment, series_lang)
 					if variants is not None:
 						dict_list.extend(variants)
 				else:
 					# Process single definition lines: 'X_raw --> X_trans // comment'
 					if DICT_DEF_DIVIDER not in line:
 						# This line is either misformatted or not a definition, skip
-						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
+						flashMisformattedLine(line, index+1)
 						continue
 
 					divider_split = [entry.strip() for entry in line.split(DICT_DEF_DIVIDER)]
 					if len(divider_split) != 2:
 						# Misformatted definition along divider, skip
-						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
+						flashMisformattedLine(line, index+1)
 						continue
 
 					raw_component = divider_split[0]
 					trans_component = divider_split[1]
 					if len(raw_component) == 0 or len(trans_component) == 0:
 						# Empty definition on either side of the definition divider, skip
-						flash("Misformatted line \"%s\" at location [%s:%d]" % (line, dict_fname, index+1), "warning")
+						flashMisformattedLine(line, index+1)
 						continue
 
 					# Split the translation component via // to seperate translation from comment
@@ -292,10 +317,13 @@ def processDictFile(dict_fname, series_lang):
 					if len(trans_comment_split) > 1 and len(trans_comment_split[1]) > 0:
 						# Non empty comment detected
 						comment = trans_comment_split[1]
+
 					dict_list.append( (raw, (translation, comment)) )
 	except Exception as err:
-		raise DictFileReadException(dict_path)
+		raise DictFileReadException(dict_fname)
 
+	# Finally, sanitize user input to prevent HTML code injection
+	dict_list = [sanitizeDictEntry(entry) for entry in dict_list]
 	return dict_list
 
 def initSeriesDict(series_abbr):
@@ -351,5 +379,5 @@ def initSeriesDict(series_abbr):
 
 	# Initialize the global. Need to sort such that longer strings are processed
 	# before the shorter ones so sort by length of the string
-	dict_list.sort(key= lambda x: len(x[0]), reverse=True)
+	dict_list.sort(key=lambda x: len(x[0]), reverse=True)
 	return OrderedDict(dict_list)

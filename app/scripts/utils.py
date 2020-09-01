@@ -181,6 +181,32 @@ def updateSeries(series_entry):
 
 	return ret
 
+def applyDictionaryToContent(content, series_dict):
+	"""-------------------------------------------------------------------
+		Function:		[applyDictionaryToContent]
+		Description:	Applies the
+		Input:
+		  [series_abbr] The abbreviation of the series
+		  [content]		Formatted chapter content gotten from hostmanager
+		Return:
+		------------------------------------------------------------------
+	"""
+	# Helper function that generates a placeholder element with the given id
+	def generatePlaceholder(id):
+		return "<span class=\"placeholder\" id=\"w%d\">placeholder</span>" % id
+
+	# Preprocess line using dictionary entities
+	series_dict_list = list(series_dict.items())
+	for i in range(0, len(series_dict_list)):
+		print(series_dict_list[i])
+
+	for i in range(0, len(content)):
+		if content[i]["type"] == "text":
+			for j in range(0, len(series_dict)):
+				(def_raw, (def_trans, def_comment)) = series_dict_list[j]
+				if def_raw in content[i]["text"]:
+					content[i]["text"] = content[i]["text"].replace(def_raw, generatePlaceholder(j+1))
+
 def customTrans(series_entry, ch):
 	"""-------------------------------------------------------------------
 		Function:		[customTrans]
@@ -189,7 +215,8 @@ def customTrans(series_entry, ch):
 		Input:
 		  [series_entry]The series db entry to generate the customtrans chapter for
 		  [ch]			The integer indicating the chapter number
-		Return:
+		Return: 		Returns a tuple consisting of the chapter data and
+						the series dictionary structure
 		------------------------------------------------------------------
 	"""
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
@@ -202,13 +229,14 @@ def customTrans(series_entry, ch):
 	# Parse out relevant content from the website source code
 	chapter_content = host_manager.parseChapterContent(chapter_html)
 	series_dict = initSeriesDict(series_entry.abbr)
-	for entry in series_dict:
-		print("%s: %s" % (entry, series_dict[entry]))
+	applyDictionaryToContent(chapter_content, series_dict)
 
+	# Done, pack all the data together and return it to the client
 	chapter_data = {
 		"title": 		next(datum for datum in chapter_content if datum['ltype'] == LType.TITLE),
 		"prescript": 	[datum for datum in chapter_content if datum['ltype'] == LType.PRESCRIPT],
 		"main": 		[datum for datum in chapter_content if datum['ltype'] == LType.MAIN],
-		"postscript": 	[datum for datum in chapter_content if datum['ltype'] == LType.POSTSCRIPT]
+		"postscript": 	[datum for datum in chapter_content if datum['ltype'] == LType.POSTSCRIPT],
+		"dictionary":	[{"trans":t, "comment":c} for (_, (t, c)) in series_dict.items()]
 	}
 	return chapter_data

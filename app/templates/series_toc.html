@@ -1,3 +1,5 @@
+{% from "flash_alert.html" import flash_alert %}
+
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_toc">
@@ -39,7 +41,17 @@
 					</button>
 				</div>
 			</div>
-			<div class="toc_main">
+
+			<!-- Flaspanel -->
+			<div class="flashpanel" id="toc_flashpanel">
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{{ flash_alert(messages) }}
+				{% endwith %}
+			</div>
+
+			<!-- Mainpanel -->
+			<div class="toc_main" id="toc_mainpanel">
 				<div class="toc_chapter_listing">
 					{% if series.latest_ch == 0 %}
 						<!-- No chapters to display -->

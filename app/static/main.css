@@ -36,6 +36,7 @@ html{
   --chapter_subtxt_color: #adadad;
   --chapter_day_night_toggle_btn_color: #572a80;
   --chapter_scroll_bar_color: #181818;
+  --chapter_word_color: #007eff;
 
   /* Dictionary palette */
   --dictionary_dlall_button_color: #b9d200;
@@ -48,6 +49,7 @@ html[data-theme='dark']{
   --chapter_subtxt_color: #505050;
   --chapter_day_night_toggle_btn_color: #bea140;
   --chapter_scroll_bar_color: #ffffff;
+  --chapter_word_color: #ffd000;
 }
 html.transition,
 html.transition *,
@@ -102,6 +104,9 @@ input[type=number] {
     background: transparent;
 }
 
+.mono{
+  font-family: Lucida Console, Courier, monospace;
+}
 .no_decoration{
   text-decoration: none !important;
   color: inherit;
@@ -733,6 +738,7 @@ pre#unbootstrap{
 /*---------------------[ Chapter Stylings ]-----------------------*/
 .section_chapter{
   padding: 10rem 3rem;
+  width: 120rem;
   max-width: 120rem;
 }
 .chapter_toolbelt{
@@ -783,7 +789,7 @@ pre#unbootstrap{
 }
 .content_line_div{
   width: 100%;
-  margin: 3rem 0;
+  margin: 4rem 0;
 }
 .content_line{
   width: fit-content;
@@ -808,6 +814,12 @@ pre#unbootstrap{
 .chapter_day_night_toggle_btn:hover{
   filter: brightness(1.2);
 }
+.word{
+  font-variant: petite-caps;
+  font-weight: bolder;
+  color: var(--chapter_word_color);
+  transition: 0.2s;
+}
 
 /* Side progress indicator */
 .chapter_sidebar{
@@ -829,7 +841,7 @@ pre#unbootstrap{
   width: 1px;
   height: 0%;
   background: var(--chapter_scroll_bar_color);
-  box-shadow: 0 0 5px 1px var(--chapter_scroll_bar_color);
+  box-shadow: 0 0 3px 0.1px var(--chapter_scroll_bar_color);
 
   /* Make this unselectable */
   user-select: none;

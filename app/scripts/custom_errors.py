@@ -15,42 +15,49 @@ class CustomException(Exception):
 		super().__init__(msg)
 		self.severity = severity
 
+# Creates a strong tag with text
+def strong(text):
+	return "<strong>%s</strong>" % text
+# Creates a monspace span with text
+def mono(text):
+	return "<span class=\"mono\">%s</span>" % text
+
 #=====================================================
 #  Dictionary Handling Errors
 #=====================================================
 # Encountered when dictionary file could not be be created
 class DictFileCreationException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Aborted: Error creating dictionary \'%s\'" % dict_file
+		msg = "%s: Error creating dictionary %s>" % (strong("Aborted"), mono(dict_file))
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be renamed
 class DictFileRenameException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Aborted: Error renaming dictionary \'%s\'" % dict_file
+		msg = "%s: Error renaming dictionary %s" % (strong("Aborted"), mono(dict_file))
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be read
 class DictFileReadException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Encountered an error reading dictionary \'%s\'. Dictionary ignored" % dict_file
+		msg = "Encountered an error reading dictionary %s. Dictionary ignored" % mono(dict_file)
 		super().__init__(msg, WARNING)
 
 # Encountered when attempting to physically delete a dict file
 class DictFileDeletionException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Encountered an error while attempting to delete dictionary \'%s\'" % dict_file
+		msg = "Encountered an error while attempting to delete dictionary %s" % mono(dict_file)
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file for a series does not exist
 class DictFileDNEOnProcessException(CustomException):
 	def __init__(self, dict_file):
-		msg = "No dictionary found for this series. Created new dictionary \'%s\'" % dict_file
+		msg = "No dictionary found for this series. Created new dictionary %s" % mono(dict_file)
 		super().__init__(msg, WARNING)
 
 class DictFileEmptyOnProcessException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Series dictionary was found to be empty. Reinitialized dictionary \'%s\'" % dict_file
+		msg = "Series dictionary was found to be empty. Reinitialized dictionary %s" % mono(dict_file)
 		super().__init__(msg, WARNING)
 
 #=====================================================
@@ -59,5 +66,5 @@ class DictFileEmptyOnProcessException(CustomException):
 # Encountered when Python fails to retrieve an html
 class HtmlFetchException(CustomException):
 	def __init__(self, url):
-		msg = "Aborted: Could not fetch html data from \'%s\'" % url
+		msg = "%s: Could not fetch html data from %s" % (strong("Aborted"), mono(url))
 		super().__init__(msg, CRITICAL)

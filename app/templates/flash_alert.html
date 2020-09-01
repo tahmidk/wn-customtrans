@@ -1,0 +1,16 @@
+{% macro flash_alert(messages) %}
+	{% if messages %}
+	<div class="flash_msg_div">
+		{% for category, message in messages %}
+			{% if category == 'success' or category == 'warning' or category == 'danger'%}
+			<div class="alert alert-dismissible fade show alert-{{category}} notranslate" role="alert">
+				{{ message|safe }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+	{% endif %}
+{% endmacro %}

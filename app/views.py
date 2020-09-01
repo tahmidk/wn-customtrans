@@ -234,19 +234,29 @@ def library_series_chapter(series_code, ch):
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
 
-	try:
-		chapter_data = utils.customTrans(series_entry, ch)
-	except CustomException as err:
-		return str(err)
-
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
 	if host_entry.host_lang == hostmanager.Language.JP:
 		dummy_text = u"ダミー"
 	elif host_entry.host_lang == hostmanager.Language.CN:
 		dummy_text = u"假"
+
+	try:
+		chapter_data = utils.customTrans(series_entry, ch)
+	except CustomException as err:
+		flash(str(err), "danger")
+		return render_template("chapter.html",
+			title="%s %d" % (series_entry.abbr, ch),
+			default_theme="dark",
+			series=series_entry,
+			ch=ch,
+			dummy_text=dummy_text,
+			series_url=host_mgr.generateSeriesUrl(series_entry.code),
+			chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch))
+
 	return render_template("chapter.html",
 		title="%s %d" % (series_entry.abbr, ch),
+		default_theme="dark",
 		series=series_entry,
 		ch=ch,
 		dummy_text=dummy_text,

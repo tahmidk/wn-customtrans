@@ -1,11 +1,22 @@
+/*=======================================================================
+ *  Copyright (c) 2020, Tahmid Khan
+ *  All rights reserved.
+ *
+ *  Licensed under the BSD 3-Clause license found in the LICENSE file
+ *=======================================================================*/
+
+/*===================================================================*/
+/* General Utility Functions
+/*===================================================================*/
 /*
  *  Sets up a given modal form element to communicate with Flask backend and sets up
  *	Proper form feedback on erroneous inputs
  * 		btn_id - the id of the button that triggered this modal
  * 		modal_id - the id of the bootstrap modal itself (should have role="dialog" attribute)
  * 		form_id - the id of the <form> being hosted on this modal
+ * 		flashpanel - the id of the flashed messages panel to append flashed messages to
  */
-function setupLibraryModalForm(btn_id, modal_id, form_id){
+function setupModalForm(btn_id, modal_id, form_id, flashpanel){
 	// Set up the trigger button and error display
 	$(btn_id).click(function (event) {
 		event.preventDefault();
@@ -21,7 +32,7 @@ function setupLibraryModalForm(btn_id, modal_id, form_id){
 				location.reload();
 			}
 			else if (data.status == 'error') {
-				createFlashMessage(data.msg, data.severity, "#library_flashpanel");
+				createFlashMessage(data.msg, data.severity, flashpanel);
 				$(modal_id).modal('hide');
 			}
 			else{
@@ -64,8 +75,9 @@ function setupLibraryModalForm(btn_id, modal_id, form_id){
 
 /*
  *  Creates a client created flash message. JS equivalent of Flask's flash()
- * 		message - The message to display
+ * 		message - the message to display
  * 		category - flash message's category
+ * 		flash_loc - the complete flash message's display destination
  */
 function createFlashMessage(message, category, flash_loc){
 	var flash_div_wrapper = document.createElement("div");
@@ -76,9 +88,11 @@ function createFlashMessage(message, category, flash_loc){
 	flash_div.classList.add("fade");
 	flash_div.classList.add("show");
 	flash_div.classList.add("alert-" + category);
+	flash_div.classList.add("notranslate");
 	flash_div.setAttribute("role", "alert");
 
-	var message_span = document.createTextNode(message);
+	var message_span = document.createElement("div");
+	message_span.innerHTML = message;
 	var close_btn = document.createElement("button");
 	close_btn.classList.add("close");
 	close_btn.setAttribute("type", "button");
@@ -96,26 +110,108 @@ function createFlashMessage(message, category, flash_loc){
 }
 
 /*===================================================================*/
-/*======================[ Page Setup Functions]======================*/
+/*  Tagged Placeholders Algorithms
+/*===================================================================*/
+/*
+ *  Creates a client created flash message. JS equivalent of Flask's flash()
+ * 		line_num - number representing the id portion of the line to process
+ */
+function replace_placeholders(line_num)
+{
+	// Validity check
+	if(line_num <= 0){
+		return;
+	}
+
+	var line_elem = document.querySelector('.content_line#l'+line_num);
+	var placeholders = line_elem.getElementsByClassName('placeholder')
+	// Replace each placeholder on this line
+	for(let elem of placeholders){
+		if( elem.innerHTML.toLowerCase().includes("placeholder") ){
+			var word_meta = '#mdata_definition_' + elem.id.substring(1);
+			var word = $(word_meta).data("translation");
+			var pattern = new RegExp("(?:the\\s|a\\s)?placeholder", 'gi');
+
+			var replacement = "<span class=\'notranslate word\'>" + word + "</span>";
+			elem.innerHTML = elem.innerHTML.replace(pattern, replacement);
+		}
+	}
+
+	// At this point, translation and substitution for this line is complete. Do
+	// some post processing (like remove unnecessary articles) to increase readability
+	var siblingPlaceholders = document.querySelectorAll('.content_line#l'+line_num+' font .placeholder');
+	for(let placeholder_elem of siblingPlaceholders)
+	{
+		var preceding_elem = placeholder_elem.previousSibling;
+		if(preceding_elem != null && !preceding_elem.classList.contains("placeholder"))
+		{
+			var remove_articles = new RegExp("(the|a)(\\s*)$", 'gi');
+			preceding_elem.innerText = preceding_elem.innerText.replace(remove_articles, "$2");
+		}
+	}
+}
+
+/*
+ *  Runs the Tagged Placeholders Algorithm
+ */
+function tagged_placeholders(){
+	var dummies = document.getElementsByClassName('dummy');
+	var checkpoint = new Array(dummies.length).fill(false);
+	var line_processed = new Array(dummies.length - 1).fill(false);
+	for(let d of dummies){
+		var dummy = document.getElementById(d.id);
+		// A dummy is "triggered" when it's translated by google translate
+		$(dummy).on('DOMSubtreeModified', dummy, function() {
+			$(this).unbind();
+			var dummy_curr_id = parseInt(this.id.substring(1));
+			checkpoint[dummy_curr_id] = true;
+
+			// If D and D-1 are both triggered, then the line between them, L=D-1
+			// should be completely translated and ready to postprocess
+			var dummy_prev_id = dummy_curr_id - 1;
+			if(dummy_prev_id > 0 && checkpoint[dummy_prev_id]){
+				if(!line_processed[dummy_prev_id]){
+					replace_placeholders(dummy_prev_id);
+					line_processed[dummy_prev_id] = true;
+				}
+			}
+
+			// If D and D+1 are both triggered, then the line between them, L=D
+			// should be completely translated and ready to postprocess
+			var dummy_next_id = dummy_curr_id + 1;
+			if(dummy_next_id < checkpoint.length && checkpoint[dummy_next_id]){
+				if(!line_processed[dummy_curr_id]){
+					replace_placeholders(dummy_curr_id);
+					line_processed[dummy_curr_id] = true;
+				}
+			}
+		});
+	}
+}
+
+/*===================================================================*/
+/*  Page Setup Functions
 /*===================================================================*/
 function setupLibrary(){
+	const lib_flashpanel = '#library_flashpanel';
+
 	// Register novel components
-	var reg_novel_submit = '#register_novel_submit_btn';
-	var reg_novel_modal = '#register_novel_modal_push';
-	var reg_novel_form = '#register_novel_form';
+	const reg_novel_submit = '#register_novel_submit_btn';
+	const reg_novel_modal = '#register_novel_modal_push';
+	const reg_novel_form = '#register_novel_form';
 	// Update library components
-	var update_btn = '#menu_library_update_btn';
+	const update_btn = '#menu_library_update_btn';
 	// Edit novel components
-	var edit_novel_submit = '#edit_novel_submit_btn';
-	var edit_novel_modal = '#edit_modal_push';
-	var edit_novel_form = '#edit_novel_form';
-	var edit_novel_action_base = $(edit_novel_form)[0].action.substr(0,
+	const edit_novel_submit = '#edit_novel_submit_btn';
+	const edit_novel_modal = '#edit_modal_push';
+	const edit_novel_form = '#edit_novel_form';
+	const edit_novel_action_base = $(edit_novel_form)[0].action.substr(0,
 		$(edit_novel_form)[0].action.lastIndexOf("/"));
 	// Remove novel components
-	var remove_novel_submit = '#remove_novel_submit_btn';
-	var remove_novel_modal = '#remove_modal_push';
-	var remove_novel_form = '#remove_novel_form';
-	var remove_novel_action_base = $(remove_novel_form)[0].action.substr(0,
+	const remove_novel_submit = '#remove_novel_submit_btn';
+	const remove_novel_modal = '#remove_modal_push';
+	const remove_novel_form = '#remove_novel_form';
+	const remove_novel_action_base = $(remove_novel_form)[0].action.substr(0,
 		$(remove_novel_form)[0].action.lastIndexOf("/"));
 
 	// On show Edit Modal events
@@ -144,6 +240,7 @@ function setupLibrary(){
 
 	// Update button event sets up an SSE and listens for update progress
 	var update_btn_enabled = true;
+	var update_error = false;
 	$(update_btn).click(function(event){
 		// Disable update button while event is finishing up
 		if(!update_btn_enabled)	{
@@ -195,35 +292,40 @@ function setupLibrary(){
 					$(".progress_bar_display").fadeOut();//.css("display", "none");
 					update_btn_enabled = true;
 				}, 1000);
-				setTimeout(() => {
-					var msg = "Successfully fetched updates for all series in the library!";
-					var category = "success";
-					createFlashMessage(msg, category, '#library_flashpanel')
-				}, 1000);
+				if(!update_error){
+					setTimeout(() => {
+						var msg = "<strong>Success</strong> Fetched updates for all series in the library!";
+						var category = "success";
+						createFlashMessage(msg, category, lib_flashpanel)
+					}, 1000);
+				}
 			}
 
 			// Display errors
 			var last = len_updated - 1;
 			var series_abbr = progress_data['updated'][last][ABBR_INDEX];
 			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
-				var msg = "A network error occurred when requesting updates for " + series_abbr;
+				update_error = true;
+				var msg = "A network error occurred when requesting updates for <strong>" + series_abbr + "</strong>";
 				var category = "danger";
-				createFlashMessage(msg, category, "#library_flashpanel");
+				createFlashMessage(msg, category, lib_flashpanel);
 			}
 		}
 	});
 
 	// Setup the register novel modal
-	setupLibraryModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form);
+	setupModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form, lib_flashpanel);
 
 	// Setup the edit novel modal
-	setupLibraryModalForm(edit_novel_submit, edit_novel_modal, edit_novel_form);
+	setupModalForm(edit_novel_submit, edit_novel_modal, edit_novel_form, lib_flashpanel);
 
 	//Setup the remove novel modal
-	setupLibraryModalForm(remove_novel_submit, remove_novel_modal, remove_novel_form);
+	setupModalForm(remove_novel_submit, remove_novel_modal, remove_novel_form, lib_flashpanel);
 }
 
 function setupTableOfContents(){
+	const toc_flashpanel = "#toc_flashpanel"
+
 	// Bookmark events
 	$('.toc_chapter_bookmark').click(function(event){
 		// Make a post request to the route responsible for handling the form's backend
@@ -265,24 +367,24 @@ function setupTableOfContents(){
 		update_series_btn_enabled = false;
 
 		// Make a post request to the route responsible for handling the form's backend
-		createFlashMessage("Fetching latest chapters... please wait a few seconds", "warning", ".toc_menu_listing");
+		createFlashMessage("Fetching latest chapters... please wait a few seconds", "warning", toc_flashpanel);
 		var update_btn = $(this)[0];
 		var url = update_btn.getAttribute('action');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				update_series_btn_enabled = true;
 				if(data.updates > 0){
-					createFlashMessage("Success! Fetched " + data.updates + " new chapters!", "success", ".toc_menu_listing");
+					createFlashMessage("Success! Fetched " + data.updates + " new chapters!", "success", toc_flashpanel);
 				}
 				else{
-					createFlashMessage("Success! This series is already up-to-date", "success", ".toc_menu_listing");
+					createFlashMessage("Success! This series is already up-to-date", "success", toc_flashpanel);
 				}
 				window.setTimeout(function(){
 					location.reload();
 				}, 1000);
 			}
 			else{
-				createFlashMessage("We encountered an error fetching latest chapters. Try again later", "danger", ".toc_menu_listing");
+				createFlashMessage("We encountered an error fetching latest chapters. Try again later", "danger", toc_flashpanel);
 			}
 		});
 	});
@@ -298,6 +400,9 @@ function setupTableOfContents(){
 }
 
 function setupChapter(){
+	// Run the postprocessing algorithm
+	tagged_placeholders();
+
 	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
 	$(window).scroll(function() {
 		var winTop = $(window).scrollTop();
@@ -363,6 +468,7 @@ function setupChapter(){
 }
 
 function setupDictionary(){
+	const dict_flashpanel = "#dictionary_flashpanel";
 	$('.action_toggle_enable').click(function() {
 		var url = this.getAttribute('action');
 		var dict_entry = this.closest('.dictionary_entry');
@@ -379,7 +485,7 @@ function setupDictionary(){
 			else{
 				var msg = "An unexpected error occurred while trying to toggle dictionary: " + series_abbr;
 				var category = "danger";
-				createFlashMessage(msg, category, "#dictionary_flashpanel");
+				createFlashMessage(msg, category, dict_flashpanel);
 			}
 		})
 	});
