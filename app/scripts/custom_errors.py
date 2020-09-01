@@ -6,15 +6,6 @@
 #=======================================================================
 
 # Severity level to display if message is displayed as a flashed message
-WARNING = 'warning'
-CRITICAL = 'danger'
-
-# CustomException super class
-class CustomException(Exception):
-	def __init__(self, msg, severity):
-		super().__init__(msg)
-		self.severity = severity
-
 # Creates a strong tag with text
 def strong(text):
 	return "<strong>%s</strong>" % text
@@ -22,25 +13,39 @@ def strong(text):
 def mono(text):
 	return "<span class=\"mono\">%s</span>" % text
 
+WARNING = 'warning'
+CRITICAL = 'danger'
+
+WARNING_BOLD = strong("Warning:")
+CRITICAL_BOLD = strong("Aborted:")
+
+
+# CustomException super class
+class CustomException(Exception):
+	def __init__(self, msg, severity):
+		super().__init__(msg)
+		self.severity = severity
+
 #=====================================================
 #  Dictionary Handling Errors
 #=====================================================
 # Encountered when dictionary file could not be be created
 class DictFileCreationException(CustomException):
 	def __init__(self, dict_file):
-		msg = "%s: Error creating dictionary %s>" % (strong("Aborted"), mono(dict_file))
+		msg = "%s Error creating dictionary %s>" % (CRITICAL_BOLD, mono(dict_file))
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be renamed
 class DictFileRenameException(CustomException):
 	def __init__(self, dict_file):
-		msg = "%s: Error renaming dictionary %s" % (strong("Aborted"), mono(dict_file))
+		msg = "%s Error renaming dictionary %s" % (CRITICAL_BOLD, mono(dict_file))
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be read
 class DictFileReadException(CustomException):
 	def __init__(self, dict_file):
-		msg = "Encountered an error reading dictionary %s. Dictionary ignored" % mono(dict_file)
+		msg = "%s Encountered an error reading dictionary %s. Dictionary ignored" % \
+			(WARNING_BOLD, mono(dict_file))
 		super().__init__(msg, WARNING)
 
 # Encountered when attempting to physically delete a dict file
@@ -66,5 +71,5 @@ class DictFileEmptyOnProcessException(CustomException):
 # Encountered when Python fails to retrieve an html
 class HtmlFetchException(CustomException):
 	def __init__(self, url):
-		msg = "%s: Could not fetch html data from %s" % (strong("Aborted"), mono(url))
+		msg = "%s Could not fetch html data from %s" % (CRITICAL_BOLD, mono(url))
 		super().__init__(msg, CRITICAL)

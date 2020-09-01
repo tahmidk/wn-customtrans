@@ -65,21 +65,27 @@
 						<!-- Non-empty chapter directory -->
 						{% for index in range(series.latest_ch) %}
 							{% set ch = index + 1 %}
-							{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch)  %}
-							{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch)  %}
+
+							{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch) %}
+							{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch) %}
+							{% set setcurrent_url = url_for('library_series_toc_setcurrent', series_code=series.code, ch=ch) %}
+
 							{% set visited = ch < series.current_ch %}
 							{% set current = ch == series.current_ch %}
 							{% set bookmarked = ch in series.bookmarks %}
 
-							{% if current %}
-							<div id="current_ch"></div>
-							{% endif %}
 							<div class="toc_chapter {{'viewed_chapter' if visited}} {{'current_chapter' if current}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
 								<a class="toc_chapter_text" href="{{series_base_url}}" target="_blank">
 									Chapter {{ch}}
 								</a>
-								<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
-									<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
+								<div class="toc_chapter_actionbar {{'active_actionbar' if bookmarked}}">
+									<div class="toc_chapter_setcurrent " action="{{setcurrent_url}}" id="setcurrent_form_{{ch}}" title="Set this as the current chapter">
+										<ion-icon name="code-download-outline" style="margin-bottom: -0.5rem"></ion-icon>
+									</div>
+									<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}"
+										title="Bookmark this chapter">
+										<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
+									</div>
 								</div>
 							</div>
 						{% endfor %}

@@ -204,16 +204,36 @@ def library_series_update(series_code):
 def library_series_toc_bookmark(series_code, ch):
 	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
+	if ch > series_entry.latest_ch:
+		# Can't set a current chapter if it's greater than the latest chapter
+		return jsonify(status='illegal_chapter_abort', target_ch=ch)
+
 	if ch in series_entry.bookmarks:
 		series_entry.bookmarks.remove(ch)
-		db.session.add(series_entry)
 		db.session.commit()
 		return jsonify(status='ok', action='rmv_bookmark', target_ch=ch)
 
 	series_entry.bookmarks.append(ch)
-	db.session.add(series_entry)
 	db.session.commit()
 	return jsonify(status='ok', action='add_bookmark', target_ch=ch)
+
+
+# Route for manual reseting of the current chapter for a given series
+@app.route("/library/<series_code>/setcurrent/<ch>", methods=["POST"])
+def library_series_toc_setcurrent(series_code, ch):
+	ch = int(ch)
+	series_entry = SeriesTable.query.filter_by(code=series_code).first();
+	if ch > series_entry.latest_ch:
+		# Can't set a current chapter if it's greater than the latest chapter
+		return jsonify(status='illegal_chapter_abort', target_ch=ch)
+
+	if ch == series_entry.current_ch:
+		# Ignore to set current chapter as current chapter
+		return jsonify(status='trivial_abort', target_ch=ch)
+
+	series_entry.current_ch = ch
+	db.session.commit()
+	return jsonify(status='ok', target_ch=ch)
 
 
 # Route for removing all bookmarks
@@ -221,7 +241,6 @@ def library_series_toc_bookmark(series_code, ch):
 def library_series_toc_bookmark_all(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
 	series_entry.bookmarks = []
-	db.session.add(series_entry)
 	db.session.commit()
 	return jsonify(status='ok')
 
@@ -302,7 +321,6 @@ def dictionaries_toggle_entry(dict_abbr):
 		series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 	dict_entry.enabled = not dict_entry.enabled
-	db.session.add(dict_entry)
 	db.session.commit()
 
 	data = {

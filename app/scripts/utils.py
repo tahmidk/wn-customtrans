@@ -197,9 +197,6 @@ def applyDictionaryToContent(content, series_dict):
 
 	# Preprocess line using dictionary entities
 	series_dict_list = list(series_dict.items())
-	for i in range(0, len(series_dict_list)):
-		print(series_dict_list[i])
-
 	for i in range(0, len(content)):
 		if content[i]["type"] == "text":
 			for j in range(0, len(series_dict)):

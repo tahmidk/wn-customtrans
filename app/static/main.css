@@ -28,6 +28,8 @@ html{
   --series_updated_tag_color: #8cd630;
 
   /* TOC palette */
+  --toc_viewed_chapter_highlight: #b71717;
+  --toc_current_chapter_highlight: #63d800;
   --toc_dictionary_btn_color: #fb8200;
   --toc_bookmarked_highlight: #ffc946;
 
@@ -638,14 +640,15 @@ pre#unbootstrap{
 .toc_chapter_text:hover{
   filter: brightness(2);
 }
-.toc_chapter_bookmark{
+.toc_chapter_actionbar{
   position: absolute;
   display: none;
-  cursor: pointer;
-  color: var(--white_contrast_font_color);
   right: 0;
   top: 0;
-
+}
+.toc_chapter_setcurrent:hover{
+  color: var(--toc_current_chapter_highlight);
+  filter: brightness(1.1);
 }
 .toc_chapter_bookmark:hover {
   color: var(--toc_bookmarked_highlight);
@@ -658,18 +661,25 @@ pre#unbootstrap{
 .bookmarked_chapter{
   border-bottom: 1px solid var(--toc_bookmarked_highlight) !important;
 }
+.active_actionbar{
+  display: flex;
+}
+.toc_chapter_actionbar > * {
+  margin: 0 0.5rem;
+  cursor: pointer;
+  color: var(--white_contrast_font_color);
+}
 .active_bookmark{
-  display: block;
   color: var(--toc_bookmarked_highlight) !important;
 }
-.toc_chapter:hover > .toc_chapter_bookmark{
-  display: block;
+.toc_chapter:hover > .toc_chapter_actionbar{
+  display: flex;
 }
 .viewed_chapter{
-  color: #b71717;
+  color: var(--toc_viewed_chapter_highlight);
 }
 .current_chapter{
-  color: #63d800;
+  color: var(--toc_current_chapter_highlight);
 }
 .toc_menu_listing{
   overflow: auto;

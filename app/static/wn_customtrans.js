@@ -8,6 +8,20 @@
 /*===================================================================*/
 /* General Utility Functions
 /*===================================================================*/
+function strong(text){
+	return "<strong>" + text + "</strong>";
+}
+
+// The following describe flash message categories
+const SUCCESS = "success";
+const WARNING = "warning";
+const CRITICAL = "danger";
+
+// The following are common constants prepended to flash messages
+const SUCCESS_BOLD= strong("Success: ");
+const WARNING_BOLD= strong("Warning: ");
+const CRITICAL_BOLD= strong("Aborted: ");
+
 /*
  *  Sets up a given modal form element to communicate with Flask backend and sets up
  *	Proper form feedback on erroneous inputs
@@ -334,18 +348,54 @@ function setupTableOfContents(){
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				var ch_div = $('#'+data.target_ch)[0];
+				var action_bar = ch_div.querySelector(".toc_chapter_actionbar");
 				var bkmk_btn = ch_div.querySelector(".toc_chapter_bookmark");
 				var bkmk_ico = bkmk_btn.querySelector("ion-icon");
 				if(data.action == 'add_bookmark'){
 					ch_div.classList.add("bookmarked_chapter");
+					action_bar.classList.add("active_actionbar");
 					bkmk_btn.classList.add("active_bookmark");
 					bkmk_ico.setAttribute("name", "bookmark");
 				}
 				else if(data.action == 'rmv_bookmark'){
 					ch_div.classList.remove("bookmarked_chapter");
+					action_bar.classList.remove("active_actionbar");
 					bkmk_btn.classList.remove("active_bookmark");
 					bkmk_ico.setAttribute("name", "bookmark-outline");
 				}
+			}
+			else{
+				var msg = CRITICAL_BOLD + "An unexpected error occurred while trying to toggle bookmark";
+				createFlashMessage(msg, CRITICAL, toc_flashpanel);
+			}
+		});
+	});
+
+	// Setcurrent events
+	$('.toc_chapter_setcurrent').click(function(event){
+		var setcurrent_btn = $(this)[0];
+		var url = setcurrent_btn.getAttribute('action');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				var chapters = $('.toc_chapter').each(function(index){
+					if($(this).attr('id') == data.target_ch){
+						$(this).addClass('current_chapter').removeClass('viewed_chapter');
+					}
+					else if($(this).attr('id') < data.target_ch){
+						$(this).removeClass('current_chapter').addClass('viewed_chapter');
+					}
+					else{
+						$(this).removeClass('current_chapter viewed_chapter');
+					}
+				});
+			}
+			else if(data.status = 'trivial_abort'){
+				var msg = "Chapter " + data.target_ch + " is already set as the current chapter";
+				createFlashMessage(msg, WARNING, toc_flashpanel);
+			}
+			else{
+				var msg = CRITICAL_BOLD + "An unexpected error occurred while trying to set the current chapter";
+				createFlashMessage(msg, CRITICAL, toc_flashpanel);
 			}
 		});
 	});
@@ -354,7 +404,7 @@ function setupTableOfContents(){
 	$("#jump_to_curr_btn").click(function() {
 		try{
 			$('html, body').animate({
-				scrollTop: $("#current_ch").offset().top - document.documentElement.clientHeight/2
+				scrollTop: $(".current_chapter").offset().top - document.documentElement.clientHeight/2
 			}, 500);
 		}
 		catch(err){ /* Do nothing */ }
@@ -367,24 +417,36 @@ function setupTableOfContents(){
 		update_series_btn_enabled = false;
 
 		// Make a post request to the route responsible for handling the form's backend
-		createFlashMessage("Fetching latest chapters... please wait a few seconds", "warning", toc_flashpanel);
+		createFlashMessage(
+			"Fetching latest chapters... please wait a few seconds",
+			WARNING,
+			toc_flashpanel);
 		var update_btn = $(this)[0];
 		var url = update_btn.getAttribute('action');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				update_series_btn_enabled = true;
 				if(data.updates > 0){
-					createFlashMessage("Success! Fetched " + data.updates + " new chapters!", "success", toc_flashpanel);
+					createFlashMessage(
+						SUCCESS_BOLD + "Fetched " + data.updates + " new chapters!",
+						SUCCESS,
+						toc_flashpanel);
 				}
 				else{
-					createFlashMessage("Success! This series is already up-to-date", "success", toc_flashpanel);
+					createFlashMessage(
+						SUCCESS_BOLD + "This series is already up-to-date",
+						SUCCESS,
+						toc_flashpanel);
 				}
 				window.setTimeout(function(){
 					location.reload();
 				}, 1000);
 			}
 			else{
-				createFlashMessage("We encountered an error fetching latest chapters. Try again later", "danger", toc_flashpanel);
+				createFlashMessage(
+					CRITICAL_BOLD + "Encountered an error while fetching latest chapters. Try again later",
+					CRITICAL,
+					toc_flashpanel);
 			}
 		});
 	});
@@ -483,9 +545,10 @@ function setupDictionary(){
 				}
 			}
 			else{
-				var msg = "An unexpected error occurred while trying to toggle dictionary: " + series_abbr;
-				var category = "danger";
-				createFlashMessage(msg, category, dict_flashpanel);
+				createFlashMessage(
+					CRITICAL_BOLD + "An unexpected error occurred while trying to toggle dictionary: " + series_abbr,
+					CRITICAL,
+					dict_flashpanel);
 			}
 		})
 	});

@@ -256,8 +256,9 @@ def processDictFile(dict_fname, series_lang):
 
 	# Helper function to flash misformatted lines
 	def flashMisformattedLine(line, linenum):
-		flash("Misformatted line <strong>\"%s\"</strong> at location <span class=\"mono\">[%s:%d]</span>" % \
-			(line, dict_fname, linenum), "warning")
+		line = strong("\"%s\"" % line)
+		location = mono("[%s:%d]" % (dict_fname, linenum))
+		flash("%s Misformatted line %s at location %s" % (WARNING_BOLD, line, location), "warning")
 
 	try:
 		with io.open(dict_path, mode='r', encoding='utf8') as dict_file:
