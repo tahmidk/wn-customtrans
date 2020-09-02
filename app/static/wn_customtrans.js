@@ -264,7 +264,8 @@ function setupLibrary(){
 
 		// Show the progress bar
 		$('#update_progress_bar')[0].setAttribute("style", "width: 0;");
-		$(".progress_bar_display").fadeIn()//.css("display","flex");
+		$('#update_info_series')[0].setAttribute("style", "display: none;");
+		$(".library_update_progress_bar_display").fadeIn()//.css("display","flex");
 
 		// Start SSE connection and listen for progress from server
 		var source = new EventSource("/library/update");
@@ -280,6 +281,10 @@ function setupLibrary(){
 			var width_attr = "width: "+value+"%;";
 			$('#update_progress_bar')[0].setAttribute("style", width_attr);
 
+			var series_abbr = progress_data['updated'][len_updated-1][ABBR_INDEX];
+			$('#update_info_series')[0].removeAttribute("style");
+			$('#update_info_series').text(series_abbr);
+
 			// Close this connection when all entries have been updated
 			if(progress_data['num_series'] == len_updated){
 				source.close();
@@ -287,11 +292,11 @@ function setupLibrary(){
 				// progress_data[updated] is packed with info returned from updateSeries() method
 				// Each entry should be in the form (abbr, num_chapter_updates, latest_ch)
 				$.each(progress_data['updated'], function(index, value){
-					var series_abbr = value[ABBR_INDEX];
+					var abbr = value[ABBR_INDEX];
 					if(value[CH_UPDATES_INDEX] > 0){
-						var update_target = '#series_' + series_abbr + " .entry_minibanner .entry_updated";
+						var update_target = '#series_' + abbr + " .entry_minibanner .entry_updated";
 						var update_label = $(update_target);
-						var latest_ch_target = "#series_" + series_abbr + " .entry_details .entry_latest pre";
+						var latest_ch_target = "#series_" + abbr + " .entry_details .entry_latest pre";
 						var latest_ch_label = $(latest_ch_target)[0];
 
 						setTimeout(() => {
@@ -303,26 +308,26 @@ function setupLibrary(){
 
 				// Hide progress bar and re-enable this button
 				setTimeout(() => {
-					$(".progress_bar_display").fadeOut();//.css("display", "none");
+					$(".library_update_progress_bar_display").fadeOut();
 					update_btn_enabled = true;
 				}, 1000);
 				if(!update_error){
 					setTimeout(() => {
-						var msg = "<strong>Success</strong> Fetched updates for all series in the library!";
-						var category = "success";
-						createFlashMessage(msg, category, lib_flashpanel)
+						createFlashMessage(
+							SUCCESS_BOLD + "Fetched updates for all series in the library!",
+							SUCCESS,
+							lib_flashpanel)
 					}, 1000);
 				}
 			}
 
 			// Display errors
-			var last = len_updated - 1;
-			var series_abbr = progress_data['updated'][last][ABBR_INDEX];
-			if(progress_data['updated'][last][CH_UPDATES_INDEX] < 0){
+			if(progress_data['updated'][len_updated-1][CH_UPDATES_INDEX] < 0){
 				update_error = true;
-				var msg = "A network error occurred when requesting updates for <strong>" + series_abbr + "</strong>";
-				var category = "danger";
-				createFlashMessage(msg, category, lib_flashpanel);
+				createFlashMessage(
+					"A network error occurred when requesting updates for " + strong(series_abbr),
+					CRITICAL,
+					lib_flashpanel);
 			}
 		}
 	});
@@ -491,12 +496,14 @@ function setupChapter(){
 	var url = this.location.href;
 	var ch = $('#mdata_ch').data("value");
 	var latest_ch = $('#mdata_latest_ch').data("value");
-	if(ch > 1){
-		$('.chapter_prev_btn').click(function() {
+	$('.chapter_prev_btn').click(function() {
+		if(ch > 1){
 			var prev = ch - 1;
 			location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
-		});
-	}
+		}
+		else{
+		}
+	});
 	if(ch < latest_ch){
 		$('.chapter_next_btn').click(function() {
 			var next = ch + 1;

@@ -41,9 +41,9 @@ html{
   --chapter_word_color: #007eff;
 
   /* Dictionary palette */
-  --dictionary_dlall_button_color: #b9d200;
+  --dictionary_dlall_button_color: #09437b;
   --dictionary_honorifics_button_color: #d20091;
-  --dictionary_entry_color_primary: #ffb43d;
+  --dictionary_entry_color_primary: #ff8f2c;
 }
 html[data-theme='dark']{
   --html_background_color: #181818;
@@ -241,9 +241,6 @@ input[type=number] {
   font-size: 87.5%;
   color: inherit;
 }
-.spinner_cust{
-  display: none;
-}
 .flash_msg_div{
   font-size: 1rem;
 
@@ -253,47 +250,6 @@ input[type=number] {
   -khtml-user-select: none;
   -webkit-user-select: none;
   -o-user-select: none;
-}
-/*.flash_msg_success{
-  color: #009e00;
-  background: #b4ff9e;
-  border-color: #009e00;
-}
-.flash_msg_warning{
-  color: #9e8f00;
-  background: #fff994;
-  border-color: #9e8f00;
-}
-.flash_msg_danger{
-  color: #9e0000;
-  background: #ff988b;
-  border-color: #9e0000;
-}*/
-.progress_bar_display{
-  position: fixed;
-  z-index: 1;
-  display: none;
-  left: 50%;
-  bottom: 1rem;
-  margin-left: -25rem;
-  width: 50rem;
-  background: #fff0d9;
-  padding: 1.5rem 4rem;
-  border: 2px solid #fbbc3f;
-  border-radius: 1rem;
-  box-sizing: border-box;
-}
-.progress_bar_label{
-  width: fit-content;
-  font-size: 1.3rem;
-  font-variant: all-petite-caps;
-  color: #c1891a;
-  margin: auto;
-}
-.progress_bar_container{
-  width: -webkit-fill-available;
-  height: fit-content;
-  margin: auto;
 }
 .superpanel{
   margin: 3rem 0 1rem 0;
@@ -426,6 +382,55 @@ section.section_library{
   background-color: var(--update_library_button_color);
   border-color: var(--update_library_button_color);
 }
+/* Progress bar stuff */
+.library_update_progress_bar_display{
+  position: fixed;
+  z-index: 1;
+  display: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  box-sizing: border-box;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.library_update_progress_bar_label{
+  display: flex;
+  width: fit-content;
+  font-size: 1.3rem;
+  font-variant: all-petite-caps;
+  color: #c1891a;
+  margin: 1.5rem auto;
+}
+#library_update_spinner{
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: 0.2rem 0.75rem;
+  border: .2rem solid currentColor;
+  border-right-color: transparent;
+}
+.library_update_progress_bar_info{
+  margin: 0 0.5rem;
+}
+#update_info_series{
+  margin: 1rem;
+  padding: 0.2rem 5rem;
+  box-sizing: border-box;
+  font-variant: petite-caps;
+  font-weight: bolder;
+  border: 1px solid currentColor;
+}
+.library_update_progress_bar_container{
+  width: -webkit-fill-available;
+  height: fit-content;
+  margin: auto;
+}
 /* Mainpanel stuff */
 .library_series_entry{
   position: relative;
@@ -484,9 +489,6 @@ section.section_library{
   margin-bottom: 0.5em;
   padding: 0.5em 0;
   border-bottom: 1px solid;
-}
-.update_badge{
-  font-size: 1rem;
 }
 .entry_details{
   line-height: 1em;
@@ -935,7 +937,7 @@ pre#unbootstrap{
   margin: 2rem 0;
 }
 #dict_Common:hover{
-  filter: hue-rotate(125deg) brightness(1.05);
+  filter: hue-rotate(125deg) brightness(1.1);
 }
 .dictionary_entry_disabled{
   filter: grayscale(1) !important;
@@ -943,14 +945,14 @@ pre#unbootstrap{
 .dictionary_entry{
   position: relative;
   display: flex;
-  background: #ff9c0024;
+  background: #ff8f2c40;
   border-right: none;
   margin: 0.75rem 0;
   box-sizing: border-box;
   height: 4rem;
 }
 .dictionary_entry:hover{
-  filter: brightness(1.05);
+  filter: brightness(1.2);
 }
 .dictionary_entry_abbr{
   width: 20rem;

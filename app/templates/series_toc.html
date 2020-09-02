@@ -75,7 +75,7 @@
 							{% set bookmarked = ch in series.bookmarks %}
 
 							<div class="toc_chapter {{'viewed_chapter' if visited}} {{'current_chapter' if current}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
-								<a class="toc_chapter_text" href="{{series_base_url}}" target="_blank">
+								<a class="toc_chapter_text" href="{{series_base_url}}"> <!--Open chapters in new tab by defualt: target="_blank"-->
 									Chapter {{ch}}
 								</a>
 								<div class="toc_chapter_actionbar {{'active_actionbar' if bookmarked}}">
