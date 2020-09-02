@@ -18,13 +18,18 @@
 		</div>
 		<div class="dictionary_body">
 			<div class="superpanel" id="dictionary_superpanel">
-				<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="menu_dictionary_dlall_btn">
+				<button type="button" class="btn btn-mdb-color superpanel_menu_btn" id="menu_dictionary_dlall_btn"
+					action="{{url_for('dictionaries_download_all')}}">
 					<ion-icon name="download-outline"></ion-icon>
 					<span> Download All </span>
 				</button>
-				<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="menu_dictionary_honorifics_btn">
+				<button type="button" class="btn btn-unique superpanel_menu_btn" id="menu_dictionary_honorifics_btn">
 					<ion-icon name="earth"></ion-icon>
 					<span> Honorifics </span>
+				</button>
+				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn">
+					<ion-icon name="toggle"></ion-icon>
+					<span> Toggle All </span>
 				</button>
 			</div>
 			<div class="flashpanel notranslate" id="dictionary_flashpanel">

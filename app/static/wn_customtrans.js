@@ -157,7 +157,7 @@ function createFlashMessage(message, category, flash_loc){
 }
 
 /*===================================================================*/
-/*  Tagged Placeholders Algorithms
+/*  Tagged Placeholders Algorithm
 /*===================================================================*/
 /*
  *  Replaces all placeholders in the given content line with an html
@@ -252,7 +252,17 @@ function tagged_placeholders(){
 }
 
 /*===================================================================*/
-/*  Page Setup Functions
+/*  Definition Similarity Algorithm
+/*===================================================================*/
+/*
+ *  Runs the Definition Similarity Algorithm
+ */
+function definition_similarity(){
+	return stringSimilarity.compareTwoStrings('paple!', 'apple?');
+}
+
+/*===================================================================*/
+/*  Route Specific Setup Functions
 /*===================================================================*/
 function setupLibrary(){
 	const lib_flashpanel = '#library_flashpanel';
@@ -358,7 +368,7 @@ function setupLibrary(){
 				if(!update_error){
 					setTimeout(() => {
 						createFlashMessage(
-							SUCCESS_BOLD + "Fetched updates for all series in the library!",
+							`${SUCCESS_BOLD} Fetched updates for all series in the library!`,
 							SUCCESS,
 							lib_flashpanel)
 					}, 1000);
@@ -443,7 +453,7 @@ function setupTableOfContents(){
 				createFlashMessage(msg, WARNING, toc_flashpanel);
 			}
 			else{
-				var msg = CRITICAL_BOLD + "An unexpected error occurred while trying to set the current chapter";
+				var msg = `${CRITICAL_BOLD} An unexpected error occurred while trying to set the current chapter`;
 				createFlashMessage(msg, CRITICAL, toc_flashpanel);
 			}
 		});
@@ -477,13 +487,13 @@ function setupTableOfContents(){
 				update_series_btn_enabled = true;
 				if(data.updates > 0){
 					createFlashMessage(
-						SUCCESS_BOLD + "Fetched " + data.updates + " new chapters!",
+						`${SUCCESS_BOLD} Fetched ${data.updates} new chapters!`,
 						SUCCESS,
 						toc_flashpanel);
 				}
 				else{
 					createFlashMessage(
-						SUCCESS_BOLD + "This series is already up-to-date",
+						`${SUCCESS_BOLD} This series is already up-to-date`,
 						SUCCESS,
 						toc_flashpanel);
 				}
@@ -493,7 +503,7 @@ function setupTableOfContents(){
 			}
 			else{
 				createFlashMessage(
-					CRITICAL_BOLD + "Encountered an error while fetching latest chapters. Try again later",
+					`${CRITICAL_BOLD} Encountered an error while fetching latest chapters. Try again later`,
 					CRITICAL,
 					toc_flashpanel);
 			}
@@ -584,26 +594,63 @@ function setupDictionary(){
 	const dict_flashpanel = "#dictionary_flashpanel";
 
 	// Dictionary superpanel button functions
+	$('#menu_dictionary_dlall_btn').click(function() {
+		window.location.href = this.getAttribute('action');
+	});
+	$('#menu_dictionary_honorifics_btn').click(function() {
+		alert("Honorifics clicked");
+	});
 
 	// Dictionary entry button functions
 	$('.action_toggle_enable').click(function() {
 		var url = this.getAttribute('action');
-		var dict_entry = this.closest('.dictionary_entry');
+		var dict_entry = $(this).closest('.dictionary_entry');
+		const dict_fname = strong(dict_entry.data('fname'));
+		const dict_abbr = strong(dict_entry.data('abbr'));
+
 		var toggle = this.querySelector('ion-icon');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
-				$(dict_entry).toggleClass('dictionary_entry_disabled');
+				dict_entry.toggleClass('dictionary_entry_disabled');
 				if(data.toggle == 0){
 					toggle.setAttribute("name", "square-outline");
 				}else{
-					toggle.setAttribute("name", "checkbox-outline");
+					toggle.setAttribute("name", "checkbox");
 				}
 			}
 			else{
 				createFlashMessage(
-					CRITICAL_BOLD + "An unexpected error occurred while trying to toggle dictionary: " + series_abbr,
+					`${CRITICAL_BOLD} An unexpected error occurred while trying to toggle ${dict_abbr}`,
 					CRITICAL,
 					dict_flashpanel);
+			}
+		})
+	});
+
+	$('.action_download').click(function() {
+		// The following code achieves the same thing by POST request
+		var dict_entry = $(this).closest('.dictionary_entry');
+		const dict_fname = strong(dict_entry.data('fname'));
+		const dict_abbr = strong(dict_entry.data('abbr'));
+
+		var url = this.getAttribute('action');
+		$.post(url, function(data){
+			if(data.status == 'dict_dne_abort'){
+				createFlashMessage(
+					`${CRITICAL_BOLD} The requested file ${dict_fname} does not exist. Upload a file under ${dict_abbr} to initialize it.`,
+					CRITICAL,
+					dict_flashpanel);
+			}
+			else if(data.status == "dict_download_error"){
+				createFlashMessage(
+					`${CRITICAL_BOLD} Ran into an unexpected error downloading ${dict_fname}`,
+					CRITICAL,
+					dict_flashpanel);
+			}
+			// Success
+			else{
+				var blob = new Blob([data], {type: "text/plain;charser=utf-8"});
+				saveAs(blob, dict_entry.data('fname'));
 			}
 		})
 	});

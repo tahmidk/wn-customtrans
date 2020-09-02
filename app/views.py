@@ -16,10 +16,10 @@ from flask import render_template
 from flask import url_for
 from flask import jsonify
 from flask import request
-from flask import send_file
 from flask import flash
 from flask import Response
 from flask import abort
+from flask import send_from_directory
 
 # Internal imports
 from app import db
@@ -339,14 +339,22 @@ def dictionaries_toggle_entry(dict_abbr):
 
 # 	return 'Saved %s to the database!' % dict_file.filename
 
+# Route for downloading a given .dict file
+@app.route("/dictionaries/download/<dict_fname>", methods=["POST"])
+def dictionaries_download_entry(dict_fname):
+	path = os.path.abspath(url_for('dict', filename=dict_fname)[1:])
+	if not os.path.exists(path):
+		return jsonify({"status": "dict_dne_abort"})
 
+	try:
+		return send_from_directory(os.path.dirname(path), filename=dict_fname, as_attachment=True)
+	except Exception as err:
+		return jsonify({"status": "dict_download_error"})
 
-# @app.route("/dictionaries/download/<series>", methods=["POST"])
-# def dictionaries_download_dict(series):
-# 	dict_file = Query SQLAlchemy
-#	fname = "Blah.dict"
-# 	return send_file(BytesIO(dict_file.file_data), attachment_filename=fname, as_attachment=True)
-
+# Route for downloading all dict files in user/dicts
+@app.route("/dictionaries/downloadall")
+def dictionaries_download_all():
+	return "Hello"
 
 # Route for Tutorial page
 @app.route("/tutorial")

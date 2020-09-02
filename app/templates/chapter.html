@@ -104,6 +104,17 @@
 {% block script_area %}
 	$(document).ready(function() {
 		setupChapter();
+
+		// Mark this chapter as the current chapter if it's greater than what it currently is
+		if({{ch}} > {{series.current_ch}}){
+			var url = "{{url_for('library_series_toc_setcurrent', series_code=series.code, ch=ch)}}";
+			$.post(url, function(data) {
+				if(data.status != 'ok') {
+					var msg = `An unexpected error occurred while trying to set this as the current chapter`;
+					createFlashMessage(msg, "warning", "#chapter_flashpanel");
+				}
+			});
+		}
 	});
 {% endblock%}
 

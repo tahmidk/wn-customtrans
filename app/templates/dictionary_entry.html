@@ -1,5 +1,6 @@
 {% macro dictionary_entry(dictionary) %}
-	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="dict_{{dictionary.abbr}}">
+	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="dict_{{dictionary.abbr}}"
+		data-fname="{{dictionary.fname}}" data-abbr="{{dictionary.abbr}}">
 		<div class="dictionary_entry_abbr">
 			<div class="dictionary_entry_abbr_text">
 				{{dictionary.abbr}}
@@ -10,7 +11,8 @@
 				{{dictionary.fname}}
 			</div>
 			<div class="dictionary_entry_action_bar">
-				<div class="dictionary_entry_action_div action_download" title="Download dict">
+				<div class="dictionary_entry_action_div action_download" title="Download dict"
+					action="{{url_for('dictionaries_download_entry', dict_fname=dictionary.fname)}}">
 					<ion-icon name="save"></ion-icon>
 				</div>
 				<div class="dictionary_entry_action_div action_upload" title="Upload and Replace dict">
@@ -20,8 +22,8 @@
 					<ion-icon name="create"></ion-icon>
 				</div>
 				<div class="dictionary_entry_action_div action_toggle_enable" title="Enable/Disable dict"
-					action="{{url_for('dictionaries_toggle_entry',dict_abbr=dictionary.abbr)}}">
-					<ion-icon name="{{'checkbox-outline' if dictionary.enabled else 'square-outline'}}"></ion-icon>
+					action="{{url_for('dictionaries_toggle_entry', dict_abbr=dictionary.abbr)}}">
+					<ion-icon name="{{'checkbox' if dictionary.enabled else 'square-outline'}}"></ion-icon>
 				</div>
 			</div>
 		</div>

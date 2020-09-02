@@ -24,6 +24,7 @@ from wtforms.validators import Regexp
 from app.models import SeriesTable
 from app.models import HostTable
 from app.scripts.hostmanager import Host
+from app.scripts.custom_errors import mono
 
 
 # Global constants
@@ -89,7 +90,7 @@ class RegisterNovelForm(FlaskForm):
 			urlopen(url)
 		# Page not found
 		except HTTPError as e:
-			raise ValidationError("<pre class=\"errurl\">%s</pre> does not exist" % url)
+			raise ValidationError("%s does not exist" % mono(url))
 		# Some error has occurred
 		except Exception as e:
 			raise ValidationError("No response from <pre class=\"errurl\">%s</pre>. Try again later" % url)
