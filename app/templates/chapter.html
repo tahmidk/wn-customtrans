@@ -43,7 +43,7 @@
 	</div>
 
 	<!-- Flashpanel -->
-	<div class="flashpanel" id="dictionary_flashpanel">
+	<div class="flashpanel" id="chapter_flashpanel">
 		<!-- Flashed messages -->
 		{% with messages = get_flashed_messages(with_categories=true) %}
 			{{ flash_alert(messages) }}
@@ -134,7 +134,8 @@
 {% macro render_toolbelt() %}
 	<div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 100%;">
 		{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
-		<button type="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter">
+		<button type="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter"
+			data-container="body" data-toggle="popover" data-placement="top" data-content="This is the first chapter">
 			<ion-icon name="return-up-back-outline"></ion-icon>
 		</button>
 		<button type="button" class="btn btn-secondary chapter_toolbelt_btn chapter_toc_btn" id="toc_btn" title="Table of Contents"

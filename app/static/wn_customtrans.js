@@ -9,7 +9,7 @@
 /* General Utility Functions
 /*===================================================================*/
 function strong(text){
-	return "<strong>" + text + "</strong>";
+	return `<strong>${text}</strong>`;
 }
 
 // The following describe flash message categories
@@ -18,9 +18,9 @@ const WARNING = "warning";
 const CRITICAL = "danger";
 
 // The following are common constants prepended to flash messages
-const SUCCESS_BOLD= strong("Success: ");
-const WARNING_BOLD= strong("Warning: ");
-const CRITICAL_BOLD= strong("Aborted: ");
+const SUCCESS_BOLD= strong("Success:");
+const WARNING_BOLD= strong("Warning:");
+const CRITICAL_BOLD= strong("Aborted:");
 
 /*
  *  Sets up a given modal form element to communicate with Flask backend and sets up
@@ -88,6 +88,39 @@ function setupModalForm(btn_id, modal_id, form_id, flashpanel){
 }
 
 /*
+ *  Initializes the given word element to display the user comment associated with this
+ * 	definition in the user dict file as a dismissable popover. Intended to be used by a
+ *	placeholder replacer function only
+ * 		word_id - the static id of the word to setup
+ * 		word_metaid - the id of the meta dictionary definition this word corresponds to
+ */
+function setupCommentPopover(word_id, word_metaid){
+	var comment = $(`#mdata_definition_${word_metaid}`).data("comment");
+	comment = (comment !== "None") ? comment : "No comment";
+	$('body').on('mouseover', `#w${word_id}`, function(event){
+		var word = $(`#w${word_id}`);
+
+		// Prepare the comment popover
+		word.attr("tabindex", "0");
+		word.attr("role", "button");
+		word.attr("data-toggle", "popover");
+
+		// Trigger the popover
+		word.popover({
+			trigger: 'focus',
+			placement: 'top',
+			content: comment,
+			template:`
+				<div class="popover word_popover_cust notranslate" role="tooltip">
+					<div class="arrow"></div>
+					<h3 class="popover-header word_popover_header_cust"></h3>
+					<div class="popover-body word_popover_body_cust"></div>
+				</div>`
+		})
+	});
+}
+
+/*
  *  Creates a client created flash message. JS equivalent of Flask's flash()
  * 		message - the message to display
  * 		category - flash message's category
@@ -127,33 +160,40 @@ function createFlashMessage(message, category, flash_loc){
 /*  Tagged Placeholders Algorithms
 /*===================================================================*/
 /*
- *  Creates a client created flash message. JS equivalent of Flask's flash()
+ *  Replaces all placeholders in the given content line with an html
+ * 	structure representing the postprocessed word translation
  * 		line_num - number representing the id portion of the line to process
+ *
+ *	@return Updated word_num
  */
-function replace_placeholders(line_num)
+function tp_replace_placeholders(line_num, word_num)
 {
 	// Validity check
 	if(line_num <= 0){
 		return;
 	}
 
-	var line_elem = document.querySelector('.content_line#l'+line_num);
+	var line_elem = document.querySelector(`.content_line#l${line_num}`);
 	var placeholders = line_elem.getElementsByClassName('placeholder')
+
 	// Replace each placeholder on this line
 	for(let elem of placeholders){
 		if( elem.innerHTML.toLowerCase().includes("placeholder") ){
-			var word_meta = '#mdata_definition_' + elem.id.substring(1);
-			var word = $(word_meta).data("translation");
+			var id = elem.id.substring(1);
+			var word = $(`#mdata_definition_${id}`).data("translation");
 			var pattern = new RegExp("(?:the\\s|a\\s)?placeholder", 'gi');
 
-			var replacement = "<span class=\'notranslate word\'>" + word + "</span>";
+			var replacement = `<a class=\'notranslate word\' id=\'w${word_num}\'>${word}</a>`;
 			elem.innerHTML = elem.innerHTML.replace(pattern, replacement);
+
+			setupCommentPopover(word_num, id);
+			word_num += 1;
 		}
 	}
 
 	// At this point, translation and substitution for this line is complete. Do
 	// some post processing (like remove unnecessary articles) to increase readability
-	var siblingPlaceholders = document.querySelectorAll('.content_line#l'+line_num+' font .placeholder');
+	var siblingPlaceholders = document.querySelectorAll(`.content_line#l${line_num} font .placeholder`);
 	for(let placeholder_elem of siblingPlaceholders)
 	{
 		var preceding_elem = placeholder_elem.previousSibling;
@@ -163,6 +203,8 @@ function replace_placeholders(line_num)
 			preceding_elem.innerText = preceding_elem.innerText.replace(remove_articles, "$2");
 		}
 	}
+
+	return word_num;
 }
 
 /*
@@ -172,6 +214,12 @@ function tagged_placeholders(){
 	var dummies = document.getElementsByClassName('dummy');
 	var checkpoint = new Array(dummies.length).fill(false);
 	var line_processed = new Array(dummies.length - 1).fill(false);
+
+	// word_num is used for setting the 'w' id of replaced placeholders. Take it
+	// as a unique identifier for each postprocessed placeholder
+	// IMPORTANT: Does NOT correlate with the meta dictionary ids found in <head>
+	var word_num = 1;
+
 	for(let d of dummies){
 		var dummy = document.getElementById(d.id);
 		// A dummy is "triggered" when it's translated by google translate
@@ -185,7 +233,7 @@ function tagged_placeholders(){
 			var dummy_prev_id = dummy_curr_id - 1;
 			if(dummy_prev_id > 0 && checkpoint[dummy_prev_id]){
 				if(!line_processed[dummy_prev_id]){
-					replace_placeholders(dummy_prev_id);
+					word_num = tp_replace_placeholders(dummy_prev_id, word_num);
 					line_processed[dummy_prev_id] = true;
 				}
 			}
@@ -195,7 +243,7 @@ function tagged_placeholders(){
 			var dummy_next_id = dummy_curr_id + 1;
 			if(dummy_next_id < checkpoint.length && checkpoint[dummy_next_id]){
 				if(!line_processed[dummy_curr_id]){
-					replace_placeholders(dummy_curr_id);
+					word_num = tp_replace_placeholders(dummy_curr_id, word_num);
 					line_processed[dummy_curr_id] = true;
 				}
 			}
@@ -263,8 +311,8 @@ function setupLibrary(){
 		update_btn_enabled = false;
 
 		// Show the progress bar
-		$('#update_progress_bar')[0].setAttribute("style", "width: 0;");
-		$('#update_info_series')[0].setAttribute("style", "display: none;");
+		$('#update_progress_bar').attr("style", "width: 0;");
+		$('#update_info_series').attr("style", "display: none;");
 		$(".library_update_progress_bar_display").fadeIn()//.css("display","flex");
 
 		// Start SSE connection and listen for progress from server
@@ -294,9 +342,9 @@ function setupLibrary(){
 				$.each(progress_data['updated'], function(index, value){
 					var abbr = value[ABBR_INDEX];
 					if(value[CH_UPDATES_INDEX] > 0){
-						var update_target = '#series_' + abbr + " .entry_minibanner .entry_updated";
+						var update_target = `#series_${abbr} .entry_minibanner .entry_updated`;
 						var update_label = $(update_target);
-						var latest_ch_target = "#series_" + abbr + " .entry_details .entry_latest pre";
+						var latest_ch_target = `#series_${abbr} .entry_details .entry_latest pre`;
 						var latest_ch_label = $(latest_ch_target)[0];
 
 						setTimeout(() => {
@@ -370,7 +418,7 @@ function setupTableOfContents(){
 				}
 			}
 			else{
-				var msg = CRITICAL_BOLD + "An unexpected error occurred while trying to toggle bookmark";
+				var msg = `${CRITICAL_BOLD} An unexpected error occurred while trying to toggle bookmark`;
 				createFlashMessage(msg, CRITICAL, toc_flashpanel);
 			}
 		});
@@ -467,6 +515,8 @@ function setupTableOfContents(){
 }
 
 function setupChapter(){
+	const chapter_flashpanel = "#chapter_flashpanel";
+
 	// Run the postprocessing algorithm
 	tagged_placeholders();
 
@@ -496,14 +546,12 @@ function setupChapter(){
 	var url = this.location.href;
 	var ch = $('#mdata_ch').data("value");
 	var latest_ch = $('#mdata_latest_ch').data("value");
-	$('.chapter_prev_btn').click(function() {
-		if(ch > 1){
+	if(ch > 1){
+		$('.chapter_prev_btn').click(function() {
 			var prev = ch - 1;
 			location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
-		}
-		else{
-		}
-	});
+		});
+	}
 	if(ch < latest_ch){
 		$('.chapter_next_btn').click(function() {
 			var next = ch + 1;
@@ -538,6 +586,10 @@ function setupChapter(){
 
 function setupDictionary(){
 	const dict_flashpanel = "#dictionary_flashpanel";
+
+	// Dictionary superpanel button functions
+
+	// Dictionary entry button functions
 	$('.action_toggle_enable').click(function() {
 		var url = this.getAttribute('action');
 		var dict_entry = this.closest('.dictionary_entry');

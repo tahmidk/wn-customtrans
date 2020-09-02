@@ -829,8 +829,18 @@ pre#unbootstrap{
 .word{
   font-variant: petite-caps;
   font-weight: bolder;
-  color: var(--chapter_word_color);
+  color: var(--chapter_word_color) !important;
   transition: 0.2s;
+}
+
+/* Chapter popover customizations */
+.word_popover_cust{
+  font-family: 'Montserrat', sans-serif;
+  max-width: 25rem;
+}
+.word_popover_header_cust{
+}
+.word_popover_body_cust{
 }
 
 /* Side progress indicator */
