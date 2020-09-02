@@ -16,7 +16,7 @@ html{
 
   /* Library palette */
   --update_library_button_color: #ffc545;
-  --register_novel_button_color: #68d629;
+  --register_novel_button_color: #00c36e;
   --register_novel_modal_color: #40cc60;
   --remove_novel_modal_color_primary: #9c0000;
   --remove_novel_modal_color_secondary: #dc3545;
@@ -25,7 +25,7 @@ html{
   --series_entry_btn_color: #9e1111;
   --series_entry_hover_color: #d83939;
   --series_entry_text_color: #940d0d;
-  --series_updated_tag_color: #8cd630;
+  --series_updated_tag_color: #830062;
 
   /* TOC palette */
   --toc_viewed_chapter_highlight: #b71717;
@@ -108,6 +108,7 @@ input[type=number] {
 
 .mono{
   font-family: Lucida Console, Courier, monospace;
+  white-space: pre;
 }
 .no_decoration{
   text-decoration: none !important;
@@ -264,6 +265,9 @@ input[type=number] {
   width: 100%;
   height: auto;
   box-sizing: border-box;
+}
+.spinner_cust{
+  display: none;
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
@@ -491,9 +495,9 @@ section.section_library{
   border-bottom: 1px solid;
 }
 .entry_details{
-  line-height: 1em;
-  font-size: 1em;
-  font-family: monospace;
+  margin: 1rem 0;
+  line-height: 2rem;
+  font-size: 1rem;
 }
 .entry_action_bar{
   width: fit-content;
@@ -650,7 +654,6 @@ pre#unbootstrap{
 }
 .toc_chapter_setcurrent:hover{
   color: var(--toc_current_chapter_highlight);
-  filter: brightness(1.1);
 }
 .toc_chapter_bookmark:hover {
   color: var(--toc_bookmarked_highlight);

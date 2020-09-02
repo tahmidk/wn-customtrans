@@ -342,14 +342,10 @@ function setupLibrary(){
 				$.each(progress_data['updated'], function(index, value){
 					var abbr = value[ABBR_INDEX];
 					if(value[CH_UPDATES_INDEX] > 0){
-						var update_target = `#series_${abbr} .entry_minibanner .entry_updated`;
-						var update_label = $(update_target);
-						var latest_ch_target = `#series_${abbr} .entry_details .entry_latest pre`;
-						var latest_ch_label = $(latest_ch_target)[0];
-
 						setTimeout(() => {
-							update_label.css("display", "block");
-							latest_ch_label.innerText = " Latest: " + value[CH_LATEST_INDEX];
+							$(`#series_${abbr} #num_updates`).text(`${value[CH_UPDATES_INDEX]}`);
+							$(`#series_${abbr} .entry_updated`).fadeIn("fast", "swing");
+							$(`#series_${abbr} #latest_ch`).text(`${value[CH_LATEST_INDEX]}`);
 						}, 1000);
 					}
 				});

@@ -3,15 +3,15 @@
 	<div class="library_series_entry" id="series_{{novel.abbr}}">
 		<div class="entry_minibanner">
 			<div class="minibanner entry_abbr"> {{novel.abbr}} </div>
-			<div class="minibanner entry_updated"> Updated </div>
+			<div class="minibanner entry_updated"> Updated (+<span id="num_updates"></span>)</div>
 		</div>
 		<div class="entry_title"> {{novel.title}} </div>
 		<div class="entry_details">
 			<div class="entry_current">
-				<pre id="unbootstrap">Current: {{novel.current_ch}}</pre>
+				<span class="mono">Current: <span id="current_ch">{{novel.current_ch}}</span></span>
 			</div>
 			<div class="entry_latest">
-				<pre id="unbootstrap"> Latest: {{novel.latest_ch}}</pre>
+				<span class="mono"> Latest: <span id="latest_ch">{{novel.latest_ch}}</span></span>
 			</div>
 		</div>
 		<div class="entry_action_bar">
