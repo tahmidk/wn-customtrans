@@ -542,7 +542,7 @@ function setupChapter(){
 
 	// Initialize the correct icon
 	var html = document.documentElement;
-	var day_night_toggle_class = ".chapter_day_night_toggle_btn";
+	var day_night_toggle_class = "#day_night_toggle_btn";
 	$(day_night_toggle_class).each(function(){
 		var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
 		var icon = $(this)[0].querySelector('ion-icon');

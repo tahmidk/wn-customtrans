@@ -253,6 +253,8 @@ def library_series_chapter(series_code, ch):
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
 
+	back_href = url_for('library_series_toc', series_code=series_code)
+
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
 	if host_entry.host_lang == hostmanager.Language.JP:
@@ -266,6 +268,7 @@ def library_series_chapter(series_code, ch):
 		flash(str(err), "danger")
 		return render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
+			back_href=back_href,
 			default_theme="dark",
 			series=series_entry,
 			ch=ch,
@@ -275,6 +278,7 @@ def library_series_chapter(series_code, ch):
 
 	return render_template("chapter.html",
 		title="%s %d" % (series_entry.abbr, ch),
+		back_href=back_href,
 		default_theme="dark",
 		series=series_entry,
 		ch=ch,
