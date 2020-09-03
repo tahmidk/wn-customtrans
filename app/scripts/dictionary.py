@@ -34,6 +34,8 @@ from app.scripts import hostmanager
 #===============================================================
 # Standard name for the common dictionary file
 COMMON_DICT_FNAME = "common_dict.dict"
+# Comments can be at most 100 characters
+COMMENT_MAX_LEN = 100
 # Common tokens used to seperate first and last names in raw chapters
 NAME_SEPERATORS = ["", " ", "・"]
 # Syntactic seperator used to seperate first, last names in the @name dictionary syntax
@@ -279,7 +281,9 @@ def processDictFile(dict_fname, series_lang):
 					#  '@name{first_name_raw|last_name_raw, first_name_trans|last_name_trans}', etc...
 					raw_component = name_match[1].strip().split(DICT_NAME_DIVIDER)
 					trans_component = name_match[2].strip().split(DICT_NAME_DIVIDER)
-					comment = name_match[3].strip() if name_match[3] is not None else None
+					comment = name_match[3].strip()[:COMMENT_MAX_LEN] if name_match[3] is not None else None
+
+					# Validity check: the raw component should be one-to-one with the translation component
 					if len(raw_component) != len(trans_component):
 						# Line is a misbalanced name tag
 						flashMisformattedLine(line, index+1)
@@ -317,7 +321,7 @@ def processDictFile(dict_fname, series_lang):
 					comment = None
 					if len(trans_comment_split) > 1 and len(trans_comment_split[1]) > 0:
 						# Non empty comment detected
-						comment = trans_comment_split[1]
+						comment = trans_comment_split[1][:COMMENT_MAX_LEN]
 
 					dict_list.append( (raw, (translation, comment)) )
 	except Exception as err:

@@ -35,12 +35,13 @@ function setupModalForm(btn_id, modal_id, form_id, flashpanel){
 	$(btn_id).click(function (event) {
 		event.preventDefault();
 		// Make spinner visible
-		$(btn_id).prev().css("display", "block");
+		var modal_spinner = $(btn_id).parent().prev();
+		modal_spinner.css("display", "block");
 
 		// Make a post request to the route responsible for handling the form's backend
 		var url = $(form_id)[0].action;
 		$.post(url, data=$(form_id).serialize(), function(data) {
-			$(btn_id).prev().css("display", "none");
+			modal_spinner.css("display", "none");
 			if (data.status == 'ok') {
 				$(modal_id).modal('hide');
 				location.reload();

@@ -1,5 +1,6 @@
 {% from "series_entry.html" import series_entry %}
 {% from "flash_alert.html" import flash_alert %}
+{% from "super_navpanel.html" import super_navpanel %}
 {% from "modals/register_novel.html" import register_novel_modal %}
 {% from "modals/edit_novel.html" import edit_novel_modal %}
 {% from "modals/remove_novel.html" import remove_novel_modal %}
@@ -9,7 +10,7 @@
 	<section class="section_library">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+			{{super_navpanel(back_href)}}
 		{% endif%}
 
 		<!-- Set up the modals needed for this  -->

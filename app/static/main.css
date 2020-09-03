@@ -146,30 +146,6 @@ input[type=number] {
   border-radius: 0.1em;
   font-size: 2em;
 }
-.back_button{
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: fit-content;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 0 0 0.1rem var(--back_btn_color);
-  border-radius: 0.2rem;
-  font-size: 0.9rem;
-  font-variant: all-petite-caps;
-  font-weight: bold;
-  cursor: pointer;
-
-  /* Make it unselectable */
-  user-select: none;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-}
-.back_button:hover{
-  background: var(--back_btn_color);
-  color: #fff;
-}
 .menu_button{
   width: 100%;
   height: 100%;
@@ -199,11 +175,11 @@ input[type=number] {
 .menu_button_small{
   font-size: 4rem;
 }
-.btn-cust{
+.btn_cust{
   font-variant: all-small-caps;
 }
-.modal-cust{
-  border-radius: 1rem;
+.modal_cust{
+  border-radius: 1rem !important;
   overflow: hidden;
 }
 .modal_header_cust{
@@ -272,6 +248,48 @@ input[type=number] {
 }
 .spinner_cust{
   display: none;
+}
+
+/*--------------------------[ Super navpanel stuff ]-------------------*/
+.super_navpanel{
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: fit-content;
+  padding: 0.5rem 1rem;
+  color: #fff;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.super_navpanel_btn{
+  color: #fff !important;
+  margin: 0;
+  border-radius: 1rem;
+}
+.super_navpanel_btn:hover{
+  filter: brightness(1.1);
+}
+.super_navpanel_btn ion-icon{
+  font-size: 1rem !important;
+}
+#super_navpanel_home_btn{
+  background: #4a5163;
+}
+#super_navpanel_library_btn{
+  background: var(--library_color_primary);
+}
+#super_navpanel_dictionary_btn{
+  background: var(--dictionary_color_primary);
+}
+#super_navpanel_back_btn{
+  padding: 0.5rem 3rem;
+  margin-left: 1.5rem;
+  border-radius: 0 !important;
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
@@ -561,37 +579,40 @@ section.section_library{
 }
 
 
-/*----------------------[ Register Novel Modal stylings ]----------------------*/
-.register_novel_modal_cust{
-  border: 1px solid var(--register_novel_modal_color);
-  border-left: 0.5rem solid var(--register_novel_modal_color);
+.modal_cust{
+  color: #fff;
 }
-.register_novel_header{
-  color: var(--register_novel_modal_color);
+
+/*----------------------[ Register Novel Modal stylings ]----------------------*/
+#register_novel_header{
+  background: var(--register_novel_modal_color);
 }
 #register_novel_spinner{
   color: var(--register_novel_modal_color) !important;
 }
+#host_search_engine_btn{
+  display: flex;
+  width: 20rem;
+  height: 2rem;
+  margin: auto 1rem;
+  padding: 0.2rem 1rem;
+  color: #fff;
+  background: #1ab196;
+  font-size: 1.6rem;
+  border-radius: 2rem;
+}
 
 /*----------------------[ Edit Novel Modal stylings ]----------------------*/
-.edit_modal_cust{
-  border: 1px solid var(--edit_novel_modal_color);
-  border-left: 0.5rem solid var(--edit_novel_modal_color);
-}
-.edit_novel_header{
-  color: var(--edit_novel_modal_color);
+#edit_novel_header{
+  background: var(--edit_novel_modal_color);
 }
 #edit_novel_spinner{
   color: var(--edit_novel_modal_color) !important;
 }
 
 /*----------------------[ Remove Novel Modal stylings ]----------------------*/
-.remove_modal_cust{
-  border: 1px solid var(--remove_novel_modal_color_primary);
-  border-left: 0.5rem solid var(--remove_novel_modal_color_primary);
-}
-.remove_novel_header{
-  color: #fff;
+#remove_novel_header{
+  background: var(--remove_novel_modal_color_primary);
 }
 #remove_novel_spinner{
   color: var(--remove_novel_modal_color_primary) !important;
@@ -708,6 +729,7 @@ section.section_library{
   border-bottom: 1px solid #d2d2d2;
 }
 .superpanel_menu_btn{
+  color: #fff !important;
   margin: auto 0.2rem;
   font-variant: all-petite-caps;
   font-size: 1rem;
@@ -754,6 +776,16 @@ section.section_library{
 }
 #chapter_toolbelt_south{
   margin-top: 5rem;
+}
+.chapter_toolbelt_btn {
+  height: fit-content;
+  padding: 1rem;
+  color: #fff !important;
+  z-index: 0 !important;
+  box-shadow: none !important;
+}
+.chapter_toolbelt_btn:hover{
+  filter: brightness(1.1);
 }
 .content_title_div{
   border-top: 1px solid #9a9a9a;
@@ -814,7 +846,6 @@ section.section_library{
   color: #fff;
   background-color: var(--chapter_day_night_toggle_btn_color);
   border-color: var(--chapter_day_night_toggle_btn_color);
-  box-shadow: none !important;
 }
 .chapter_day_night_toggle_btn:hover{
   filter: brightness(1.2);

@@ -1,3 +1,4 @@
+{% from "super_navpanel.html" import super_navpanel %}
 {% from "flash_alert.html" import flash_alert %}
 
 {% extends 'general_layout.html' %}
@@ -5,7 +6,7 @@
 	<section class="section_toc">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+			{{super_navpanel(back_href)}}
 		{% endif%}
 
 		<!-- Main content -->

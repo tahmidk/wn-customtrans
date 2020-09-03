@@ -66,7 +66,13 @@ class RegisterNovelForm(FlaskForm):
 	# Submit form
 	submit = SubmitField('Register', )
 
-	# Custom validator for series code
+	# Custom validator for title
+	def validate_title(self, title):
+		series_entry = SeriesTable.query.filter_by(title=title.data).first()
+		if series_entry is not None:
+			raise ValidationError("This title is already taken by another series")
+
+	# Custom validator for abbreviation
 	def validate_abbr(self, abbr):
 		if abbr.data == COMMON_DICT_ABBR:
 			raise ValidationError("The abbreviation \'%s\' is illegal" % abbr.data)
@@ -93,7 +99,7 @@ class RegisterNovelForm(FlaskForm):
 			raise ValidationError("%s does not exist" % mono(url))
 		# Some error has occurred
 		except Exception as e:
-			raise ValidationError("No response from <pre class=\"errurl\">%s</pre>. Try again later" % url)
+			raise ValidationError("No response from %s. Try again later" % mono(url))
 
 class EditNovelForm(FlaskForm):
 	'''

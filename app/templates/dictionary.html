@@ -1,3 +1,4 @@
+{% from "super_navpanel.html" import super_navpanel %}
 {% from "dictionary_entry.html" import dictionary_entry %}
 {% from "flash_alert.html" import flash_alert %}
 
@@ -5,14 +6,14 @@
 {% block content %}
 	<section class="section_dictionary">
 		<!-- Back button -->
-		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
-		{% endif%}
+		{%- if back_href is defined -%}
+			{{ super_navpanel(back_href) }}
+		{%- endif -%}
 
 		<!-- Main content -->
 		<div class="banner" id="dictionary_banner">
 			<div class="banner_icon" id="dictionary_icon">
-				<ion-icon name="book"></ion-icon>
+				<ion-icon name="reader"></ion-icon>
 			</div>
 			<div class="banner_title" id="dictionary_title">Dictionary</div>
 		</div>
@@ -23,10 +24,11 @@
 					<ion-icon name="download-outline"></ion-icon>
 					<span> Download All </span>
 				</button>
-				<button type="button" class="btn btn-unique superpanel_menu_btn" id="menu_dictionary_honorifics_btn">
+				<a role="button" class="btn btn-unique superpanel_menu_btn" id="menu_dictionary_honorifics_btn"
+					href="{{url_for('tutorial')}}">
 					<ion-icon name="earth"></ion-icon>
 					<span> Honorifics </span>
-				</button>
+				</a>
 				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn">
 					<ion-icon name="toggle"></ion-icon>
 					<span> Toggle All </span>

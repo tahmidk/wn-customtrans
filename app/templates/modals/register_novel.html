@@ -2,26 +2,26 @@
 <div class="modal fade" id="register_novel_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal-cust register_novel_modal_cust" id="register_novel_form" action="{{ url_for('library_register_novel') }}">
+    <form class="modal-content text-center modal_cust register_novel_modal_cust" id="register_novel_form" action="{{ url_for('library_register_novel') }}">
       <!--Modal Header-->
-      <div class="modal-header d-flex justify-content-center">
-        <p class="modal_header_cust register_novel_header"> Register a Novel </p>
+      <div class="modal-header light-green modal_header_cust d-flex justify-content-center" id="register_novel_header">
+        <p style="margin: 0.5rem 0"> Register a Novel </p>
       </div>
 
       <!--Modal Body-->
       <div class="modal-body modal_body_cust">
           {{ form.hidden_tag() }}
-          <fieldset class="form-group">
+          <fieldset class="form-group" style="margin: 0">
             <div class="form-group form_group_cust">
               {{ form.title.label(class="form-control-label label_cust") }}
               <div class="form_input_div">
-                {{ form.title(class="form-control input_cust") }}
+                {{ form.title(class="form-control input_cust", placeholder="Whatever Novel Title You Want") }}
               </div>
             </div>
             <div class="form-group form_group_cust">
               {{ form.abbr.label(class="form-control-label label_cust") }}
               <div class="form_input_div">
-                {{ form.abbr(class="form-control input_cust") }}
+                {{ form.abbr(class="form-control input_cust", placeholder="WhateverAbbr") }}
               </div>
             </div>
             <div class="form-group form_group_cust">
@@ -35,17 +35,21 @@
               <div class="form_input_div">
                 {{ form.series_code(class="form-control input_cust", placeholder="http://ncode.syosetu.com/XXXXXXX") }}
               </div>
+              <button type="button" class="btn" id="host_search_engine_btn" title="Go to this host's search engine">
+                <ion-icon name="search-circle"></ion-icon>
+                <div style="font-size: 0.7rem; margin: auto;"> Search </div>
+              </button>
             </div>
           </fieldset>
       </div>
 
       <!--Modal Footer-->
-      <div class="modal-footer flex-center">
+      <div class="modal-footer flex">
         <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="register_novel_spinner">
           <span class="sr-only"></span>
         </div>
-        {{ form.submit(class="btn btn-success btn-cust", id="register_novel_submit_btn") }}
-        <button class="btn btn-outline-danger btn-cust" data-dismiss="modal"> Cancel </button>
+        {{ form.submit(class="btn btn-success btn_cust", id="register_novel_submit_btn") }}
+        <button class="btn btn-outline-danger btn_cust" data-dismiss="modal"> Cancel </button>
       </div>
 
     </form>
