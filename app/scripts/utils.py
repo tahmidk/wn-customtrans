@@ -10,6 +10,7 @@ import os
 import io
 import ssl
 import re
+import json
 
 from urllib.request import Request
 from urllib.request import urlopen
@@ -19,12 +20,10 @@ from urllib.error import HTTPError
 from flask import url_for
 
 # Internal imports
+from app import app
 from app import db
 
-from app.forms import RegisterNovelForm
-from app.forms import EditNovelForm
-from app.forms import RemoveNovelForm
-
+from app.forms import *
 from app.models import *
 
 from app.scripts.hostmanager import *
@@ -93,7 +92,7 @@ def registerSeriesToDatabase(reg_form):
 	series_abbr = str(reg_form.abbr.data)
 	series_code = str(reg_form.series_code.data)
 
-	host_entry = HostTable.query.filter_by(host_type=Host(reg_form.series_host.data)).first()
+	host_entry = reg_form.series_host.data
 	dict_fname = generateDictFilename(series_abbr, host_entry.host_name, series_code)
 	dict_entry = None
 
@@ -237,3 +236,124 @@ def customTrans(series_entry, ch):
 		"dictionary":	[{"trans":t, "comment":c} for (_, (t, c)) in series_dict.items()]
 	}
 	return chapter_data
+
+def seedSeries(series_json_path, mode='append'):
+	"""-------------------------------------------------------------------
+		Function:		[seedSeries]
+		Description:	Seeds the SeriesTable on the database using series found
+						in the given json file
+		Input:
+		  [series_json_path] Path to the json file containing the series to seed
+		  [mode]		If 'overwrite', drops SeriesTable data before seeding
+		  				Default 'append' will append to SeriesTable
+		Return:			None, reseeds HostTable
+
+		PRECONDITION: 	HostTable contains a row for the hosts referred to by the
+						series in the given json
+		------------------------------------------------------------------
+	"""
+	print("Seeding database's SeriesTable and DictionaryTable from \'%s\' in \'%s\' mode" %
+		(series_json_path, mode))
+
+	if mode == 'overwrite':
+		SeriesTable.__table__.drop(db.engine)
+		DictionaryTable.__table__.drop(db.engine)
+		db.metadata.create_all(db.engine, tables=[
+			SeriesTable.__table__,
+			DictionaryTable.__table__])
+
+		# Add back the common dictionary
+		dict_entry = DictionaryTable(
+			fname="common_dict.dict",
+		)
+		db.session.add(dict_entry)
+		db.session.commit()
+
+
+	# Populate database from json
+	with open(series_json_path, mode='r') as series_json:
+		series_content = json.loads(series_json.read())
+		for entry in series_content['series']:
+			host_entry = HostTable.query.filter_by(host_type=Host.to_enum(entry['host'])).first();
+			# Submit dictionary to database
+			dict_fname = generateDictFilename(entry['abbr'], host_entry.host_name, entry['code'])
+			dict_entry = DictionaryTable(
+				fname=dict_fname,
+			)
+			db.session.add(dict_entry)
+			db.session.commit()
+
+			# Create series entry in database
+			series_entry = SeriesTable(
+				code=entry['code'],
+				title=entry['title'],
+				abbr=entry['abbr'],
+				current_ch=entry['current'],
+				latest_ch=entry['latest'],
+				bookmarks=entry['bookmarks'],
+				dict_id=dict_entry.id,
+				host_id=host_entry.id
+			)
+			db.session.add(series_entry)
+			db.session.commit()
+
+def seedHosts(hosts_json_path, mode='append'):
+	"""-------------------------------------------------------------------
+		Function:		[seedHosts]
+		Description:	Drops any HostTable data currently in the database and
+						reseeds it from seed_data/hosts.json
+		Input:			None
+		Return:			None, reseeds HostTable
+		------------------------------------------------------------------
+	"""
+	print("Seeding database's HostTable from \'%s\' in \'%s\' mode" %
+		(hosts_json_path, mode))
+
+	# Drop and recreate this table on option 'overwrite'
+	if mode == 'overwrite':
+		HostTable.__table__.drop(db.engine)
+		db.metadata.create_all(db.engine, tables=[HostTable.__table__])
+
+	# Populate database from json
+	with open(hosts_json_path, mode='r') as hosts_json:
+		hosts_content = json.loads(hosts_json.read())
+		for entry in hosts_content["hosts"]:
+			host_entry = HostTable(
+				host_type=Host.to_enum(entry['host_type']),
+				host_name=entry['host_name'],
+				host_lang=Language.to_enum(entry['host_lang']),
+				host_url=entry['host_url'],
+				host_search_engine=entry['host_search_engine'])
+			db.session.add(host_entry)
+			db.session.commit()
+
+def seedHonorifics(honorifics_json_path, mode='append'):
+	"""-------------------------------------------------------------------
+		Function:		[seedHonorifics]
+		Description:	Drops any HonorificsTable data currently in the database
+						and reseeds it from seed_data/honorifics.json
+		Input:			None
+		Return:			None, reseeds HostTable
+		------------------------------------------------------------------
+	"""
+	print("Seeding database's HonorificsTable from \'%s\' in \'%s\' mode" %
+		(honorifics_json_path, mode))
+
+	# Drop and recreate this table on option 'overwrite'
+	if mode == 'overwrite':
+		HonorificsTable.__table__.drop(db.engine)
+		db.metadata.create_all(db.engine, tables=[HonorificsTable.__table__])
+
+	# Populate database from json
+	with io.open(honorifics_json_path, mode='r', encoding='utf8') as honorifics_json:
+		honorifics_content = json.loads(honorifics_json.read())
+		for lang in Language:
+			for entry in honorifics_content[Language.to_string(lang)]:
+				honorific_entry = HonorificsTable(
+					lang=lang,
+					raw=entry["raw"],
+					trans=entry["trans"],
+					opt_standalone=entry["standalone"],
+				)
+				db.session.add(honorific_entry)
+				db.session.commit()

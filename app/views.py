@@ -7,9 +7,10 @@
 #=======================================================================
 
 # Python imports
-import json
-from io import BytesIO
 import os
+import json
+import zipfile
+from io import BytesIO
 
 # Flask imports
 from flask import render_template
@@ -19,6 +20,7 @@ from flask import request
 from flask import flash
 from flask import Response
 from flask import abort
+from flask import send_file
 from flask import send_from_directory
 
 # Internal imports
@@ -75,7 +77,8 @@ def library_register_novel():
 			if series_entry.latest_ch == 0:
 				flash("Couldn't pull latest chapter for submitted series from host. \
 					Try hitting \'Update\' later", "warning")
-			flash("%s was successfully registered!" % series_entry.abbr, "success")
+			msg = "%s %s was successfully registered!" % (SUCCESS_BOLD, strong(series_entry.abbr))
+			flash(msg, "success")
 			return jsonify(status='ok')
 		except CustomException as err:
 			return jsonify(status='error', msg=str(err), severity=err.severity)
@@ -137,7 +140,7 @@ def library_edit_novel(series_code):
 		series_entry.abbr = new_abbr
 		db.session.commit()
 
-		flash("Successfully applied changes!", "success")
+		flash("%s Successfully applied changes!" % SUCCESS_BOLD, "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
@@ -164,7 +167,7 @@ def library_remove_novel(series_code):
 		db.session.delete(series_entry)
 		db.session.commit()
 
-		flash("Successfully removed %s!" % series_abbr, "success")
+		flash("%s Removed %s!" % (SUCCESS_BOLD, strong(series_abbr)), "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(remove_novel_form.errors, ensure_ascii=False)
@@ -351,14 +354,28 @@ def dictionaries_download_entry(dict_fname):
 		return jsonify({"status": "dict_dne_abort"})
 
 	try:
-		return send_from_directory(os.path.dirname(path), filename=dict_fname, as_attachment=True)
+		return send_from_directory(app.config['DICTIONARIES_PATH'],
+			filename=dict_fname,
+			as_attachment=True)
 	except Exception as err:
 		return jsonify({"status": "dict_download_error"})
 
 # Route for downloading all dict files in user/dicts
 @app.route("/dictionaries/downloadall")
 def dictionaries_download_all():
-	return "Hello"
+	#import pdb; pdb.set_trace()
+	data = BytesIO()
+	with zipfile.ZipFile(data, mode='w', compression=zipfile.ZIP_DEFLATED) as dict_zip:
+		for (root, _, files) in os.walk(app.config['DICTIONARIES_PATH']):
+			for dict_fname in files:
+				dict_path = os.path.join(root, dict_fname)
+				dict_zip.write(dict_path, arcname=dict_fname)
+
+	data.seek(0)
+	return send_file(data,
+		mimetype="application/zip",
+		as_attachment=True,
+		attachment_filename='wnct_dictionaries.zip')
 
 # Route for Tutorial page
 @app.route("/tutorial")

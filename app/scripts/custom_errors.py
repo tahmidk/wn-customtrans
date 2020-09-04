@@ -13,9 +13,11 @@ def strong(text):
 def mono(text):
 	return "<span class=\"mono\">%s</span>" % text
 
+SUCCESS = 'success'
 WARNING = 'warning'
 CRITICAL = 'danger'
 
+SUCCESS_BOLD = strong("Success:")
 WARNING_BOLD = strong("Warning:")
 CRITICAL_BOLD = strong("Aborted:")
 

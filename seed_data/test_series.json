@@ -1,0 +1,58 @@
+{
+    "series":[
+		{
+			"code": "n7031bs",
+			"title": "Konjiki no Wordmaster",
+			"abbr": "GoldnWordmaster",
+			"current": 1,
+			"latest": 230,
+			"bookmarks": [],
+			"host": "Host.Syosetu"
+		},
+		{
+			"code": "n9946fx",
+			"title": "The longer the title the more views webnovels get so I'm going to test the limit",
+			"abbr": "80CharLong",
+			"current": 0,
+			"latest": 45,
+			"bookmarks": [3, 12, 13],
+			"host": "Host.Syosetu"
+		},
+		{
+			"code": "n3404fh",
+			"title": "The Adventurer Contracted to the Strongest Deity Crushes Flags",
+			"abbr": "FlagCrush",
+			"current": 100,
+			"latest": 300,
+			"bookmarks": [],
+			"host": "Host.Syosetu"
+		},
+		{
+			"code": "n4893gi",
+			"title": "When My Childhood Friend Becomes JK",
+			"abbr": "CHJK",
+			"current": 2,
+			"latest": 28,
+			"bookmarks": [2],
+			"host": "Host.Syosetu"
+		},
+		{
+			"code": "n0737ga",
+			"title": "The Strongest Incompetent Reaches for the Top",
+			"abbr": "WhiteRabbit",
+			"current": 1,
+			"latest": 10,
+			"bookmarks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			"host": "Host.Syosetu"
+		},
+		{
+			"code": "n9450ge",
+			"title": "Surrounded By Four",
+			"abbr": "Surrounded",
+			"current": 0,
+			"latest": 1,
+			"bookmarks": [1],
+			"host": "Host.Syosetu"
+		}
+    ]
+}

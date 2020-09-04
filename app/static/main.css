@@ -11,8 +11,8 @@ html{
   /* Main page palette */
   --library_color_primary: #d83939;
   --dictionary_color_primary: #f58e38;
-  --tutorial_color_primary: #aaff77;
-  --settings_color_primary: #97ecff;
+  --tutorial_color_primary: #9fde44;
+  --settings_color_primary: #7ae2f9;
 
   /* Library palette */
   --update_library_button_color: #ffc545;
@@ -110,6 +110,9 @@ input[type=number] {
     background: transparent;
 }
 
+.errurl{
+  overflow: hidden;
+}
 .mono{
   font-family: Lucida Console, Courier, monospace;
   white-space: pre;
@@ -269,7 +272,6 @@ input[type=number] {
 .super_navpanel_btn{
   color: #fff !important;
   margin: 0;
-  border-radius: 1rem;
 }
 .super_navpanel_btn:hover{
   filter: brightness(1.1);
@@ -278,7 +280,7 @@ input[type=number] {
   font-size: 1rem !important;
 }
 #super_navpanel_home_btn{
-  background: #4a5163;
+  background: #575c69;
 }
 #super_navpanel_library_btn{
   background: var(--library_color_primary);
@@ -289,7 +291,7 @@ input[type=number] {
 #super_navpanel_back_btn{
   padding: 0.5rem 3rem;
   margin-left: 1.5rem;
-  border-radius: 0 !important;
+  border-radius: 1rem !important;
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
@@ -344,36 +346,40 @@ section.section_index{
   box-sizing: border-box;
 }
 #menu_library{
+  color: #fff;
+  background-color: var(--library_color_primary);
   box-shadow: 0 0 0 0.2rem var(--library_color_primary);
-  color: var(--library_color_primary);
+  /*color: var(--library_color_primary);*/
 }
 #menu_library:hover {
-  background-color: var(--library_color_primary);
-  color: #fff;
+  filter: brightness(1.2);
 }
 #menu_dictionaries{
+  color: #fff;
+  background-color: var(--dictionary_color_primary);
   box-shadow: 0 0 0 0.2rem var(--dictionary_color_primary);
-  color: var(--dictionary_color_primary);
+  /*color: var(--dictionary_color_primary);*/
 }
 #menu_dictionaries:hover {
-  background-color: var(--dictionary_color_primary);
-  color: #fff;
+  filter: brightness(1.15);
 }
 #menu_tutorial{
+  color: #fff;
+  background-color: var(--tutorial_color_primary);
   box-shadow: 0 0 0 0.2rem var(--tutorial_color_primary);
-  color: var(--tutorial_color_primary);
+  /*color: var(--tutorial_color_primary);*/
 }
 #menu_tutorial:hover {
-  background-color: var(--tutorial_color_primary);
-  color: #fff;
+  filter: brightness(1.03);
 }
 #menu_settings{
+  color: #fff;
+  background-color: var(--settings_color_primary);
   box-shadow: 0 0 0 0.2rem var(--settings_color_primary);
-  color: var(--settings_color_primary);
+  /*color: var(--settings_color_primary);*/
 }
 #menu_settings:hover {
-  background-color: var(--settings_color_primary);
-  color: #fff;
+  filter: brightness(1.1);
 }
 
 
@@ -582,6 +588,10 @@ section.section_library{
 .modal_cust{
   color: #fff;
 }
+.modal_cancel_btn:hover{
+  background: #ff3547  !important;
+  color: #fff !important;
+}
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
 #register_novel_header{
@@ -624,6 +634,10 @@ section.section_library{
   border: 2px solid var(--remove_novel_modal_color_secondary);
   border-radius: 1rem;
   font-size: 1.4rem;
+}
+#remove_novel_submit_btn{
+  color: #fff;
+  background: var(--remove_novel_modal_color_primary);
 }
 
 /*---------------------[ Table of Contents Stylings ]-----------------------*/

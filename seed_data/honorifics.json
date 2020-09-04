@@ -1,0 +1,406 @@
+{
+    "Language.JP":[
+        {
+            "raw": "さん",
+            "trans": "san",
+            "standalone": false
+        },
+        {
+            "raw": "氏",
+            "trans": "san",
+            "standalone": false
+        },
+        {
+            "raw": "くん",
+            "trans": "kun",
+            "standalone": false
+        },
+        {
+            "raw": "クン",
+            "trans": "kun",
+            "standalone": false
+        },
+        {
+            "raw": "君",
+            "trans": "kun",
+            "standalone": false
+        },
+        {
+            "raw": "さま",
+            "trans": "sama",
+            "standalone": false
+        },
+        {
+            "raw": "様",
+            "trans": "sama",
+            "standalone": false
+        },
+        {
+            "raw": "サマ",
+            "trans": "sama",
+            "standalone": false
+        },
+        {
+            "raw": "殿",
+            "trans": "dono",
+            "standalone": false
+        },
+        {
+            "raw": "たん",
+            "trans": "tan",
+            "standalone": false
+        },
+        {
+            "raw": "ちゃん",
+            "trans": "chan",
+            "standalone": false
+        },
+        {
+            "raw": "ねーちゃん",
+            "trans": "neechan",
+            "standalone": true
+        },
+        {
+            "raw": "姉ちゃん",
+            "trans": "neechan",
+            "standalone": true
+        },
+        {
+            "raw": "お姉様",
+            "trans": "oneesama",
+            "standalone": true
+        },
+        {
+            "raw": "お姉さま",
+            "trans": "oneesama",
+            "standalone": true
+        },
+        {
+            "raw": "おねーさん",
+            "trans": "oneesan",
+            "standalone": true
+        },
+        {
+            "raw": "お姉さん",
+            "trans": "oneesan",
+            "standalone": true
+        },
+        {
+            "raw": "お姉ちゃん",
+            "trans": "oneechan",
+            "standalone": true
+        },
+        {
+            "raw": "おねーちゃん",
+            "trans": "oneechan",
+            "standalone": true
+        },
+        {
+            "raw": "おねえちゃん",
+            "trans": "oneechan",
+            "standalone": true
+        },
+        {
+            "raw": "おねぇちゃん",
+            "trans": "oneechan",
+            "standalone": true
+        },
+        {
+            "raw": "姉さま",
+            "trans": "neesama",
+            "standalone": true
+        },
+        {
+            "raw": "姉さん",
+            "trans": "neesan",
+            "standalone": true
+        },
+        {
+            "raw": "姉様",
+            "trans": "anesama",
+            "standalone": true
+        },
+        {
+            "raw": "あねさま",
+            "trans": "anesama",
+            "standalone": true
+        },
+        {
+            "raw": "姉",
+            "trans": "ane",
+            "standalone": true
+        },
+        {
+            "raw": "おにーちゃん",
+            "trans": "oniichan",
+            "standalone": true
+        },
+        {
+            "raw": "おにぃちゃん",
+            "trans": "oniichan",
+            "standalone": true
+        },
+        {
+            "raw": "おにいちゃん",
+            "trans": "oniichan",
+            "standalone": true
+        },
+        {
+            "raw": "お兄ちゃん",
+            "trans": "oniichan",
+            "standalone": true
+        },
+        {
+            "raw": "お兄さん",
+            "trans": "oniisan",
+            "standalone": true
+        },
+        {
+            "raw": "おにーさん",
+            "trans": "oniisan",
+            "standalone": true
+        },
+        {
+            "raw": "おにぃさん",
+            "trans": "oniisan",
+            "standalone": true
+        },
+        {
+            "raw": "兄ちゃん",
+            "trans": "niichan",
+            "standalone": true
+        },
+        {
+            "raw": "にーちゃん",
+            "trans": "niichan",
+            "standalone": true
+        },
+        {
+            "raw": "兄さん",
+            "trans": "niisan",
+            "standalone": true
+        },
+        {
+            "raw": "にーさん",
+            "trans": "niisan",
+            "standalone": true
+        },
+        {
+            "raw": "兄さま",
+            "trans": "niisama",
+            "standalone": true
+        },
+        {
+            "raw": "兄様",
+            "trans": "anisama",
+            "standalone": true
+        },
+        {
+            "raw": "兄貴",
+            "trans": "aniki",
+            "standalone": true
+        },
+        {
+            "raw": "兄",
+            "trans": "ani",
+            "standalone": true
+        },
+        {
+            "raw": "王女",
+            "trans": "ojou",
+            "standalone": true
+        },
+        {
+            "raw": "王女様",
+            "trans": "ojousama",
+            "standalone": true
+        },
+        {
+            "raw": "お嬢様",
+            "trans": "ojousama",
+            "standalone": true
+        },
+        {
+            "raw": "お嬢さん",
+            "trans": "ojousan",
+            "standalone": true
+        },
+        {
+            "raw": "王子",
+            "trans": "ouji",
+            "standalone": true
+        },
+        {
+            "raw": "王子様",
+            "trans": "oujisama",
+            "standalone": true
+        },
+        {
+            "raw": "嬢",
+            "trans": "jou",
+            "standalone": true
+        },
+        {
+            "raw": "姫",
+            "trans": "hime",
+            "standalone": true
+        },
+        {
+            "raw": "姫様",
+            "trans": "himesama",
+            "standalone": true
+        },
+        {
+            "raw": "姫さま",
+            "trans": "himesama",
+            "standalone": true
+        },
+        {
+            "raw": "お姫様",
+            "trans": "ohimesama",
+            "standalone": true
+        },
+        {
+            "raw": "先生",
+            "trans": "sensei",
+            "standalone": true
+        },
+        {
+            "raw": "せんせー",
+            "trans": "sensei",
+            "standalone": true
+        },
+        {
+            "raw": "先輩",
+            "trans": "senpai",
+            "standalone": true
+        },
+        {
+            "raw": "センパイ",
+            "trans": "senpai",
+            "standalone": true
+        },
+        {
+            "raw": "せんぱい",
+            "trans": "senpai",
+            "standalone": true
+        },
+        {
+            "raw": "後輩",
+            "trans": "kouhai",
+            "standalone": true
+        },
+        {
+            "raw": "嬢ちゃん",
+            "trans": "jouchan",
+            "standalone": true
+        },
+        {
+            "raw": "母さん",
+            "trans": "kaasan",
+            "standalone": true
+        },
+        {
+            "raw": "おかーさん",
+            "trans": "okaasan",
+            "standalone": true
+        },
+        {
+            "raw": "お母さん",
+            "trans": "okaasan",
+            "standalone": true
+        },
+        {
+            "raw": "父さん",
+            "trans": "otousan",
+            "standalone": true
+        },
+        {
+            "raw": "おっさん",
+            "trans": "ossan",
+            "standalone": true
+        },
+        {
+            "raw": "おじいちゃん",
+            "trans": "ojichan",
+            "standalone": true
+        },
+        {
+            "raw": "お祖父ちゃん",
+            "trans": "ojichan",
+            "standalone": true
+        },
+        {
+            "raw": "おじさん",
+            "trans": "ojisan",
+            "standalone": true
+        },
+        {
+            "raw": "お祖母ちゃん",
+            "trans": "obachan",
+            "standalone": true
+        },
+        {
+            "raw": "お祖母さん",
+            "trans": "obasan",
+            "standalone": true
+        },
+        {
+            "raw": "婆さん",
+            "trans": "baasan",
+            "standalone": true
+        },
+        {
+            "raw": "ばーさん",
+            "trans": "baasan",
+            "standalone": true
+        },
+        {
+            "raw": "兄妹",
+            "trans": "siblings",
+            "standalone": true
+        },
+        {
+            "raw": "兄弟",
+            "trans": "siblings",
+            "standalone": true
+        },
+        {
+            "raw": "姉弟",
+            "trans": "siblings",
+            "standalone": true
+        },
+        {
+            "raw": "姉妹",
+            "trans": "sisters",
+            "standalone": true
+        },
+        {
+            "raw": "義姉",
+            "trans": "step-sister",
+            "standalone": true
+        },
+        {
+            "raw": "義姉弟",
+            "trans": "step-siblings",
+            "standalone": true
+        },
+        {
+            "raw": "主任",
+            "trans": "chief",
+            "standalone": true
+        },
+        {
+            "raw": "達",
+            "trans": "and co'",
+            "standalone": false
+        },
+        {
+            "raw": "たち",
+            "trans": "and co'",
+            "standalone": false
+        }
+    ],
+    "Language.CN":[
+    ]
+}

@@ -68,6 +68,7 @@ class HostTable(db.Model):
 	host_name = db.Column(db.String, unique=True, nullable=False)
 	host_lang = db.Column(db.Enum(Language), nullable=False)
 	host_url = db.Column(db.String, unique=True, nullable=False)
+	host_search_engine = db.Column(db.String)
 
 	def __repr__(self):
 		return "Host(id=%s, host_name=%s, host_lang=%s, host_url=%s)" % \
