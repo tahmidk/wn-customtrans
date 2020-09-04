@@ -58,6 +58,11 @@ def library():
 
 	# Fetch series from database
 	series = SeriesTable.query.order_by(SeriesTable.title).all();
+	# Add additional host info
+	for entry in series:
+		host_entry = HostTable.query.filter_by(id=entry.host_id).first()
+		lang = Language.to_string(host_entry.host_lang).split('.')[-1]
+		entry.__dict__["host"] = "%s [%s]" % (host_entry.host_name, lang)
 	return render_template('library.html',
 		title="Library",
 		back_href=url_for('index'),
@@ -75,8 +80,9 @@ def library_register_novel():
 		try:
 			series_entry = utils.registerSeriesToDatabase(register_novel_form)
 			if series_entry.latest_ch == 0:
-				flash("Couldn't pull latest chapter for submitted series from host. \
-					Try hitting \'Update\' later", "warning")
+				flash("%s Couldn't pull latest chapter for %s from host. \
+					Try hitting \'Update\' later" % (WARNING_BOLD, strong(series_entry.abbr)),
+					"warning")
 			msg = "%s %s was successfully registered!" % (SUCCESS_BOLD, strong(series_entry.abbr))
 			flash(msg, "success")
 			return jsonify(status='ok')
@@ -140,7 +146,7 @@ def library_edit_novel(series_code):
 		series_entry.abbr = new_abbr
 		db.session.commit()
 
-		flash("%s Successfully applied changes!" % SUCCESS_BOLD, "success")
+		flash("%s Your changes have been applied!" % SUCCESS_BOLD, "success")
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
@@ -161,7 +167,8 @@ def library_remove_novel(series_code):
 			# Remove dict from database
 			db.session.delete(dict_entry)
 			db.session.commit()
-			flash("Successfully removed dictionary associated with %s" % series_abbr, "success")
+			flash("%s Removed the following dictionary: %s" % (SUCCESS_BOLD, mono(dict_entry.fname)),
+				"success")
 
 		# Remove series from database
 		db.session.delete(series_entry)

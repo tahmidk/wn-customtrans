@@ -50,8 +50,8 @@
 			"title": "Surrounded By Four",
 			"abbr": "Surrounded",
 			"current": 0,
-			"latest": 1,
-			"bookmarks": [1],
+			"latest": 0,
+			"bookmarks": [],
 			"host": "Host.Syosetu"
 		}
     ]

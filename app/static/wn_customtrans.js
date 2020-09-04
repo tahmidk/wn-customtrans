@@ -312,80 +312,82 @@ function setupLibrary(){
 	});
 
 	// Update button event sets up an SSE and listens for update progress
-	var update_btn_enabled = true;
-	var update_error = false;
-	$(update_btn).click(function(event){
-		// Disable update button while event is finishing up
-		if(!update_btn_enabled)	{
-			return;
-		}
-		update_btn_enabled = false;
+	if(!$(update_btn)[0].hasAttribute('disabled')){
+		var update_btn_enabled = true;
+		var update_error = false;
+		$(update_btn).click(function(event){
+			// Disable update button while event is finishing up
+			if(!update_btn_enabled)	{
+				return;
+			}
+			update_btn_enabled = false;
 
-		// Show the progress bar
-		$('#update_progress_bar').attr("style", "width: 0;");
-		$('#update_info_series').attr("style", "display: none;");
-		$(".library_update_progress_bar_display").fadeIn()//.css("display","flex");
+			// Show the progress bar
+			$('#update_progress_bar').attr("style", "width: 0;");
+			$('#update_info_series').attr("style", "display: none;");
+			$(".library_update_progress_bar_display").fadeIn()//.css("display","flex");
 
-		// Start SSE connection and listen for progress from server
-		var source = new EventSource("/library/update");
-		var ABBR_INDEX = 0;
-		var CH_UPDATES_INDEX = 1;
-		var CH_LATEST_INDEX = 2;
-		source.onmessage = function(event) {
-			progress_data = JSON.parse(event.data)
+			// Start SSE connection and listen for progress from server
+			var source = new EventSource("/library/update");
+			var ABBR_INDEX = 0;
+			var CH_UPDATES_INDEX = 1;
+			var CH_LATEST_INDEX = 2;
+			source.onmessage = function(event) {
+				progress_data = JSON.parse(event.data)
 
-			// Update the progress bar
-			var len_updated = progress_data['updated'].length;
-			var value = (len_updated / progress_data['num_series']) * 100;
-			var width_attr = "width: "+value+"%;";
-			$('#update_progress_bar')[0].setAttribute("style", width_attr);
+				// Update the progress bar
+				var len_updated = progress_data['updated'].length;
+				var value = (len_updated / progress_data['num_series']) * 100;
+				var width_attr = "width: "+value+"%;";
+				$('#update_progress_bar')[0].setAttribute("style", width_attr);
 
-			var series_abbr = progress_data['updated'][len_updated-1][ABBR_INDEX];
-			$('#update_info_series')[0].removeAttribute("style");
-			$('#update_info_series').text(series_abbr);
+				var series_abbr = progress_data['updated'][len_updated-1][ABBR_INDEX];
+				$('#update_info_series')[0].removeAttribute("style");
+				$('#update_info_series').text(series_abbr);
 
-			// Close this connection when all entries have been updated
-			if(progress_data['num_series'] == len_updated){
-				source.close();
-				// Show updates on page
-				// progress_data[updated] is packed with info returned from updateSeries() method
-				// Each entry should be in the form (abbr, num_chapter_updates, latest_ch)
-				$.each(progress_data['updated'], function(index, value){
-					var abbr = value[ABBR_INDEX];
-					if(value[CH_UPDATES_INDEX] > 0){
+				// Close this connection when all entries have been updated
+				if(progress_data['num_series'] == len_updated){
+					source.close();
+					// Show updates on page
+					// progress_data[updated] is packed with info returned from updateSeries() method
+					// Each entry should be in the form (abbr, num_chapter_updates, latest_ch)
+					$.each(progress_data['updated'], function(index, value){
+						var abbr = value[ABBR_INDEX];
+						if(value[CH_UPDATES_INDEX] > 0){
+							setTimeout(() => {
+								$(`#series_${abbr} #num_updates`).text(`${value[CH_UPDATES_INDEX]}`);
+								$(`#series_${abbr} .entry_updated`).fadeIn("fast", "swing");
+								$(`#series_${abbr} #latest_ch`).text(`${value[CH_LATEST_INDEX]}`);
+							}, 1000);
+						}
+					});
+
+					// Hide progress bar and re-enable this button
+					setTimeout(() => {
+						$(".library_update_progress_bar_display").fadeOut();
+						update_btn_enabled = true;
+					}, 1000);
+					if(!update_error){
 						setTimeout(() => {
-							$(`#series_${abbr} #num_updates`).text(`${value[CH_UPDATES_INDEX]}`);
-							$(`#series_${abbr} .entry_updated`).fadeIn("fast", "swing");
-							$(`#series_${abbr} #latest_ch`).text(`${value[CH_LATEST_INDEX]}`);
+							createFlashMessage(
+								`${SUCCESS_BOLD} Fetched updates for all series in the library!`,
+								SUCCESS,
+								lib_flashpanel)
 						}, 1000);
 					}
-				});
+				}
 
-				// Hide progress bar and re-enable this button
-				setTimeout(() => {
-					$(".library_update_progress_bar_display").fadeOut();
-					update_btn_enabled = true;
-				}, 1000);
-				if(!update_error){
-					setTimeout(() => {
-						createFlashMessage(
-							`${SUCCESS_BOLD} Fetched updates for all series in the library!`,
-							SUCCESS,
-							lib_flashpanel)
-					}, 1000);
+				// Display errors
+				if(progress_data['updated'][len_updated-1][CH_UPDATES_INDEX] < 0){
+					update_error = true;
+					createFlashMessage(
+						"A network error occurred when requesting updates for " + strong(series_abbr),
+						CRITICAL,
+						lib_flashpanel);
 				}
 			}
-
-			// Display errors
-			if(progress_data['updated'][len_updated-1][CH_UPDATES_INDEX] < 0){
-				update_error = true;
-				createFlashMessage(
-					"A network error occurred when requesting updates for " + strong(series_abbr),
-					CRITICAL,
-					lib_flashpanel);
-			}
-		}
-	});
+		});
+	}
 
 	// Setup the register novel modal
 	setupModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form, lib_flashpanel);
@@ -398,7 +400,10 @@ function setupLibrary(){
 }
 
 function setupTableOfContents(){
-	const toc_flashpanel = "#toc_flashpanel"
+	const toc_flashpanel = "#toc_flashpanel";
+	const jump_to_curr_btn = "#jump_to_curr_btn";
+	const update_series_btn = "#update_series_btn";
+	const rmv_all_bkmk_btn = "#rmv_all_bkmk_btn";
 
 	// Bookmark events
 	$('.toc_chapter_bookmark').click(function(event){
@@ -461,64 +466,72 @@ function setupTableOfContents(){
 	});
 
 	// Menu button events
-	$("#jump_to_curr_btn").click(function() {
-		try{
-			$('html, body').animate({
-				scrollTop: $(".current_chapter").offset().top - document.documentElement.clientHeight/2
-			}, 500);
-		}
-		catch(err){ /* Do nothing */ }
-	});
-	var update_series_btn_enabled = true;
-	$('#update_series_btn').click(function(){
-		if(!update_series_btn_enabled){
-			return
-		}
-		update_series_btn_enabled = false;
+	if(!$(jump_to_curr_btn)[0].hasAttribute('disabled')){
+		$(jump_to_curr_btn).click(function() {
+			try{
+				$('html, body').animate({
+					scrollTop: $(".current_chapter").offset().top - document.documentElement.clientHeight/2
+				}, 500);
+			}
+			catch(err){ /* Do nothing */ }
+		});
+	}
 
-		// Make a post request to the route responsible for handling the form's backend
-		createFlashMessage(
-			"Fetching latest chapters... please wait a few seconds",
-			WARNING,
-			toc_flashpanel);
-		var update_btn = $(this)[0];
-		var url = update_btn.getAttribute('action');
-		$.post(url, function(data) {
-			if(data.status == 'ok') {
-				update_series_btn_enabled = true;
-				if(data.updates > 0){
-					createFlashMessage(
-						`${SUCCESS_BOLD} Fetched ${data.updates} new chapters!`,
-						SUCCESS,
-						toc_flashpanel);
+	if(!$(update_series_btn)[0].hasAttribute('disabled')){
+		var update_series_btn_enabled = true;
+		$(update_series_btn).click(function(){
+			if(!update_series_btn_enabled){
+				return
+			}
+			update_series_btn_enabled = false;
+
+			// Make a post request to the route responsible for handling the form's backend
+			createFlashMessage(
+				"Fetching latest chapters... please wait a few seconds",
+				WARNING,
+				toc_flashpanel);
+			var update_btn = $(this)[0];
+			var url = update_btn.getAttribute('action');
+			$.post(url, function(data) {
+				if(data.status == 'ok') {
+					update_series_btn_enabled = true;
+					if(data.updates > 0){
+						createFlashMessage(
+							`${SUCCESS_BOLD} Fetched ${data.updates} new chapters!`,
+							SUCCESS,
+							toc_flashpanel);
+					}
+					else{
+						createFlashMessage(
+							`${SUCCESS_BOLD} This series is already up-to-date`,
+							SUCCESS,
+							toc_flashpanel);
+					}
+					window.setTimeout(function(){
+						location.reload();
+					}, 1000);
 				}
 				else{
 					createFlashMessage(
-						`${SUCCESS_BOLD} This series is already up-to-date`,
-						SUCCESS,
+						`${CRITICAL_BOLD} Encountered an error while fetching latest chapters. Try again later`,
+						CRITICAL,
 						toc_flashpanel);
 				}
-				window.setTimeout(function(){
+			});
+		});
+	}
+
+	if(!$(rmv_all_bkmk_btn)[0].hasAttribute('disabled')){
+		$(rmv_all_bkmk_btn).click(function() {
+			var rmv_all_bkmk_btn = $(this)[0];
+			var url = rmv_all_bkmk_btn.getAttribute('action');
+			$.post(url, function(data){
+				if(data.status == 'ok') {
 					location.reload();
-				}, 1000);
-			}
-			else{
-				createFlashMessage(
-					`${CRITICAL_BOLD} Encountered an error while fetching latest chapters. Try again later`,
-					CRITICAL,
-					toc_flashpanel);
-			}
+				}
+			});
 		});
-	});
-	$('#rmv_all_bkmk_btn').click(function() {
-		var rmv_all_bkmk_btn = $(this)[0];
-		var url = rmv_all_bkmk_btn.getAttribute('action');
-		$.post(url, function(data){
-			if(data.status == 'ok') {
-				location.reload();
-			}
-		});
-	});
+	}
 }
 
 function setupChapter(){
@@ -551,15 +564,13 @@ function setupChapter(){
 
 	// Add functionality of prev, toc, and next buttons
 	var url = this.location.href;
-	var ch = $('#mdata_ch').data("value");
-	var latest_ch = $('#mdata_latest_ch').data("value");
-	if(ch > 1){
+	if(!$(".chapter_prev_btn")[0].hasAttribute('disabled')){
 		$('.chapter_prev_btn').click(function() {
 			var prev = ch - 1;
 			location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
 		});
 	}
-	if(ch < latest_ch){
+	if(!$(".chapter_next_btn")[0].hasAttribute('disabled')){
 		$('.chapter_next_btn').click(function() {
 			var next = ch + 1;
 			location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
@@ -603,13 +614,13 @@ function setupDictionary(){
 	});
 
 	// Dictionary entry button functions
-	$('.action_toggle_enable').click(function() {
-		var url = this.getAttribute('action');
+	$('.action_toggle_enable ion-icon').click(function() {
+		var url = $(this).parent().attr("action");
 		var dict_entry = $(this).closest('.dictionary_entry');
 		const dict_fname = strong(dict_entry.data('fname'));
 		const dict_abbr = strong(dict_entry.data('abbr'));
 
-		var toggle = this.querySelector('ion-icon');
+		var toggle = this;
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				dict_entry.toggleClass('dictionary_entry_disabled');

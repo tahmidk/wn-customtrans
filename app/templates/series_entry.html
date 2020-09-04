@@ -3,16 +3,26 @@
 	<div class="library_series_entry" id="series_{{novel.abbr}}">
 		<div class="entry_minibanner">
 			<div class="minibanner entry_abbr"> {{novel.abbr}} </div>
-			<div class="minibanner entry_updated"> Updated (+<span id="num_updates"></span>)</div>
+			<div class="minibanner entry_updated light-green"> Updated (+<span id="num_updates"></span>)</div>
 		</div>
 		<div class="entry_title"> {{novel.title}} </div>
 		<div class="entry_details">
-			<div class="entry_current">
+			<!-- <div class="entry_current">
 				<span class="mono">Current: <span id="current_ch">{{novel.current_ch}}</span></span>
 			</div>
 			<div class="entry_latest">
 				<span class="mono"> Latest: <span id="latest_ch">{{novel.latest_ch}}</span></span>
-			</div>
+			</div> -->
+			<table class="entry_info_table mono">
+				<tr>
+					<td class="entry_info_table_label_column">Host Info</td>
+					<td class="entry_info_table_data_column" id="host">{{novel.host}}</td>
+				</tr>
+				<tr>
+					<td class="entry_info_table_label_column">Progress</td>
+					<td class="entry_info_table_data_column" id="progress"><span id="current_ch">{{novel.current_ch}}</span> / <span id="latest_ch">{{novel.latest_ch}}</span></td>
+				</tr>
+			</table>
 		</div>
 		<div class="entry_action_bar">
 			<!-- This div is for convenience in js and is not meant to be displayed-->
@@ -39,6 +49,10 @@
 				title="Go to Table of Contents" style="margin-left: 0;">
 				<span> Table of Contents </span>
 				<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="library-outline"></ion-icon>
+			</a>
+			<a class="series_entry_btn series_dict" title="Go to series dictionary">
+				<span> Dictionary </span>
+				<ion-icon style="font-size: 1.5rem; margin: 0 auto;" name="reader"></ion-icon>
 			</a>
 			<a class="series_entry_btn download_next" href="{{url_for('library_series_chapter', series_code=novel.code, ch=resume_ch)}}"
 				title="Read chapter {{resume_ch}}">

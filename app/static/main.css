@@ -4,7 +4,7 @@ html{
   background: var(--html_background_color);
 
   /* Color definitions */
-  --html_background_color: #fff;
+  --html_background_color: white;
   --back_btn_color: #292929;
   --white_contrast_font_color: #828282;
 
@@ -22,10 +22,9 @@ html{
   --remove_novel_modal_color_secondary: #dc3545;
   --edit_novel_modal_color: #cc406b;
 
-  --series_entry_btn_color: #9e1111;
+  --series_entry_darkend_color: #9e1111;
   --series_entry_hover_color: #d83939;
   --series_entry_text_color: #940d0d;
-  --series_updated_tag_color: #830062;
 
   /* TOC palette */
   --toc_viewed_chapter_highlight: #b71717;
@@ -51,7 +50,7 @@ html[data-theme='dark']{
   --chapter_maintxt_color: #d0d0d0;
   --chapter_subtxt_color: #505050;
   --chapter_day_night_toggle_btn_color: #bea140;
-  --chapter_scroll_bar_color: #ffffff;
+  --chapter_scroll_bar_color: white;
   --chapter_word_color: #ffd000;
 }
 html.transition,
@@ -110,6 +109,10 @@ input[type=number] {
     background: transparent;
 }
 
+ion-icon .icon-inner{
+  height: auto !important;
+}
+
 .errurl{
   overflow: hidden;
 }
@@ -145,7 +148,7 @@ input[type=number] {
   height: fit-content;
   padding: 0.5em 0.5em;
   margin: 0.2em 0 0.2em 0.2em;
-  color: #fff;
+  color: white;
   border-radius: 0.1em;
   font-size: 2em;
 }
@@ -154,7 +157,7 @@ input[type=number] {
   height: 100%;
   padding: 0.75em 0;
   box-sizing: border-box;
-  box-shadow: 0 0 0 0.5rem #000;
+  box-shadow: 0 0 0 0.5rem black;
   border-radius: 0.5rem;
   text-align: center;
   text-decoration: none !important;
@@ -252,6 +255,27 @@ input[type=number] {
 .spinner_cust{
   display: none;
 }
+.page_empty_div{
+  margin: 10rem auto auto;
+}
+.page_empty_img_div{
+  margin: auto;
+  margin-bottom: 2rem;
+  width: fit-content;
+}
+.page_empty_img{
+  border-radius: 4rem;
+  width: 25rem;
+}
+.page_empty_text_div{
+  width: fit-content;
+  text-align: center;
+  margin: auto;
+  color: var(--white_contrast_font_color);
+  font-size: 3rem;
+  font-variant: all-petite-caps;
+  font-family: monospace;
+}
 
 /*--------------------------[ Super navpanel stuff ]-------------------*/
 .super_navpanel{
@@ -260,7 +284,7 @@ input[type=number] {
   top: 0;
   width: fit-content;
   padding: 0.5rem 1rem;
-  color: #fff;
+  color: white;
 
   /* Make it unselectable */
   user-select: none;
@@ -270,7 +294,7 @@ input[type=number] {
   -o-user-select: none;
 }
 .super_navpanel_btn{
-  color: #fff !important;
+  color: white !important;
   margin: 0;
 }
 .super_navpanel_btn:hover{
@@ -346,7 +370,7 @@ section.section_index{
   box-sizing: border-box;
 }
 #menu_library{
-  color: #fff;
+  color: white;
   background-color: var(--library_color_primary);
   box-shadow: 0 0 0 0.2rem var(--library_color_primary);
   /*color: var(--library_color_primary);*/
@@ -355,7 +379,7 @@ section.section_index{
   filter: brightness(1.2);
 }
 #menu_dictionaries{
-  color: #fff;
+  color: white;
   background-color: var(--dictionary_color_primary);
   box-shadow: 0 0 0 0.2rem var(--dictionary_color_primary);
   /*color: var(--dictionary_color_primary);*/
@@ -364,7 +388,7 @@ section.section_index{
   filter: brightness(1.15);
 }
 #menu_tutorial{
-  color: #fff;
+  color: white;
   background-color: var(--tutorial_color_primary);
   box-shadow: 0 0 0 0.2rem var(--tutorial_color_primary);
   /*color: var(--tutorial_color_primary);*/
@@ -373,7 +397,7 @@ section.section_index{
   filter: brightness(1.03);
 }
 #menu_settings{
-  color: #fff;
+  color: white;
   background-color: var(--settings_color_primary);
   box-shadow: 0 0 0 0.2rem var(--settings_color_primary);
   /*color: var(--settings_color_primary);*/
@@ -395,25 +419,10 @@ section.section_library{
   color: var(--library_color_primary);
 }
 /* Library superpanel stuff */
-#menu_library_register_btn{
-  margin-left: 0;
-  /*color: var(--register_novel_button_color);
-  border-color: var(--register_novel_button_color);*/
-}
 #menu_library_register_btn:hover{
-  /*color: #fff;
-  background-color: var(--register_novel_button_color);
-  border-color: var(--register_novel_button_color);*/
   filter: brightness(1.05);
 }
-#menu_library_update_btn{
-  /*color: var(--update_library_button_color);
-  border-color: var(--update_library_button_color);*/
-}
 #menu_library_update_btn:hover{
-  /*color: #fff;
-  background-color: var(--update_library_button_color);
-  border-color: var(--update_library_button_color);*/
   filter: brightness(1.05);
 }
 /* Progress bar stuff */
@@ -424,7 +433,7 @@ section.section_library{
   left: 0;
   top: 0;
   width: 100%;
-  background: #fff;
+  background: white;
   box-sizing: border-box;
 
   /* Make it unselectable */
@@ -474,16 +483,8 @@ section.section_library{
   padding: 1em 2em;
 }
 .library_series_entry:hover{
-  color: #fff;
+  color: white;
   background: var(--series_entry_hover_color);
-}
-.library_series_entry:hover .entry_abbr{
-  color: var(--series_entry_hover_color);
-  background: #fff;
-}
-.library_series_entry:hover .entry_updated{
-  color: var(--series_updated_tag_color);
-  background: #fff;
 }
 .entry_minibanner{
   position: absolute;
@@ -502,15 +503,12 @@ section.section_library{
   text-align: right;
 }
 .entry_abbr{
-  color: #fff;
-  background: var(--library_color_primary);
-  box-shadow: 0 0 0 0.1em var(--library_color_primary);
+  color: white;
+  background: var(--series_entry_darkend_color);
 }
 .entry_updated{
   display: none;
-  color: #fff;
-  background: var(--series_updated_tag_color);
-  box-shadow: 0 0 0 0.1em var(--series_updated_tag_color);
+  color: white;
 }
 .entry_title{
   width: 80%;
@@ -523,6 +521,14 @@ section.section_library{
   margin-bottom: 0.5em;
   padding: 0.5em 0;
   border-bottom: 1px solid;
+}
+table.entry_info_table{
+  border-collapse: separate;
+  border-spacing: 1rem 0;
+}
+.entry_info_table_label_column{
+  font-weight: bold;
+  text-align: right;
 }
 .entry_details{
   margin: 1rem 0;
@@ -539,7 +545,7 @@ section.section_library{
   bottom: 0.5rem;
 }
 .entry_action_bar > *:hover{
-  color: #fff;
+  color: white;
 }
 .entry_action_bar > *{
   margin: 0 0.5rem;
@@ -560,8 +566,8 @@ section.section_library{
   flex-direction: column;
   height: 100%;
   margin: 0 0.5rem;
-  padding: 1.5rem;
-  color: #fff !important;
+  padding: 1.5rem 2rem;
+  color: white !important;
   background: var(--library_color_primary);
   text-align: center;
   font-size: 1.2rem;
@@ -577,20 +583,20 @@ section.section_library{
   -o-user-select: none;
 }
 .series_entry_btn:hover{
-  background: #fff !important;
-  color: var(--series_entry_btn_color) !important;
+  background: white !important;
+  color: var(--series_entry_darkend_color) !important;
 }
 .library_series_entry:hover .series_entry_btn{
-  background: var(--series_entry_btn_color);
+  background: var(--series_entry_darkend_color);
 }
 
 
 .modal_cust{
-  color: #fff;
+  color: white;
 }
 .modal_cancel_btn:hover{
   background: #ff3547  !important;
-  color: #fff !important;
+  color: white !important;
 }
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
@@ -606,7 +612,7 @@ section.section_library{
   height: 2rem;
   margin: auto 1rem;
   padding: 0.2rem 1rem;
-  color: #fff;
+  color: white;
   background: #1ab196;
   font-size: 1.6rem;
   border-radius: 2rem;
@@ -636,7 +642,7 @@ section.section_library{
   font-size: 1.4rem;
 }
 #remove_novel_submit_btn{
-  color: #fff;
+  color: white;
   background: var(--remove_novel_modal_color_primary);
 }
 
@@ -743,7 +749,7 @@ section.section_library{
   border-bottom: 1px solid #d2d2d2;
 }
 .superpanel_menu_btn{
-  color: #fff !important;
+  color: white !important;
   margin: auto 0.2rem;
   font-variant: all-petite-caps;
   font-size: 1rem;
@@ -757,22 +763,6 @@ section.section_library{
 }
 #rmv_all_bkmk_btn{
   float: right;
-}
-.no_chapters_img_div{
-  margin: 10rem auto 2rem auto;
-  width: fit-content;
-}
-.no_chapters_img{
-  border-radius: 4rem;
-  width: 25rem;
-}
-.no_chapters_text_div{
-  width: fit-content;
-  margin: auto;
-  color: var(--white_contrast_font_color);
-  font-size: 3rem;
-  font-variant: all-petite-caps;
-  font-family: monospace;
 }
 
 
@@ -794,7 +784,7 @@ section.section_library{
 .chapter_toolbelt_btn {
   height: fit-content;
   padding: 1rem;
-  color: #fff !important;
+  color: white !important;
   z-index: 0 !important;
   box-shadow: none !important;
 }
@@ -857,7 +847,7 @@ section.section_library{
   width: 100%;
 }
 #day_night_toggle_btn{
-  color: #fff;
+  color: white;
   background-color: var(--chapter_day_night_toggle_btn_color);
   border-color: var(--chapter_day_night_toggle_btn_color);
 }
@@ -953,12 +943,15 @@ section.section_library{
   width: fit-content;
   padding: 0.5rem 3rem;
   margin: 0.5rem;
-  color: #fff;
+  color: white;
   background: var(--dictionary_color_primary);
   font-variant: all-small-caps;
   font-size: 1.5rem;
   font-weight: bold;
   border-radius: 0.5rem;
+}
+#no_dictionaries_div{
+  margin-top: 5rem;
 }
 #menu_dictionary_toggleall_btn{
   float: right;
@@ -981,7 +974,7 @@ section.section_library{
 }
 .dictionary_entry_abbr{
   width: 20rem;
-  color: #fff;
+  color: white;
   font-weight: bolder;
   font-size: 1.5rem;
   font-family: monospace;
@@ -1011,28 +1004,35 @@ section.section_library{
   color: var(--series_entry_text_color);
   font-size: 1.5rem;
 }
-.dictionary_entry_action_bar > *:hover{
-  filter: brightness(1.1);
-}
 .dictionary_entry_action_div{
   width: 4rem;
   text-align: center;
   margin: 0 1px;
   background: #ffad64;
-  color: #fff;
+  color: white;
   cursor: pointer;
 }
 .dictionary_entry_action_div ion-icon{
   height: 100%;
   font-size: 1.3rem;
 }
+.dictionary_entry_action_div:hover{
+  filter: brightness(1.1);
+}
+.dictionary_toggle_enable_div{
+  width: 6rem;
+  text-align: center;
+  margin: 0 1px;
+  background: #ff8f2c;
+  color: white;
+}
+.dictionary_toggle_enable_div ion-icon{
+  margin: auto;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
 #opt_keep_dict{
   width: 1.5rem;
   height: 1.5rem;
   margin: 0 auto;
-}
-.action_toggle_enable{
-  width: 6rem;
-  background: #ff8f2c;
-  filter: none !important;
 }

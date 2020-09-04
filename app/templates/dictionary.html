@@ -20,7 +20,7 @@
 		<div class="dictionary_body">
 			<div class="superpanel" id="dictionary_superpanel">
 				<button type="button" class="btn btn-mdb-color superpanel_menu_btn" id="menu_dictionary_dlall_btn"
-					action="{{url_for('dictionaries_download_all')}}">
+					action="{{url_for('dictionaries_download_all')}}" {{'disabled' if dictionaries|length == 0}}>
 					<ion-icon name="download-outline"></ion-icon>
 					<span> Download All </span>
 				</button>
@@ -29,7 +29,7 @@
 					<ion-icon name="earth"></ion-icon>
 					<span> Honorifics </span>
 				</a>
-				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn">
+				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" {{'disabled' if dictionaries|length == 0}}>
 					<ion-icon name="toggle"></ion-icon>
 					<span> Toggle All </span>
 				</button>
@@ -45,6 +45,20 @@
 				{% for dictionary in dictionaries %}
 					{{ dictionary_entry(dictionary) }}
 				{% endfor %}
+
+				{% if dictionaries|length == 1 %}
+				<div class="page_empty_div" id="no_dictionaries_div">
+					<!-- No series dictionaries to display -->
+					<div class="page_empty_img_div" id="no_dictionaries_img_div">
+						<img src="{{url_for('static', filename='dictionary_nothing_here.jpg')}}" class="page_empty_img" id="no_dictionaries_img">
+					</div>
+					<div class="page_empty_text_div" id="no_dictionaries_text_div">
+						Got no other dictionaries cuz' your library is empty
+						<br>
+						Start by adding a series in <span style="color: var(--library_color_primary); font-weight: bold;">Library</span>
+					</div>
+				</div>
+				{% endif %}
 			</div>
 		</div>
 	</section>

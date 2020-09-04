@@ -21,7 +21,7 @@
 				<div class="dictionary_entry_action_div action_edit" title="Edit dict contents">
 					<ion-icon name="create"></ion-icon>
 				</div>
-				<div class="dictionary_entry_action_div action_toggle_enable" title="Enable/Disable dict"
+				<div class="dictionary_toggle_enable_div action_toggle_enable" title="Enable/Disable dict"
 					action="{{url_for('dictionaries_toggle_entry', dict_abbr=dictionary.abbr)}}">
 					<ion-icon name="{{'checkbox' if dictionary.enabled else 'square-outline'}}"></ion-icon>
 				</div>

@@ -52,7 +52,7 @@
 					<span> Register </span>
 				</button>
 				<!-- Update button -->
-				<button type="button" class="btn btn-yellow superpanel_menu_btn" id="menu_library_update_btn" title="Update Library">
+				<button type="button" class="btn btn-yellow superpanel_menu_btn" id="menu_library_update_btn" title="Update Library" {{'disabled' if series|length == 0}}>
 					<ion-icon name="sync-outline"></ion-icon>
 					<span> Update </span>
 				</button>
@@ -65,9 +65,21 @@
 			</div>
 			<div class="mainpanel" id="library_mainpanel">
 				<!-- Novel entries -->
-				{% for novel in series %}
-					{{ series_entry(novel) }}
-				{% endfor %}
+				{% if series|length == 0 %}
+					<!-- No chapters to display -->
+					<div class="page_empty_div" id="no_series_div">
+						<div class="page_empty_img_div" id="no_series_img_div">
+							<img src="{{url_for('static', filename='library_nothing_here.jpg')}}" class="page_empty_img" id="no_series_img">
+						</div>
+						<div class="page_empty_text_div "id="no_series_text_div">
+							Nothing to see here. Start by hitting <span class="light-green-text font-weight-bold">Register</span>
+						</div>
+					</div>
+				{% else %}
+					{% for novel in series %}
+						{{ series_entry(novel) }}
+					{% endfor %}
+				{% endif %}
 			</div>
 		</div>
 	</section>
