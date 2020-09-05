@@ -953,9 +953,6 @@ table.entry_info_table{
 #no_dictionaries_div{
   margin-top: 5rem;
 }
-#menu_dictionary_toggleall_btn{
-  float: right;
-}
 #dict_Common{
   filter: hue-rotate(125deg);
   margin: 2rem 0;

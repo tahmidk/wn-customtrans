@@ -612,6 +612,38 @@ function setupDictionary(){
 	$('#menu_dictionary_honorifics_btn').click(function() {
 		alert("Honorifics clicked");
 	});
+	$('#menu_dictionary_toggleall_btn').click(function() {
+		var url = $(this).attr('action');
+
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				const master_toggle = data.toggle;
+				$('.dictionary_entry').each(function(index){
+					if(($(this).hasClass('dictionary_entry_disabled') && master_toggle) ||
+						(!$(this).hasClass('dictionary_entry_disabled') && !master_toggle))
+					{
+						var toggle = $(this).find(".action_toggle_enable ion-icon").first();
+						$(this).toggleClass('dictionary_entry_disabled');
+						if(data.toggle){
+							toggle.attr("name", "checkbox");
+						}else{
+							toggle.attr("name", "square-outline");
+						}
+					}
+				});
+			}
+		});
+
+		// Next click toggles dictionaries to the other state
+		var url_split = url.split('/');
+		if(url_split[url_split.length-1] == 'on'){
+			url_split[url_split.length-1] = 'off';
+		}
+		else{
+			url_split[url_split.length-1] = 'on';
+		}
+		$(this).attr('action', url_split.join('/'));
+	});
 
 	// Dictionary entry button functions
 	$('.action_toggle_enable ion-icon').click(function() {
@@ -624,10 +656,10 @@ function setupDictionary(){
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				dict_entry.toggleClass('dictionary_entry_disabled');
-				if(data.toggle == 0){
-					toggle.setAttribute("name", "square-outline");
-				}else{
+				if(data.toggle){
 					toggle.setAttribute("name", "checkbox");
+				}else{
+					toggle.setAttribute("name", "square-outline");
 				}
 			}
 			else{

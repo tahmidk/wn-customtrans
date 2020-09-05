@@ -19,6 +19,11 @@
 		</div>
 		<div class="dictionary_body">
 			<div class="superpanel" id="dictionary_superpanel">
+				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" action="{{url_for('dictionaries_toggleall', enable='on')}}"
+					{{'disabled' if dictionaries|length == 0}}>
+					<ion-icon name="toggle"></ion-icon>
+					<span> Toggle All </span>
+				</button>
 				<button type="button" class="btn btn-mdb-color superpanel_menu_btn" id="menu_dictionary_dlall_btn"
 					action="{{url_for('dictionaries_download_all')}}" {{'disabled' if dictionaries|length == 0}}>
 					<ion-icon name="download-outline"></ion-icon>
@@ -29,10 +34,6 @@
 					<ion-icon name="earth"></ion-icon>
 					<span> Honorifics </span>
 				</a>
-				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" {{'disabled' if dictionaries|length == 0}}>
-					<ion-icon name="toggle"></ion-icon>
-					<span> Toggle All </span>
-				</button>
 			</div>
 			<div class="flashpanel notranslate" id="dictionary_flashpanel">
 				<!-- Flashed messages -->

@@ -339,7 +339,21 @@ def dictionaries_toggle_entry(dict_abbr):
 
 	data = {
 		"status": "ok",
-		"toggle": int(dict_entry.enabled)
+		"toggle": dict_entry.enabled
+	}
+	return jsonify(data)
+
+# Route for toggle all dictionaries to the given enable status
+@app.route("/dictionaries/toggleall/<enable>", methods=["POST"])
+def dictionaries_toggleall(enable):
+	master_toggle = True if enable == 'on' else False
+	for dict_entry in DictionaryTable.query.all():
+		dict_entry.enabled = master_toggle
+		db.session.commit()
+
+	data = {
+		"status": "ok",
+		"toggle": master_toggle
 	}
 	return jsonify(data)
 
