@@ -20,7 +20,7 @@
 		<div class="dictionary_body">
 			<div class="superpanel" id="dictionary_superpanel">
 				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" action="{{url_for('dictionaries_toggleall', enable='on')}}"
-					{{'disabled' if dictionaries|length == 0}}>
+					{{'disabled' if dictionaries|length == 0}} style="float: right;">
 					<ion-icon name="toggle"></ion-icon>
 					<span> Toggle All </span>
 				</button>
@@ -35,12 +35,20 @@
 					<span> Honorifics </span>
 				</a>
 			</div>
+
+			<div class="superpanel_menu_searchbar_div" id="menu_dictionary_searchbar_div">
+				<div class="md-form active-cyan-2 mb-3" id="menu_dictionary_searchbar">
+					<input class="form-control" type="text" placeholder="Search Dictionaries" aria-label="Search">
+				</div>
+			</div>
+
 			<div class="flashpanel notranslate" id="dictionary_flashpanel">
 				<!-- Flashed messages -->
 				{% with messages = get_flashed_messages(with_categories=true) %}
 					{{ flash_alert(messages) }}
 				{% endwith %}
 			</div>
+
 			<div class="mainpanel" id="dictionary_mainpanel">
 				<!-- Novel entries -->
 				{% for dictionary in dictionaries %}

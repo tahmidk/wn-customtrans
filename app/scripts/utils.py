@@ -76,6 +76,21 @@ def getLatestChapter(series_code, host_entry):
 
 	return res
 
+def getFileExtension(filename):
+	"""-------------------------------------------------------------------
+		Function:		[getFileExtension]
+		Description:	Fetches the latest chapter directly from the series's host
+		Input:
+		  [series_code]	The identifying series code
+		  [host_entry] 	The HostTable entry associated with this series
+		Return:			Latest chapter number
+		------------------------------------------------------------------
+	"""
+	if not '.' in filename:
+		return None
+
+	return filename.split('.')[-1]
+
 def registerSeriesToDatabase(reg_form):
 	"""-------------------------------------------------------------------
 		Function:		[registerSeriesToDatabase]

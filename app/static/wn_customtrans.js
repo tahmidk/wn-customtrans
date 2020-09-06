@@ -157,6 +157,11 @@ function createFlashMessage(message, category, flash_loc){
 	$(flash_loc)[0].appendChild(flash_div_wrapper);
 }
 
+function handleUploadDict(input){
+	document.cookie = `filesize=${input.files[0].size}`
+	input.form.submit();
+}
+
 /*===================================================================*/
 /*  Tagged Placeholders Algorithm
 /*===================================================================*/
@@ -289,10 +294,10 @@ function setupLibrary(){
 
 	// On show Edit Modal events
 	$(edit_novel_modal).on('shown.bs.modal', function (event) {
-		var action_bar = $(event.relatedTarget)[0].closest('.entry_action_bar');
-		var title = action_bar.querySelector('.entry_info .info_title').innerText.trim();
-		var abbr = action_bar.querySelector('.entry_info .info_abbr').innerText.trim();
-		var code = action_bar.querySelector('.entry_info .info_code').innerText.trim();
+		var series_entry = $(event.relatedTarget).closest('.library_series_entry');
+		var title = series_entry.data('title');
+		var abbr = series_entry.data('abbr');
+		var code = series_entry.data('code');
 
 		// Set the defaults for the form fields
 		$(edit_novel_modal)[0].querySelector('#title').defaultValue = title;
@@ -303,9 +308,8 @@ function setupLibrary(){
 
 	// On show Remove Modal events
 	$(remove_novel_modal).on('shown.bs.modal', function (event) {
-		var action_bar = $(event.relatedTarget)[0].closest('.entry_action_bar');
-		var abbr = action_bar.querySelector('.entry_info .info_abbr').innerText.trim();
-		var code = action_bar.querySelector('.entry_info .info_code').innerText.trim();
+		var series_entry = $(event.relatedTarget).closest('.library_series_entry');
+		var code = series_entry.data('code');
 
 		// Customize the remove form's action to the specific series
 		$(remove_novel_form)[0].action = remove_novel_action_base + '/' + code;
@@ -634,7 +638,8 @@ function setupDictionary(){
 			}
 		});
 
-		// Next click toggles dictionaries to the other state
+		// Next click toggles dictionaries to the other state (basically toggle the url between
+		// '/dictionary/toggleall/on' and '/dictionary/toggleall/off')
 		var url_split = url.split('/');
 		if(url_split[url_split.length-1] == 'on'){
 			url_split[url_split.length-1] = 'off';
@@ -643,6 +648,14 @@ function setupDictionary(){
 			url_split[url_split.length-1] = 'on';
 		}
 		$(this).attr('action', url_split.join('/'));
+	});
+
+	// Dictionary searchar functionality
+	$("#menu_dictionary_searchbar input").on("input", function(){
+		var input = this.value;
+		$('.dictionary_entry').each(function(index){
+
+		});
 	});
 
 	// Dictionary entry button functions
@@ -661,6 +674,9 @@ function setupDictionary(){
 				}else{
 					toggle.setAttribute("name", "square-outline");
 				}
+			}
+			else if(data.status == 'series_nf'){
+				createFlashMessage(data.msg, data.severity, dict_flashpanel);
 			}
 			else{
 				createFlashMessage(
@@ -697,5 +713,15 @@ function setupDictionary(){
 				saveAs(blob, dict_entry.data('fname'));
 			}
 		})
+	});
+
+	/*$(".upload_file_select").change(function(){
+		this.form.submit();
+	});*/
+
+	$('.action_upload').click(function() {
+		var dict_entry = $(this).closest('.dictionary_entry');
+		var upload_file_select = dict_entry.find('.upload_file_select');
+		upload_file_select.click();
 	});
 }

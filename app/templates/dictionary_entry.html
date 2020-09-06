@@ -1,6 +1,8 @@
 {% macro dictionary_entry(dictionary) %}
 	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="dict_{{dictionary.abbr}}"
-		data-fname="{{dictionary.fname}}" data-abbr="{{dictionary.abbr}}">
+		data-dictid="{{dictionary.id}}"
+		data-fname="{{dictionary.fname}}"
+		data-abbr="{{dictionary.abbr}}">
 		<div class="dictionary_entry_abbr">
 			<div class="dictionary_toggle_enable_div action_toggle_enable" title="Enable/Disable dict"
 				action="{{url_for('dictionaries_toggle_entry', dict_abbr=dictionary.abbr)}}">
@@ -16,7 +18,7 @@
 			</div>
 			<div class="dictionary_entry_action_bar">
 				<div class="dictionary_entry_action_div action_download" title="Download dict"
-					action="{{url_for('dictionaries_download_entry', dict_fname=dictionary.fname)}}">
+					action="{{url_for('dictionaries_download_dict', dict_fname=dictionary.fname)}}">
 					<ion-icon name="save"></ion-icon>
 					<div class="dictionary_entry_action_label"> Save </div>
 				</div>
@@ -30,5 +32,13 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Invisible upload form specific to this dictionary entry -->
+		<form action="{{ url_for('dictionaries_upload_dict', dict_fname=dictionary.fname) }}" method="POST"
+			enctype="multipart/form-data" hidden="hidden">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+			<input type="file" class="upload_file_select" oninput="handleUploadDict(this);" name="uploaded_dict_file"
+				accept=".dict,.txt" >
+		</form>
 	</div>
 {% endmacro %}

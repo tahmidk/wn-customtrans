@@ -17,6 +17,7 @@ from flask import render_template
 from flask import url_for
 from flask import jsonify
 from flask import request
+from flask import redirect
 from flask import flash
 from flask import Response
 from flask import abort
@@ -61,8 +62,8 @@ def library():
 	# Add additional host info
 	for entry in series:
 		host_entry = HostTable.query.filter_by(id=entry.host_id).first()
-		lang = Language.to_string(host_entry.host_lang).split('.')[-1]
-		entry.__dict__["host"] = "%s [%s]" % (host_entry.host_name, lang)
+		entry.__dict__["host"] = host_entry.host_name
+		entry.__dict__["lang"] = lang = Language.to_string(host_entry.host_lang)
 	return render_template('library.html',
 		title="Library",
 		back_href=url_for('index'),
@@ -306,6 +307,7 @@ def dictionaries():
 	for entry in series:
 		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
 		dictionaries.append({
+			"id": dict_entry.id,
 			"abbr": entry.abbr,
 			"fname": dict_entry.fname,
 			"enabled": dict_entry.enabled
@@ -315,6 +317,7 @@ def dictionaries():
 	# Add common_dict
 	dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
 	dictionaries.insert(0, {
+		"id": dict_entry.id,
 		"abbr": COMMON_DICT_ABBR,
 		"fname": dict_entry.fname,
 		"enabled": dict_entry.enabled
@@ -329,11 +332,17 @@ def dictionaries():
 # Route for enabling/disabling dictionaries
 @app.route("/dictionaries/toggle/<dict_abbr>", methods=["POST"])
 def dictionaries_toggle_entry(dict_abbr):
-	if dict_abbr == "Common":
-		dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
-	else:
-		series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
-		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+	try:
+		if dict_abbr == "Common":
+			dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
+		else:
+			series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
+			if series_entry is None:
+				raise SeriesEntryDNEException(dict_abbr)
+			dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+	except CustomException as err:
+		return jsonify(status='series_nf', msg=str(err), severity=err.severity)
+
 	dict_entry.enabled = not dict_entry.enabled
 	db.session.commit()
 
@@ -342,6 +351,7 @@ def dictionaries_toggle_entry(dict_abbr):
 		"toggle": dict_entry.enabled
 	}
 	return jsonify(data)
+
 
 # Route for toggle all dictionaries to the given enable status
 @app.route("/dictionaries/toggleall/<enable>", methods=["POST"])
@@ -357,29 +367,60 @@ def dictionaries_toggleall(enable):
 	}
 	return jsonify(data)
 
-# @app.route("/dictionaries/upload/<series>", methods=["POST"])
-# def dictionaries_upload_dict(series):
-# 	dict_file = request.files['inputFile']
 
-# 	db_file = DictionaryTable(name=dict_file.filename, data=dict_file.read())
-# 	db.session.add(db_file)
-# 	db.session.commit()
+@app.route("/dictionaries/upload/<dict_fname>", methods=["POST"])
+def dictionaries_upload_dict(dict_fname):
+	if request.files:
+		try:
+			uploaded_dict_file = request.files['uploaded_dict_file']
+			dict_entry = DictionaryTable.query.filter_by(fname=dict_fname).first()
+			if dict_entry is None:
+				raise DictEntryDNEException(dict_fname)
 
-# 	return 'Saved %s to the database!' % dict_file.filename
+			# File size constraint
+			if int(request.cookies.get("filesize")) > app.config['MAX_DICT_FILESIZE']:
+				fsize_mb = app.config['MAX_DICT_FILESIZE'] / 1024 / 1024
+				raise FileTooLargeException("%sMB" % int(fsize_mb))
+
+			# File extension constraint
+			ext = utils.getFileExtension(uploaded_dict_file.filename)
+			if ext is None:
+				raise InvalidFilenameException(uploaded_dict_file.filename)
+			elif not ext.upper() in app.config['ALLOWED_DICT_EXTENSIONS']:
+				raise InvalidDictFileExtensionException(ext)
+
+			# Validation stage passed. Save the file on the server
+			uploaded_dict_file.save(
+				os.path.join(app.config['DICTIONARIES_PATH'], dict_entry.fname))
+
+			# Flash success
+			flash("%s File has successfully uploaded and replaced %s" % \
+				(SUCCESS_BOLD, mono(dict_entry.fname)),
+				"success")
+		except CustomException as err:
+			flash(str(err), err.severity)
+		except Exception as err:
+			flash("%s Encountered an unexpected server-side error" % CRITICAL_BOLD,
+				"danger")
+	else:
+		flash("%s File upload failed" % CRITICAL, "danger")
+
+	return redirect(url_for('dictionaries'))
+
 
 # Route for downloading a given .dict file
 @app.route("/dictionaries/download/<dict_fname>", methods=["POST"])
-def dictionaries_download_entry(dict_fname):
+def dictionaries_download_dict(dict_fname):
 	path = os.path.abspath(url_for('dict', filename=dict_fname)[1:])
 	if not os.path.exists(path):
 		return jsonify({"status": "dict_dne_abort"})
-
 	try:
 		return send_from_directory(app.config['DICTIONARIES_PATH'],
 			filename=dict_fname,
 			as_attachment=True)
 	except Exception as err:
 		return jsonify({"status": "dict_download_error"})
+
 
 # Route for downloading all dict files in user/dicts
 @app.route("/dictionaries/downloadall")
@@ -397,6 +438,7 @@ def dictionaries_download_all():
 		mimetype="application/zip",
 		as_attachment=True,
 		attachment_filename='wnct_dictionaries.zip')
+
 
 # Route for Tutorial page
 @app.route("/tutorial")

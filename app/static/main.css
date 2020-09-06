@@ -209,6 +209,7 @@ ion-icon .icon-inner{
 .label_cust{
   font-variant: all-small-caps;
   white-space: nowrap;
+  margin-top: 5px;
 }
 .input_cust{
   margin: 0 1rem;
@@ -219,6 +220,7 @@ ion-icon .icon-inner{
 .form_input_div{
   width: -webkit-fill-available;
   padding: 0 1rem;
+  margin: 0;
 }
 .invalid_feedback_cust{
   font-size: 90%;
@@ -316,6 +318,10 @@ ion-icon .icon-inner{
   padding: 0.5rem 3rem;
   margin-left: 1.5rem;
   border-radius: 1rem !important;
+}
+.superpanel_menu_searchbar_div{
+  margin-top: 2rem;
+  margin-bottom: 3rem;
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
@@ -473,6 +479,11 @@ section.section_library{
   width: -webkit-fill-available;
   height: fit-content;
   margin: auto;
+}
+#menu_library_searchbar input:focus{
+  border-bottom: 1px solid var(--library_color_primary);
+  -webkit-box-shadow: 0 1px 0 0 var(--library_color_primary);
+  box-shadow: 0 1px 0 0 var(--library_color_primary);
 }
 /* Mainpanel stuff */
 .library_series_entry{
@@ -1042,6 +1053,20 @@ table.entry_info_table{
   margin: auto;
   font-size: 1.3rem;
   cursor: pointer;
+}
+#menu_dictionary_toggleall_btn:hover{
+  filter: brightness(1.2);
+}
+#menu_dictionary_dlall_btn:hover{
+  filter: brightness(1.2);
+}
+#menu_dictionary_honorifics_btn:hover{
+  filter: brightness(1.3);
+}
+#menu_dictionary_searchbar input:focus{
+  border-bottom: 1px solid var(--dictionary_color_primary);
+  -webkit-box-shadow: 0 1px 0 0 var(--dictionary_color_primary);
+  box-shadow: 0 1px 0 0 var(--dictionary_color_primary);
 }
 #opt_keep_dict{
   width: 1.5rem;

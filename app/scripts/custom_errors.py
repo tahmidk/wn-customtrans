@@ -31,10 +31,40 @@ class CustomException(Exception):
 #=====================================================
 #  Dictionary Handling Errors
 #=====================================================
+class SeriesEntryDNEException(CustomException):
+	def __init__(self, series_abbr):
+		msg = "%s The series entry %s is not registered" % \
+			(CRITICAL_BOLD, strong(series_abbr))
+		super().__init__(msg, CRITICAL)
+
+class DictEntryDNEException(CustomException):
+	def __init__(self, dict_fname):
+		msg = "%s The dictionary entry %s is not registered" % \
+			(CRITICAL_BOLD, mono(dict_fname))
+		super().__init__(msg, CRITICAL)
+
+class FileTooLargeException(CustomException):
+	def __init__(self, filesize_str):
+		msg = "%s The uploaded file is larger than %s" % \
+			(CRITICAL_BOLD, mono(filesize_str))
+		super().__init__(msg, CRITICAL)
+
+class InvalidFilenameException(CustomException):
+	def __init__(self, filename):
+		msg = "%s The uploaded file \'%s\' has an invalid filename" % \
+			(CRITICAL_BOLD, mono(filename))
+		super().__init__(msg, CRITICAL)
+
+class InvalidDictFileExtensionException(CustomException):
+	def __init__(self, ext):
+		msg = "%s Unexpected file extension \'%s\' uploaded" % \
+			(CRITICAL_BOLD, mono(ext))
+		super().__init__(msg, CRITICAL)
+
 # Encountered when dictionary file could not be be created
 class DictFileCreationException(CustomException):
 	def __init__(self, dict_file):
-		msg = "%s Error creating dictionary %s>" % (CRITICAL_BOLD, mono(dict_file))
+		msg = "%s Error creating dictionary %s" % (CRITICAL_BOLD, mono(dict_file))
 		super().__init__(msg, CRITICAL)
 
 # Encountered when dictionary file could not be renamed

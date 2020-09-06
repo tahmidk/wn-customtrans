@@ -1,22 +1,24 @@
 {% macro series_entry(novel) %}
 	{% set resume_ch = [novel.current_ch, 1] | max %}
-	<div class="library_series_entry" id="series_{{novel.abbr}}">
+	<div class="library_series_entry" id="series_{{novel.abbr}}"
+		data-title="{{novel.title}}"
+		data-abbr="{{novel.abbr}}"
+		data-current="{{novel.current_ch}}"
+		data-latest="{{novel.latest_ch}}"
+		data-code="{{novel.code}}"
+		data-host="{{novel.host}}"
+		data-lang="{{novel.lang}}"
+		>
 		<div class="entry_minibanner">
 			<div class="minibanner entry_abbr"> {{novel.abbr}} </div>
 			<div class="minibanner entry_updated light-green"> Updated (+<span id="num_updates"></span>)</div>
 		</div>
 		<div class="entry_title"> {{novel.title}} </div>
 		<div class="entry_details">
-			<!-- <div class="entry_current">
-				<span class="mono">Current: <span id="current_ch">{{novel.current_ch}}</span></span>
-			</div>
-			<div class="entry_latest">
-				<span class="mono"> Latest: <span id="latest_ch">{{novel.latest_ch}}</span></span>
-			</div> -->
 			<table class="entry_info_table mono">
 				<tr>
 					<td class="entry_info_table_label_column">Host Info</td>
-					<td class="entry_info_table_data_column" id="host">{{novel.host}}</td>
+					<td class="entry_info_table_data_column" id="host">{{novel.host}} [{{novel.lang[-2:]}}]</td>
 				</tr>
 				<tr>
 					<td class="entry_info_table_label_column">Progress</td>
@@ -25,14 +27,6 @@
 			</table>
 		</div>
 		<div class="entry_action_bar">
-			<!-- This div is for convenience in js and is not meant to be displayed-->
-			<div class="entry_info" style="display: none;">
-				<span class="info_title"> {{novel.title}} </span>
-				<span class="info_abbr"> {{novel.abbr}} </span>
-				<span class="info_current"> {{novel.current_ch}} </span>
-				<span class="info_latest"> {{novel.latest_ch}} </span>
-				<span class="info_code"> {{novel.code}} </span>
-			</div>
 			<div class="entry_edit">
 				<button type="button" class="entry_action_button modal_trigger" data-toggle="modal" data-target="#edit_modal_push" title="Edit Series" id="edit_{{novel.abbr}}">
 					<ion-icon name="create"></ion-icon>

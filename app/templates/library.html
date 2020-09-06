@@ -57,12 +57,20 @@
 					<span> Update </span>
 				</button>
 			</div>
+
+			<div class="superpanel_menu_searchbar_div" id="menu_library_searchbar_div">
+				<div class="md-form active-cyan-2 mb-3" id="menu_library_searchbar">
+					<input class="form-control" type="text" placeholder="Search Library" aria-label="Search">
+				</div>
+			</div>
+
 			<div class="flashpanel" id="library_flashpanel">
 				<!-- Flashed messages -->
 				{% with messages = get_flashed_messages(with_categories=true) %}
 					{{ flash_alert(messages) }}
 				{% endwith %}
 			</div>
+
 			<div class="mainpanel" id="library_mainpanel">
 				<!-- Novel entries -->
 				{% if series|length == 0 %}
