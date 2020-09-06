@@ -3,10 +3,11 @@ html{
   scroll-behavior: smooth;
   background: var(--html_background_color);
 
-  /* Color definitions */
+  /* Misc Color definitions */
   --html_background_color: white;
   --back_btn_color: #292929;
   --white_contrast_font_color: #828282;
+  --error_page_code_color: #ce4d69;
 
   /* Main page palette */
   --library_color_primary: #d83939;
@@ -277,6 +278,58 @@ ion-icon .icon-inner{
   font-size: 3rem;
   font-variant: all-petite-caps;
   font-family: monospace;
+}
+
+/*----------------------------[ Error Page stuff ]---------------------*/
+.error_page_content{
+  margin: auto;
+  max-width: 50rem;
+  font-family: 'Montserrat', sans-serif;
+}
+.error_page_img_div{
+  width: fit-content;
+  margin: auto;
+  margin-bottom: 2rem;
+}
+.error_page_img{
+  max-width: 40rem;
+  border-radius: 2rem;
+
+  /* Make it undraggable */
+  user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+.error_page_message_div{
+  margin: auto;
+}
+.error_page_code_div{
+  width: 75%;
+  margin: auto;
+  border-bottom: 1px solid var(--error_page_code_color);
+}
+.error_page_code{
+  width: fit-content;
+  color: var(--error_page_code_color);
+  margin: auto;
+  font-size: 4rem;
+}
+.error_page_msg{
+  margin: 2rem auto;
+  color: #929292;
+  text-align: center;
+  font-size: 1.2rem;
+}
+.error_page_msg_header{
+  margin: auto;
+  margin-bottom: 0.5rem;
+  color: #d8d8d8;
+  font-size: 1.75rem;
+  font-variant: petite-caps;
+  text-align: center;
 }
 
 /*--------------------------[ Super navpanel stuff ]-------------------*/
@@ -1027,7 +1080,7 @@ table.entry_info_table{
   margin: auto 1px;
   padding: 0.85rem 2.3rem;
   background: #ff7043;
-  color: white;
+  color: white !important;
   cursor: pointer;
 }
 .dictionary_entry_action_div ion-icon{

@@ -1,0 +1,25 @@
+{% extends 'general_layout.html' %}
+{% block content %}
+	<div class="position-fixed h-100 w-100 col-md-auto d-flex align-items-center bg-dark">
+		<div class="error_page_content">
+			<div class="error_page_img_div">
+				<img class="error_page_img" src="{{err_img}}">
+			</div>
+			<div class="error_page_message_div">
+				<div class="error_page_code_div">
+					<div class="error_page_code">
+						<span style="font-size: 3rem; font-variant: petite-caps;">Error</span> {{err_code}}
+					</div>
+				</div>
+				<div class="error_page_msg">
+					<div class="error_page_msg_header">
+						{{err_msg_header|safe}}
+					</div>
+					<div class="error_page_msg_description">
+						{{err_msg_description|safe}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

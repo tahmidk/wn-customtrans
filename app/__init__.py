@@ -13,12 +13,12 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Dynamically choose config based on FLASK_ENV environment variable
-if app.config["ENV"] == "production":
-	app.config.from_object('config.ProductionConfig')
+if app.config["ENV"] == "development":
+	app.config.from_object('config.DevelopmentConfig')
 elif app.config["ENV"] == "testing":
 	app.config.from_object('config.TestingConfig')
 else:
-	app.config.from_object('config.DevelopmentConfig')
+	app.config.from_object('config.ProductionConfig')
 
 # Trim excess whitespace when rendering with jinja2
 app.jinja_env.trim_blocks = True

@@ -17,19 +17,20 @@
 				{{dictionary.fname}}
 			</div>
 			<div class="dictionary_entry_action_bar">
-				<div class="dictionary_entry_action_div action_download" title="Download dict"
+				<a class="dictionary_entry_action_div action_download" title="Download dict"
 					action="{{url_for('dictionaries_download_dict', dict_fname=dictionary.fname)}}">
 					<ion-icon name="save"></ion-icon>
 					<div class="dictionary_entry_action_label"> Save </div>
-				</div>
-				<div class="dictionary_entry_action_div action_upload" title="Upload and Replace dict">
+				</a>
+				<a class="dictionary_entry_action_div action_upload" title="Upload and Replace dict">
 					<ion-icon name="arrow-up-circle"></ion-icon>
 					<div class="dictionary_entry_action_label"> Upload </div>
-				</div>
-				<div class="dictionary_entry_action_div action_edit" title="Edit dict contents">
+				</a>
+				<a class="dictionary_entry_action_div action_edit" title="Edit dict contents"
+					href="{{url_for('dictionaries_edit', dict_fname=dictionary.fname)}}">
 					<ion-icon name="create"></ion-icon>
 					<div class="dictionary_entry_action_label"> Edit </div>
-				</div>
+				</a>
 			</div>
 		</div>
 

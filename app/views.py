@@ -46,9 +46,36 @@ from app.scripts.custom_errors import *
 # This is the route for the main page
 @app.route("/")
 def index():
+	abort(500)
 	return render_template('index.html',
 		title='CustomTrans')
 
+# Custom error handlers
+@app.errorhandler(404)
+def error_404(error):
+	hdr = '''<strong>Ummm...</strong> The page you requested does not
+		exist'''
+	desc = '''Perhaps you followed a bad link. Or maybe this is a series
+		sepcific page for a series that\'s no longer in your Library?'''
+	return render_template('error_page.html',
+		title='Error 404',
+		err_img=url_for('static', filename="error_404_img.gif"),
+		err_code=404,
+		err_msg_header=hdr,
+		err_msg_description=desc)
+
+# Custom error handlers
+@app.errorhandler(500)
+def error_500(error):
+	hdr = '''<strong>Whoops!</strong> Server error. Yeah this one\'s on me...'''
+	desc = '''Looks like something caused the server side to error out. It's
+		not a you-problem though, it's a me-problem. Accept this sliding dogeza!'''
+	return render_template('error_page.html',
+		title='Error 500',
+		err_img=url_for('static', filename="error_500_img.gif"),
+		err_code=500,
+		err_msg_header=hdr,
+		err_msg_description=desc)
 
 # The following 4 routes are the routes for the 4 main page buttons
 @app.route("/library")
@@ -439,6 +466,20 @@ def dictionaries_download_all():
 		as_attachment=True,
 		attachment_filename='wnct_dictionaries.zip')
 
+# Route for downloading all dict files in user/dicts
+@app.route("/dictionaries/edit/<dict_fname>")
+def dictionaries_edit(dict_fname):
+	if utils.spliceDictName(dict_fname):
+		(series_abbr, host_name, series_code) = utils.spliceDictName(dict_fname)
+		host_entry = HostTable.query.filter_by(host_name=host_name).first()
+		if host_entry is None:
+			abort(404)
+		series_entry = SeriesTable.query.filter_by(host_id=host_entry.id, code=series_code).first()
+		if series_entry is None:
+			abort(404)
+
+		return "Edit page for series " + series_entry.abbr
+	return abort(404)
 
 # Route for Tutorial page
 @app.route("/tutorial")
