@@ -1196,7 +1196,16 @@ table.entry_info_table{
   border-top: 5px solid var(--dictionary_edit_color_primary);
 }
 /* Lexer token styles */
-.cm-dict-nametag    { color: #ff0071; }
-.cm-dict-namesplit  { color: #32ca20 }
-.cm-dict-divider    { color: #ff7a00; }
-.cm-dict-comment    { color: #adadad; }
+.cm-dict-nametag   { color: #ff0071; }
+.cm-dict-nameargs  { color: #fff; }
+.cm-dict-namesplit { color: #3cc500; }
+.cm-dict-divider   { color: #ff7a00; }
+.cm-dict-comment   { color: #adadad; }
+.dict-error{
+  margin: -1px 0 !important;
+  border: 1px solid red;
+  border-left: none !important;
+  border-right: none !important;
+  border-style: dashed;
+  border-width: 1px !important;
+}

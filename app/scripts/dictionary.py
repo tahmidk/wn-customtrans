@@ -304,6 +304,11 @@ def processDictFile(dict_fname, series_lang):
 						flashMisformattedLine(line, index+1)
 						continue
 
+					# Validity check: No empty strings in the components
+					if '' in raw_component or '' in trans_component:
+						flashMisformattedLine(line, index+1)
+						continue
+
 					# Generate and append name variants to the dict
 					variants = generateNameVariants(raw_component, trans_component, comment, series_lang)
 					if variants is not None:

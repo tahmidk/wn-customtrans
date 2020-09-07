@@ -724,31 +724,134 @@ function setupDictionary(){
 
 function setupDictionaryEdit(){
 	// Define a super simple lexer for the dictionary syntax
-	CodeMirror.defineSimpleMode("dictionary_mode", {
+	/*CodeMirror.defineSimpleMode("dictionary_mode", {
 		// The start state contains the rules that are intially used
 		start: [
 			{regex: /\|/, token: "dict-namesplit"},
-			{regex: /\/\/.*/, token: "dict-comment"},
-			{regex: /\s*(@name)\{(.+),(.+)\}/,
-			 token: ["dict-nametag"]},
+			{regex: /\/\/.*<remove this>/, token: "dict-comment"},
+			{regex: /\s*(@name)\{(.+),(.+)\}/, token: ["dict-nametag"]},
 			{regex: /-->/, token: "dict-divider"}
 		],
 		// The multi-line comment state.
 		comment: [
 			{regex: /.*?\*\//, token: "comment", next: "start"},
-			{regex: /.*/, token: "comment"}
+			{regex: /.*<remove this>/, token: "comment"}
 		],
 		meta: {
 			dontIndentStates: ["comment"],
 			lineComment: "//"
 		}
+	});*/
+	CodeMirror.defineMode("dictionary_mode", function() {
+		return {
+			startState: function() {
+				return {
+					validNameTag: false,
+					validNameArgs: false,
+					validDivLine: false
+				};
+			},
+			token: function(stream, state) {
+				// Rule for detecting comments '//'
+				if(stream.match(/\/\/.*/)) {
+					stream.skipToEnd();       // Rest of the line is comment
+					return "dict-comment";
+				}
+
+				// Rule for detecting the nametag syntax '@name'
+				if(stream.match(/@name\{(.+), (.+)\}/, false)){
+					state.validNameTag = true;
+					stream.skipTo("{");
+					return "dict-nametag";
+				}
+				else if(state.validNameTag){
+					// First determine if the arguments provided are balanced and valid
+					if(!state.nameArgsValidated){
+						var matches = stream.match(/\{(.+), (.+)\}/, false);
+						if(matches){
+							// Same number of splits in both args
+							if(matches[1].split('|').length != matches[2].split('|').length){
+								stream.next();
+								return "line-dict-error";
+							}
+							// No empty strings in args
+							if(matches[1].split('|').includes('') || matches[2].split('|').includes('')){
+								stream.next();
+								return "line-dict-error";
+							}
+						}
+
+						state.nameArgsValidated = true;
+					}
+
+					if(stream.match(/[,{]/)){
+						return null;
+					}
+					if(stream.match(/\|/)){
+						return "dict-namesplit";
+					}
+					if(stream.match(/}/)){
+						// End of the name tag, reset nametag states
+						state.validNameTag = false;
+						state.nameArgsValidated = false;
+						// Eat up the trailing spaces between this nametag and either an inline comment or EOL
+						stream.match(/\s*/);
+						return null;
+					}
+
+					stream.next();
+					//return "dict-nameargs";
+					return null;
+				}
+
+				// Rule for detecting individual definition dividers '-->'
+				// Note: Regex checks that neither side of the definition is empty
+				if(!state.validDivLine && stream.match(/(.*\S.*)-->(.*\S.*)/, false)){
+					stream.skipTo("-->");
+					state.validDivLine = true;
+					return null;
+				}
+				else if(state.validDivLine){
+					// If we enter this block, we're right at the divider
+					if(stream.match("-->")){
+						return "dict-divider";
+					}
+
+					// At this point we're at the translated definition
+					/* To take into account inline comments, either jump iterator to start of comment
+					   if there is one, or jump straight to the end of the line*/
+					stream.pos = 0;
+					if(stream.match(/(.+)-->(.+)\s*\/\//, false)){
+						stream.skipTo("//");
+					}
+					else{
+						stream.skipToEnd();
+					}
+
+					// Done, reset divline states
+					state.validDivLine = false;
+					return null;
+				}
+
+				// Skip whitespace lines
+				if(stream.match(/^\s*$/)){
+					stream.skipToEnd();
+					return null;
+				}
+				// By default a line is an error if it does not fit any of the above rules
+				stream.next();
+				return "line-dict-error";
+			}
+		};
 	});
 
-	var editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
+	var dict_editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
 		mode: "dictionary_mode",
 		lineNumbers: true,
-		autoCloseBrackets: true
-	});
+		autoCloseBrackets: true,
+		indentWithTabs: false,
+		tabSize: 8
+	})
 
 	// Editor toolbelt button functions
 	$('#menu_dictionary_edit_fullscreen_btn').click(function(){

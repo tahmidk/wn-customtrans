@@ -148,7 +148,6 @@ def library_update():
 def library_edit_novel(series_code):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
-		import pdb; pdb.set_trace()
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
@@ -468,7 +467,6 @@ def dictionaries_download_dict(dict_fname):
 # Route for downloading all dict files in user/dicts
 @app.route("/dictionaries/downloadall")
 def dictionaries_download_all():
-	#import pdb; pdb.set_trace()
 	data = io.BytesIO()
 	with zipfile.ZipFile(data, mode='w', compression=zipfile.ZIP_DEFLATED) as dict_zip:
 		for (root, _, files) in os.walk(app.config['DICTIONARIES_PATH']):
@@ -502,7 +500,6 @@ def dictionaries_edit(dict_fname):
 		series_title = series_entry.title
 		series_abbr = series_entry.abbr
 		series_url = host_manager.generateSeriesUrl(series_code)
-
 	elif dict_fname == dictionary.COMMON_DICT_FNAME:
 		series_title = dictionary.COMMON_DICT_TITLE
 		series_abbr = dictionary.COMMON_DICT_ABBR
