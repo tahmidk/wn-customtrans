@@ -19,6 +19,7 @@ from flask import flash
 from flask import url_for
 
 # Internal imports
+from app import app
 from app import db
 
 from app.models import *
@@ -34,6 +35,8 @@ from app.scripts import hostmanager
 #===============================================================
 # Standard name for the common dictionary file
 COMMON_DICT_FNAME = "common_dict.dict"
+COMMON_DICT_TITLE = "Common Dictionary"
+COMMON_DICT_ABBR = "Common"
 # Comments can be at most 100 characters
 COMMENT_MAX_LEN = 100
 # Common tokens used to seperate first and last names in raw chapters
@@ -86,10 +89,10 @@ def createDictFile(dict_fname, series_title, series_abbr, series_link):
 		  [series_title] Series title
 		  [series_abbr]	 Series abbreviation
 		  [series_link]	 Link to the raws of this series
-		Return:			None, renames physical file if it exists
+		Return:			True on success, False otherwise
 		------------------------------------------------------------------
 	"""
-	dict_path = url_for('dict', filename=dict_fname)[1:]
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	try:
 		with io.open(dict_path, mode='w', encoding='utf8') as dict_file:
 			dict_file.write("// series_title :  %s\n" % series_title)
@@ -104,40 +107,50 @@ def createDictFile(dict_fname, series_title, series_abbr, series_link):
 			dict_file.write(u'\n九尾の狐 %s Nine Tailed Fox' % DICT_DEF_DIVIDER)
 			dict_file.write("\n\n//==============================[ Misc ]==================================")
 			dict_file.write("\n\n// END OF FILE")
-	except OSError as err:
-		if err.errno == errno.EEXIST:
-			# If renamed file already exists, ignore
-			return
 	except Exception as err:
 		# OS error creating the file
 		raise DictFileCreationException(dict_fname)
 
 def removeDictFile(dict_fname):
-	dict_path = url_for('dict', filename=dict_fname)[1:]
-	try:
-		os.remove(dict_path)
-	except Exception as err:
-		raise DictFileDeletionException(dict_fname)
+	"""-------------------------------------------------------------------
+		Function:		[removeDictFile]
+		Description:	Attempts to remove a dict file
+		Input:
+		  [dict_fname]	Name of the dictionary file to delete
+		Return:			True on success, False otherwise
+		------------------------------------------------------------------
+	"""
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
+	if os.path.exists(dict_path):
+		try:
+			os.remove(dict_path)
+			return True
+		except Exception as err:
+			raise DictFileDeletionException(dict_fname)
+
+	return False
 
 def renameDictFile(old_dict_fname, new_dict_fname):
 	"""-------------------------------------------------------------------
 		Function:		[renameDictFile]
-		Description:	Attempts to rename a dict file. If the old_path is invalid
-						or DNE, a new dict with
+		Description:	Attempts to rename a dict file
 		Input:
 		  [old_dict_fname]	Name of the old dictionary file
 		  [new_dict_fname] 	Name of the new dictionary file
-		Return:			None, renames physical file if it exists
+		Return:			True on success, False otherwise
 		------------------------------------------------------------------
 	"""
-	old_path = url_for('dict', filename=old_dict_fname)[1:]
-	new_path = url_for('dict', filename=new_dict_fname)[1:]
+	old_path = os.path.join(app.config['DICTIONARIES_PATH'], old_dict_fname)
+	new_path = os.path.join(app.config['DICTIONARIES_PATH'], new_dict_fname)
 	if os.path.exists(old_path):
 		try:
 			os.rename(old_path, new_path)
+			return True
 		except Exception as err:
 			# OS error renaming the file
 			raise DictFileRenameException(old_dict_fname)
+
+	return False
 
 def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 	"""-------------------------------------------------------------------
@@ -150,7 +163,7 @@ def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 		Return:			None, renames physical file if it exists
 		------------------------------------------------------------------
 	"""
-	dict_path = url_for('dict', filename=dict_fname)[1:]
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	try:
 		with io.open(dict_path, mode='r+', encoding='utf8') as dict_file:
 			contents = dict_file.readlines()
@@ -158,9 +171,11 @@ def updateDictMetaHeader(dict_fname, new_title, new_abbr):
 			contents[1] = re.sub(r'//\s*series_abbr\s*:\s*(\w+)',  r'// series_abbr  :  {0}'.format(new_abbr), contents[1])
 			dict_file.seek(0)
 			dict_file.writelines(contents)
+
+		return True
 	except Exception as err:
 		# Failed to rewrite metadata, but this isn't fatal
-		return
+		return False
 
 def generateNameVariants(rn, tn, comment, lang):
 	"""-------------------------------------------------------------------
@@ -247,7 +262,7 @@ def processDictFile(dict_fname, series_lang):
 						(raw, (translation, comment))
 		------------------------------------------------------------------
 	"""
-	dict_path = url_for('dict', filename=dict_fname)[1:]
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	dict_list = []
 
 	# Sanity checks

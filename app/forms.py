@@ -24,12 +24,8 @@ from wtforms.validators import Regexp
 # Internal imports
 from app.models import SeriesTable
 from app.models import HostTable
+from app.scripts.dictionary import COMMON_DICT_ABBR
 from app.scripts.custom_errors import mono
-
-
-# Global constants
-COMMON_DICT_ABBR = "Common"
-
 
 class RegisterNovelForm(FlaskForm):
 	'''

@@ -697,7 +697,7 @@ function setupDictionary(){
 		$.post(url, function(data){
 			if(data.status == 'dict_dne_abort'){
 				createFlashMessage(
-					`${CRITICAL_BOLD} The requested file ${dict_fname} does not exist. Upload a file under ${dict_abbr} to initialize it.`,
+					`${CRITICAL_BOLD} The requested file ${dict_fname} does not exist. Upload a file or hit Edit under ${dict_abbr} to initialize it.`,
 					CRITICAL,
 					dict_flashpanel);
 			}
@@ -715,13 +715,43 @@ function setupDictionary(){
 		})
 	});
 
-	/*$(".upload_file_select").change(function(){
-		this.form.submit();
-	});*/
-
 	$('.action_upload').click(function() {
 		var dict_entry = $(this).closest('.dictionary_entry');
 		var upload_file_select = dict_entry.find('.upload_file_select');
 		upload_file_select.click();
+	});
+}
+
+function setupDictionaryEdit(){
+	// Define a super simple lexer for the dictionary syntax
+	CodeMirror.defineSimpleMode("dictionary_mode", {
+		// The start state contains the rules that are intially used
+		start: [
+			{regex: /\|/, token: "dict-namesplit"},
+			{regex: /\/\/.*/, token: "dict-comment"},
+			{regex: /\s*(@name)\{(.+),(.+)\}/,
+			 token: ["dict-nametag"]},
+			{regex: /-->/, token: "dict-divider"}
+		],
+		// The multi-line comment state.
+		comment: [
+			{regex: /.*?\*\//, token: "comment", next: "start"},
+			{regex: /.*/, token: "comment"}
+		],
+		meta: {
+			dontIndentStates: ["comment"],
+			lineComment: "//"
+		}
+	});
+
+	var editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
+		mode: "dictionary_mode",
+		lineNumbers: true,
+		autoCloseBrackets: true
+	});
+
+	// Editor toolbelt button functions
+	$('#menu_dictionary_edit_fullscreen_btn').click(function(){
+		$('.dictionary_edit_body').toggleClass('fullscreen');
 	});
 }

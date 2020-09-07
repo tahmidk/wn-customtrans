@@ -10,7 +10,7 @@
 import os
 import json
 import zipfile
-from io import BytesIO
+import io
 
 # Flask imports
 from flask import render_template
@@ -32,7 +32,6 @@ from app import csrf
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
-from app.forms import COMMON_DICT_ABBR
 
 from app.models import *
 
@@ -46,7 +45,6 @@ from app.scripts.custom_errors import *
 # This is the route for the main page
 @app.route("/")
 def index():
-	abort(500)
 	return render_template('index.html',
 		title='CustomTrans')
 
@@ -91,6 +89,8 @@ def library():
 		host_entry = HostTable.query.filter_by(id=entry.host_id).first()
 		entry.__dict__["host"] = host_entry.host_name
 		entry.__dict__["lang"] = lang = Language.to_string(host_entry.host_lang)
+		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
+		entry.__dict__["dict_fname"] = dict_entry.fname
 	return render_template('library.html',
 		title="Library",
 		back_href=url_for('index'),
@@ -148,30 +148,46 @@ def library_update():
 def library_edit_novel(series_code):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
+		import pdb; pdb.set_trace()
 		series_entry = SeriesTable.query.filter_by(code=series_code).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
+		host_manager = hostmanager.createManager(host_entry.host_type)
 
 		new_title = edit_novel_form.title.data
 		new_abbr  = edit_novel_form.abbr.data
-
-		# Rename the associated dict according to new abbreviation
 		fname_new = dictionary.generateDictFilename(
 			edit_novel_form.abbr.data,
 			host_entry.host_name,
 			series_entry.code
 		)
-		dictionary.renameDictFile(dict_entry.fname, fname_new)
-		# If the dict exists but is empty, repopulate it with the dictionary skeleton text
-		dict_path = url_for('dict', filename=fname_new)[1:]
-		if os.path.getsize(dict_path) == 0:
-			host_manager = hostmanager.createManager(host_entry.host_type)
-			createDictFile(fname_new, series_title, series_abbr, host_manager.generateSeriesUrl(series_code))
-		dictionary.updateDictMetaHeader(fname_new, new_title, new_abbr)
+		dict_path_old = os.path.join(app.config['DICTIONARIES_PATH'], dict_entry.fname)
+		dict_path_new = os.path.join(app.config['DICTIONARIES_PATH'], fname_new)
+
+		# First check if the dicitonary file exists, create it if necessary
+		if not os.path.exists(dict_path_old):
+			dictionary.createDictFile(fname_new,
+				new_title,
+				new_abbr,
+				host_manager.generateSeriesUrl(series_code))
+		# It exists so reprocess it
+		else:
+			# Rename the associated dict according to new abbreviation
+			dictionary.renameDictFile(dict_entry.fname, fname_new)
+			# If the dict exists but is empty, repopulate it with the dictionary skeleton text
+			if os.path.getsize(dict_path_new) == 0:
+				dictionary.createDictFile(fname_new,
+					new_title,
+					new_abbr,
+					host_manager.generateSeriesUrl(series_code))
+			# Otherwise, just update the meta
+			else:
+				dictionary.updateDictMetaHeader(fname_new, new_title, new_abbr)
 
 		# Change the series entry itself
 		series_entry.title = new_title
 		series_entry.abbr = new_abbr
+		dict_entry.fname = fname_new
 		db.session.commit()
 
 		flash("%s Your changes have been applied!" % SUCCESS_BOLD, "success")
@@ -345,7 +361,7 @@ def dictionaries():
 	dict_entry = DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first()
 	dictionaries.insert(0, {
 		"id": dict_entry.id,
-		"abbr": COMMON_DICT_ABBR,
+		"abbr": dictionary.COMMON_DICT_ABBR,
 		"fname": dict_entry.fname,
 		"enabled": dict_entry.enabled
 	})
@@ -438,8 +454,8 @@ def dictionaries_upload_dict(dict_fname):
 # Route for downloading a given .dict file
 @app.route("/dictionaries/download/<dict_fname>", methods=["POST"])
 def dictionaries_download_dict(dict_fname):
-	path = os.path.abspath(url_for('dict', filename=dict_fname)[1:])
-	if not os.path.exists(path):
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
+	if not os.path.exists(dict_path):
 		return jsonify({"status": "dict_dne_abort"})
 	try:
 		return send_from_directory(app.config['DICTIONARIES_PATH'],
@@ -453,7 +469,7 @@ def dictionaries_download_dict(dict_fname):
 @app.route("/dictionaries/downloadall")
 def dictionaries_download_all():
 	#import pdb; pdb.set_trace()
-	data = BytesIO()
+	data = io.BytesIO()
 	with zipfile.ZipFile(data, mode='w', compression=zipfile.ZIP_DEFLATED) as dict_zip:
 		for (root, _, files) in os.walk(app.config['DICTIONARIES_PATH']):
 			for dict_fname in files:
@@ -466,20 +482,58 @@ def dictionaries_download_all():
 		as_attachment=True,
 		attachment_filename='wnct_dictionaries.zip')
 
+
 # Route for downloading all dict files in user/dicts
 @app.route("/dictionaries/edit/<dict_fname>")
 def dictionaries_edit(dict_fname):
 	if utils.spliceDictName(dict_fname):
+		if DictionaryTable.query.filter_by(fname=dict_fname).first() is None:
+			abort(404)
+
 		(series_abbr, host_name, series_code) = utils.spliceDictName(dict_fname)
 		host_entry = HostTable.query.filter_by(host_name=host_name).first()
 		if host_entry is None:
 			abort(404)
+		host_manager = hostmanager.createManager(host_entry.host_type)
 		series_entry = SeriesTable.query.filter_by(host_id=host_entry.id, code=series_code).first()
 		if series_entry is None:
 			abort(404)
 
-		return "Edit page for series " + series_entry.abbr
-	return abort(404)
+		series_title = series_entry.title
+		series_abbr = series_entry.abbr
+		series_url = host_manager.generateSeriesUrl(series_code)
+
+	elif dict_fname == dictionary.COMMON_DICT_FNAME:
+		series_title = dictionary.COMMON_DICT_TITLE
+		series_abbr = dictionary.COMMON_DICT_ABBR
+		series_url = "N/A"
+	else:
+		return abort(404)
+
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
+	if not os.path.exists(dict_path):
+		dictionary.createDictFile(dict_fname, series_title, series_abbr, series_url)
+		flash("Dictionary file %s was newly created" % mono(dict_fname), "success")
+	elif os.path.getsize(dict_path) == 0:
+		dictionary.createDictFile(dict_fname, series_title, series_abbr, series_url)
+		flash("Dictionary file %s was found empty. The header metadata was reinitialized" % \
+			mono(dict_fname), "success")
+
+	dict_content = ""
+	try:
+		with io.open(dict_path, mode='r', encoding='utf8') as dict_file:
+			dict_content = dict_file.read()
+	except Exception as err:
+		flash("%s Ran into an issue opening the file %s" % \
+			(WARNING_BOLD, mono(dict_fname)), "warning")
+
+	return render_template("dictionary_edit.html",
+		title="Edit %s" % series_abbr,
+		back_href=url_for('dictionaries'),
+		series_abbr=series_abbr,
+		dict_fname=dict_fname,
+		dict_content=dict_content)
+
 
 # Route for Tutorial page
 @app.route("/tutorial")

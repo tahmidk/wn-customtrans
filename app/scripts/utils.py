@@ -132,15 +132,14 @@ def registerSeriesToDatabase(reg_form):
 	db.session.commit()
 
 	# Check the physical file,
-	dict_dir = url_for('user', filename='dicts')[1:]
-	dict_path = url_for('dict', filename=dict_fname)[1:]
+	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	if not os.path.exists(dict_path):
 		# First traverse the dict files to see if there is a dict file with the same host-code combination
 		# This implies the user has registered and removed this series before with the preserve dictionary
 		# option enabled and is currently trying to reregister that same series
 		dict_initialized = False
-		for dict_file in os.listdir(dict_dir):
-			if os.path.isfile(os.path.join(dict_dir, dict_file)):
+		for dict_file in os.listdir(app.config['DICTIONARIES_PATH']):
+			if os.path.isfile(os.path.join(app.config['DICTIONARIES_PATH'], dict_file)):
 				info = spliceDictName(dict_file)
 				if info is not None:
 					(_, host, code) = info

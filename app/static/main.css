@@ -45,6 +45,9 @@ html{
   --dictionary_honorifics_button_color: #d20091;
   --dictionary_toggleall_button_color: #f77808;
   --dictionary_entry_color_primary: #ff8f2c;
+
+  /* Dictionary edit palette */
+  --dictionary_edit_color_primary: #ff702c;
 }
 html[data-theme='dark']{
   --html_background_color: #181818;
@@ -243,6 +246,19 @@ ion-icon .icon-inner{
 }
 .superpanel{
   margin: 3rem 0 1rem 0;
+}
+.superpanel_menu_btn{
+  color: white !important;
+  margin: auto 0.2rem;
+  font-variant: all-petite-caps;
+  font-size: 1rem;
+  box-shadow: none !important;
+}
+.superpanel_menu_btn:hover{
+  filter: brightness(1.05);
+}
+.superpanel_menu_btn ion-icon{
+  margin: 0 0.2rem -0.2rem 0;
 }
 .flashpanel{
   display: flex;
@@ -662,6 +678,11 @@ table.entry_info_table{
   background: #ff3547  !important;
   color: white !important;
 }
+.form_input_div input:focus{
+  border-bottom: 1px solid #00d0be !important;
+  -webkit-box-shadow: 0 1px 0 0 #00d0be !important;
+  box-shadow: 0 1px 0 0 #00d0be !important;
+}
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
 #register_novel_header{
@@ -811,19 +832,6 @@ table.entry_info_table{
   margin: 1rem 0;
   padding: 1rem 0;
   border-bottom: 1px solid #d2d2d2;
-}
-.superpanel_menu_btn{
-  color: white !important;
-  margin: auto 0.2rem;
-  font-variant: all-petite-caps;
-  font-size: 1rem;
-  box-shadow: none !important;
-}
-.superpanel_menu_btn:hover{
-  filter: brightness(1.05);
-}
-.superpanel_menu_btn ion-icon{
-  margin: 0 0.2rem -0.2rem 0.2rem;
 }
 #rmv_all_bkmk_btn{
   float: right;
@@ -1126,3 +1134,69 @@ table.entry_info_table{
   height: 1.5rem;
   margin: 0 auto;
 }
+
+
+/* Dictionary Edit page stylings */
+.section_dictionary_edit{
+}
+.dictionary_edit_body{
+  margin-top: 3rem;
+}
+#dictionary_edit_mainpanel{
+  min-width: 100%;
+  max-width: 75rem;
+}
+.fullscreen #dictionary_edit_mainpanel{
+  position: fixed;
+  width: 100%;
+  max-width: 2048px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  background: white;
+}
+#dictionary_edit_icon{
+  background: var(--dictionary_edit_color_primary);
+}
+#dictionary_edit_title{
+  color: var(--dictionary_edit_color_primary);
+}
+.dictionary_edit_toolbelt{
+  position: relative;
+}
+.dictionary_edit_toolbelt_btn{
+  color: white !important;
+  margin: 0.5rem 0;
+  padding: 0.5rem 2rem;
+  font-variant: all-petite-caps;
+  font-size: 1rem;
+  box-shadow: none !important;
+}
+.dictionary_edit_toolbelt_btn:hover{
+  filter: brightness(1.2);
+}
+.dictionary_edit_toolbelt_btn ion-icon{
+  margin: 0 0.2rem -0.2rem 0;
+}
+.dictionary_edit_abbr_tag{
+  position: absolute;
+  width: fit-content;
+  right: 0;
+  bottom: 0;
+  padding: 0.5rem 2rem;
+  color: white;
+  font-size: 1.2rem;
+  font-family: monospace;
+  background: var(--dictionary_edit_color_primary);
+}
+#dictionary_edit_mainpanel .CodeMirror{
+  height: fit-content;
+  border-left: 1px solid var(--dictionary_edit_color_primary);
+  border-top: 5px solid var(--dictionary_edit_color_primary);
+}
+/* Lexer token styles */
+.cm-dict-nametag    { color: #ff0071; }
+.cm-dict-namesplit  { color: #32ca20 }
+.cm-dict-divider    { color: #ff7a00; }
+.cm-dict-comment    { color: #adadad; }
