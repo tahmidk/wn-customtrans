@@ -55,7 +55,7 @@ def error_404(error):
 		exist'''
 	desc = '''Perhaps you followed a bad link. Or maybe this is a series
 		sepcific page for a series that\'s no longer in your Library?'''
-	return render_template('error_page.html',
+	return render_template('misc/error_page.html',
 		title='Error 404',
 		err_img=url_for('static', filename="error_404_img.gif"),
 		err_code=404,
@@ -68,7 +68,7 @@ def error_500(error):
 	hdr = '''<strong>Whoops!</strong> Server error. Yeah this one\'s on me...'''
 	desc = '''Looks like something caused the server side to error out. It's
 		not a you-problem though, it's a me-problem. Accept this sliding dogeza!'''
-	return render_template('error_page.html',
+	return render_template('misc/error_page.html',
 		title='Error 500',
 		err_img=url_for('static', filename="error_500_img.gif"),
 		err_code=500,

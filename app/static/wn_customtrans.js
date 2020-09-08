@@ -935,6 +935,12 @@ function setupDictionaryEdit(){
 				}
 			});
 		}
+		else{
+			createToast("No changes to save, ignored",
+				"warning",
+				"warning_on_save",
+				dictionary_edit_toastpanel);
+		}
 	});
 
 	$('#confirm_discard_btn').click(function(){
@@ -945,6 +951,12 @@ function setupDictionaryEdit(){
 			createToast("Your changes were discarded",
 				"success",
 				"successful_discard",
+				dictionary_edit_toastpanel);
+		}
+		else{
+			createToast("No changes to discard, ignored",
+				"warning",
+				"warning_on_discard",
 				dictionary_edit_toastpanel);
 		}
 	});
