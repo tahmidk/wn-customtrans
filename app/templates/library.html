@@ -1,14 +1,16 @@
-{% from "series_entry.html" import series_entry%}
-{% from "modals/register_novel.html" import register_novel_modal%}
-{% from "modals/edit_novel.html" import edit_novel_modal%}
-{% from "modals/remove_novel.html" import remove_novel_modal%}
+{% from "series_entry.html" import series_entry %}
+{% from "flash_alert.html" import flash_alert %}
+{% from "super_navpanel.html" import super_navpanel %}
+{% from "modals/register_novel.html" import register_novel_modal %}
+{% from "modals/edit_novel.html" import edit_novel_modal %}
+{% from "modals/remove_novel.html" import remove_novel_modal %}
 
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_library">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+			{{super_navpanel(back_href)}}
 		{% endif%}
 
 		<!-- Set up the modals needed for this  -->
@@ -17,16 +19,16 @@
 		{{ remove_novel_modal(rmv_form)}}
 
 		<!-- Progress bar -->
-		<div class="progress_bar_display">
-			<div class="progress_bar_label">
-				<div class="spinner-border text-warning" role="status">
+		<div class="library_update_progress_bar_display">
+			<div class="library_update_progress_bar_label">
+				<div class="spinner-border text-warning" role="status" id="library_update_spinner">
 					<span class="sr-only"></span>
 				</div>
-				<span>
-					Updating...
-				</span>
+				<div class="library_update_progress_bar_info">
+					Fetching updates for <span id="update_info_series"></span>
+				</div>
 			</div>
-			<div class="progress_bar_container">
+			<div class="library_update_progress_bar_container">
 				<div class="progress" style="height: 0.5rem; background: #ffe26e;">
 					<div class="progress-bar bg-warning" id="update_progress_bar"
 						role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
@@ -42,42 +44,50 @@
 			<div class="banner_title" id="library_title">Library</div>
 		</div>
 		<div class="library_body">
-			<div class="library_superpanel">
+			<div class="superpanel" id="library_superpanel">
 				<!-- Register button -->
-				<button type="button" class="btn btn-outline-primary superpanel_menu_btn modal_trigger" id="menu_library_register_btn" data-toggle="modal"
+				<button type="button" class="btn btn-light-green superpanel_menu_btn modal_trigger" id="menu_library_register_btn" data-toggle="modal"
 					data-target="#register_novel_modal_push" title="Add Series">
 					<ion-icon name="add-outline"></ion-icon>
 					<span> Register </span>
 				</button>
 				<!-- Update button -->
-				<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="menu_library_update_btn" title="Update Library">
+				<button type="button" class="btn btn-yellow superpanel_menu_btn" id="menu_library_update_btn" title="Update Library" {{'disabled' if series|length == 0}}>
 					<ion-icon name="sync-outline"></ion-icon>
 					<span> Update </span>
 				</button>
 			</div>
-			<div class="library_mainpanel">
-				<!-- Novel entries -->
-				{% for novel in series %}
-					{{ series_entry(novel) }}
-				{% endfor %}
 
+			<div class="superpanel_menu_searchbar_div" id="menu_library_searchbar_div">
+				<div class="md-form active-cyan-2 mb-3" id="menu_library_searchbar">
+					<input class="form-control" type="text" placeholder="Search Library" aria-label="Search">
+				</div>
+			</div>
+
+			<div class="flashpanel" id="library_flashpanel">
 				<!-- Flashed messages -->
 				{% with messages = get_flashed_messages(with_categories=true) %}
-					{% if messages %}
-					<div class="flash_msg_div">
-						{% for category, message in messages %}
-							{% if category == 'success' or category == 'warning' or category == 'danger'%}
-							<div class="alert alert-dismissible fade show flash_msg_{{category}}" role="alert">
-								{{ message }}
-								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							{% endif %}
-						{% endfor %}
-					</div>
-					{% endif %}
+					{{ flash_alert(messages) }}
 				{% endwith %}
+			</div>
+
+			<div class="mainpanel" id="library_mainpanel">
+				<!-- Novel entries -->
+				{% if series|length == 0 %}
+					<!-- No chapters to display -->
+					<div class="page_empty_div" id="no_series_div">
+						<div class="page_empty_img_div" id="no_series_img_div">
+							<img src="{{url_for('static', filename='library_nothing_here.jpg')}}" class="page_empty_img" id="no_series_img">
+						</div>
+						<div class="page_empty_text_div "id="no_series_text_div">
+							Nothing to see here. Start by hitting <span class="light-green-text font-weight-bold">Register</span>
+						</div>
+					</div>
+				{% else %}
+					{% for novel in series %}
+						{{ series_entry(novel) }}
+					{% endfor %}
+				{% endif %}
 			</div>
 		</div>
 	</section>

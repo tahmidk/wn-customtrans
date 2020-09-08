@@ -1,9 +1,12 @@
+{% from "super_navpanel.html" import super_navpanel %}
+{% from "flash_alert.html" import flash_alert %}
+
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_toc">
 		<!-- Back button -->
 		{% if back_href is defined %}
-			<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+			{{super_navpanel(back_href)}}
 		{% endif%}
 
 		<!-- Main content -->
@@ -18,56 +21,76 @@
 		<div class="toc_body">
 			<div class="toc_menu_listing">
 				<div class="toc_menu_options">
-					<button type="button" class="btn btn-outline-success superpanel_menu_btn" id="jump_to_curr_btn" title="Jump to the latest chapter">
+					<button type="button" class="btn btn-success superpanel_menu_btn" id="jump_to_curr_btn" title="Jump to the chapter you left off">
 						<ion-icon name="code-download-outline"></ion-icon>
 						<span>Current</span>
 					</button>
-					<button type="button" class="btn btn-outline-warning superpanel_menu_btn" id="update_series_btn" title="Fetch the latest chapter"
+					<button type="button" class="btn btn-yellow superpanel_menu_btn" id="update_series_btn" title="Fetch the latest chapter"
 						action="{{url_for('library_series_update', series_code=series.code)}}">
 						<ion-icon name="sync-outline"></ion-icon>
 						<span>Update</span>
 					</button>
-					<button type="button" class="btn btn-outline-primary superpanel_menu_btn" id="series_dictionary_btn" title="Open this series' dictionary"
+					<button type="button" class="btn btn-amber superpanel_menu_btn" id="series_dictionary_btn" title="Edit this series' dictionary"
 						action="{{url_for('library_series_update', series_code=series.code)}}">
 						<ion-icon name="reader-outline"></ion-icon>
 						<span>Dictionary</span>
 					</button>
-					<button type="button" class="btn btn-outline-danger superpanel_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
-						action="{{url_for('library_series_toc_bookmark_all', series_code=series.code)}}">
+					<button type="button" class="btn btn-danger superpanel_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
+						action="{{url_for('library_series_toc_bookmark_all', series_code=series.code)}}" {{'disabled' if series.latest_ch == 0}}>
 						<ion-icon name="bookmarks" style="font-size: 1rem; margin-bottom: -0.1rem;"></ion-icon>
 						<span>Remove All Bookmarks</span>
 					</button>
 				</div>
 			</div>
-			<div class="toc_main">
+
+			<!-- Flaspanel -->
+			<div class="flashpanel" id="toc_flashpanel">
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{{ flash_alert(messages) }}
+				{% endwith %}
+			</div>
+
+			<!-- Mainpanel -->
+			<div class="toc_main" id="toc_mainpanel">
+				<div class="toc_pagination">
+				</div>
 				<div class="toc_chapter_listing">
 					{% if series.latest_ch == 0 %}
 						<!-- No chapters to display -->
-						<div class="no_chapters_img_div">
-							<img src="{{url_for('static', filename='0ee66d20ef99b9ee6753076213df9635.jpg')}}" class="no_chapters_img">
-						</div>
-						<div class="no_chapters_text_div">
-							No chapters here. Try hitting "update"
+						<div class="page_empty_div" id="no_chapters_div">
+							<div class="page_empty_img_div" id="no_chapters_img_div">
+								<img src="{{url_for('static', filename='toc_nothing_here.jpg')}}" class="page_empty_img" id="no_chapters_img">
+							</div>
+							<div class="page_empty_text_div" id="no_chapters_text_div">
+								No chapters here. Try hitting <span class="text-warning font-weight-bold">Update</span>
+							</div>
 						</div>
 					{% else %}
 						<!-- Non-empty chapter directory -->
 						{% for index in range(series.latest_ch) %}
 							{% set ch = index + 1 %}
-							{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch)  %}
-							{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch)  %}
+
+							{% set series_base_url = url_for('library_series_chapter', series_code=series.code, ch=ch) %}
+							{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch) %}
+							{% set setcurrent_url = url_for('library_series_toc_setcurrent', series_code=series.code, ch=ch) %}
+
 							{% set visited = ch < series.current_ch %}
 							{% set current = ch == series.current_ch %}
 							{% set bookmarked = ch in series.bookmarks %}
 
-							{% if current %}
-							<div id="current_ch"></div>
-							{% endif %}
 							<div class="toc_chapter {{'viewed_chapter' if visited}} {{'current_chapter' if current}} {{'bookmarked_chapter' if bookmarked}}" id="{{ch}}">
-								<a class="toc_chapter_text" href="{{series_base_url}}" target="_blank">
+								<a class="toc_chapter_text" href="{{series_base_url}}"> <!--Open chapters in new tab by defualt: target="_blank"-->
 									Chapter {{ch}}
 								</a>
-								<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}">
-									<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
+								<div class="toc_chapter_actionbar {{'active_actionbar' if bookmarked}}">
+									<div class="toc_chapter_setcurrent " action="{{setcurrent_url}}" id="setcurrent_form_{{ch}}" title="Set this as the current chapter">
+										<ion-icon name="code-download-outline" style="margin-bottom: -0.5rem"></ion-icon>
+									</div>
+									<div class="toc_chapter_bookmark {{'active_bookmark' if bookmarked}}" action="{{bookmark_url}}" id="bookmark_form_{{ch}}"
+										title="Bookmark this chapter">
+										<ion-icon name="bookmark{{'-outline' if not bookmarked}}" style="margin-bottom: -0.5rem"></ion-icon>
+									</div>
 								</div>
 							</div>
 						{% endfor %}

@@ -9,7 +9,7 @@
 # Python imports
 import pykakasi as pkk 					# Python Japanese romanization api
 from abc import ABC, abstractmethod		# Pythonic abstract inheritance
-from enum import Enum 					# Pythonic enumerators
+from enum import Enum					# Pythonic enumerators
 import bs4 as soup 						# Python HTML query tool
 import re 								# Regex for personalized parsing HTML
 
@@ -27,10 +27,51 @@ class Host(Enum):
 	Biquyun = 1
 	Shu69 	= 2
 
+	@staticmethod
+	def to_string(host):
+		if host == Host.Syosetu:
+			return "Host.Syosetu"
+		elif host == Host.Biquyun:
+			return "Host.Biquyun"
+		elif host == Host.Shu69:
+			return "Host.Shu69"
+		else:
+			raise ValueError
+
+	@staticmethod
+	def to_enum(label):
+		if label in ('Host.Syosetu', 0):
+			return Host.Syosetu
+		elif label in ('Host.Biquyun', 1):
+			return Host.Biquyun
+		elif label in ('Host.Shu69', 2):
+			return Host.Shu69
+		else:
+			raise ValueError
+
 # Language enumeration
 class Language(Enum):
     JP = 1
     CN = 2
+
+    @staticmethod
+    def to_string(lang):
+    	if lang == Language.JP:
+    		return "Language.JP"
+    	elif lang == Language.CN:
+    		return "Language.CN"
+    	else:
+    		raise ValueError
+
+    @staticmethod
+    def to_enum(label):
+    	if label in ('Language.JP', 1):
+    		return Language.JP
+    	elif label in ('Language.CN', 2):
+    		return Language.CN
+    	else:
+    		raise ValueError
+
 
 
 def createManager(host):

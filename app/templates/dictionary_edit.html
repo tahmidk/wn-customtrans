@@ -1,0 +1,69 @@
+{% from "super_navpanel.html" import super_navpanel %}
+{% from "flash_alert.html" import flash_alert %}
+{% from "modals/discard_dict_changes.html" import discard_dict_changes %}
+
+{% extends 'general_layout.html' %}
+{% block content %}
+	<section class="section_dictionary_edit">
+		<!-- Back button -->
+		{% if back_href is defined %}
+			{{super_navpanel(back_href)}}
+		{% endif%}
+
+		<!-- Set up the Discard Changes modal -->
+		{{ discard_dict_changes() }}
+
+		<!-- Main content -->
+		<div class="banner" id="dictionary_edit_banner">
+			<div class="banner_icon" id="dictionary_edit_icon">
+				<ion-icon name="create"></ion-icon>
+			</div>
+			<div class="banner_title" id="dictionary_edit_title">Edit Dictionary</div>
+		</div>
+
+		<div class="dictionary_edit_body">
+			<div class="flashpanel" id="dictionary_edit_flashpanel">
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{{ flash_alert(messages) }}
+				{% endwith %}
+			</div>
+
+			<div class="mainpanel" id="dictionary_edit_mainpanel">
+				<div class="dictionary_edit_toolbelt w-100">
+					<div class="dictionary_edit_btn_div">
+						<!-- Register button -->
+						<button type="button" class="btn btn-dark-green dictionary_edit_toolbelt_btn" title="Save changes"
+							id="menu_dictionary_edit_save_btn" action="{{url_for('dictionaries_edit_save', dict_fname=dict_fname)}}">
+							<ion-icon name="checkmark-outline"></ion-icon>
+							<span> Save </span>
+						</button>
+						<button type="button" class="btn btn-danger dictionary_edit_toolbelt_btn" title="Discard changes"
+							id="menu_dictionary_edit_discard_btn" data-toggle="modal" data-target="#dict_discard_changes_modal">
+							<ion-icon name="close-outline"></ion-icon>
+							<span> Discard </span>
+						</button>
+						<button type="button" class="btn btn-elegant dictionary_edit_toolbelt_btn" title="Toggle fullscreen"
+							id="menu_dictionary_edit_fullscreen_btn" >
+							<ion-icon name="scan-outline"></ion-icon>
+						</button>
+					</div>
+					<div class="dictionary_edit_abbr_tag">
+						{{dict_fname}}
+					</div>
+				</div>
+				<textarea id="dictionary_editor" style="display: none;">{{dict_content}}</textarea>
+			</div>
+		</div>
+
+		<div class="toastpanel" id="dictionary_edit_toastpanel">
+			<!-- Toast messages go here -->
+		</div>
+	</section>
+{% endblock %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupDictionaryEdit();
+	});
+{% endblock%}

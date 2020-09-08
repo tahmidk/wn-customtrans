@@ -1,16 +1,28 @@
 {% extends 'general_layout.html' %}
+{% from "super_navpanel.html" import super_navpanel %}
 {% from "general_layout.html" import define_metavar%}
+{% from "flash_alert.html" import flash_alert %}
 
-{% block metavars %}
+
+{% block theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{%- block metavars -%}
 	{{ define_metavar('ch', ch) }}
 	{{ define_metavar('latest_ch', series.latest_ch) }}
-{% endblock %}
+	{% if chapter_data is defined %}
+		{% for definition in chapter_data.dictionary %}
+			{% set id = loop.index %}
+			{% set translation = definition.trans %}
+			{% set comment = definition.comment %}
+			{{ define_metavar_dict(id, translation, comment) }}
+		{% endfor%}
+	{% endif %}
+{%- endblock -%}
 
 {% block content %}
 <section class="section_chapter">
 	<!-- Back button -->
 	{% if back_href is defined %}
-		<div class="back_button" onclick="location.href='{{back_href}}'"> Back </div>
+		{{super_navpanel(back_href)}}
 	{% endif%}
 
 	<!-- The chapter title and number -->
@@ -31,32 +43,42 @@
 		{{ render_toolbelt() }}
 	</div>
 
+	<!-- Flashpanel -->
+	<div class="flashpanel" id="chapter_flashpanel">
+		<!-- Flashed messages -->
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{{ flash_alert(messages) }}
+		{% endwith %}
+	</div>
+
 	<div class="content">
-		<p class="dummy" id="d0">{{dummy_text}}</p>
-		<div class="content_title_div content_section">
-			{{ line_entry(chapter_data.title) }}
-		</div>
-		<p class="dummy" id="d1">{{dummy_text}}</p>
-		{% if chapter_data.prescript|length > 0 %}
-		<div class="content_prescript content_section">
-		{% for data in chapter_data.prescript %}
-			{{ line_entry(data) }}
-		{% endfor %}
-		</div>
-		{% endif %}
-		{% if chapter_data.main|length > 0 %}
-		<div class="content_main content_section">
-		{% for data in chapter_data.main %}
-			{{ line_entry(data) }}
-		{% endfor %}
-		</div>
-		{% endif %}
-		{% if chapter_data.postscript|length > 0 %}
-		<div class="content_afterword content_section">
-		{% for data in chapter_data.postscript %}
-			{{ line_entry(data) }}
-		{% endfor %}
-		</div>
+		{% if chapter_data is defined %}
+			<p class="dummy" id="d0">{{dummy_text}}</p>
+			<div class="content_title_div content_section">
+				{{ line_entry(chapter_data.title) }}
+			</div>
+			<p class="dummy" id="d1">{{dummy_text}}</p>
+			{% if chapter_data.prescript|length > 0 %}
+				<div class="content_prescript content_section">
+				{% for data in chapter_data.prescript %}
+					{{ line_entry(data) }}
+				{% endfor %}
+				</div>
+			{% endif %}
+			{% if chapter_data.main|length > 0 %}
+				<div class="content_main content_section">
+				{% for data in chapter_data.main %}
+					{{ line_entry(data) }}
+				{% endfor %}
+				</div>
+			{% endif %}
+			{% if chapter_data.postscript|length > 0 %}
+				<div class="content_afterword content_section">
+				{% for data in chapter_data.postscript %}
+					{{ line_entry(data) }}
+				{% endfor %}
+				</div>
+			{% endif %}
 		{% endif %}
 	</div>
 
@@ -82,7 +104,18 @@
 
 {% block script_area %}
 	$(document).ready(function() {
-		setupChapter({{series.latest_ch}});
+		setupChapter();
+
+		// Mark this chapter as the current chapter if it's greater than what it currently is
+		if({{ch}} > {{series.current_ch}}){
+			var url = "{{url_for('library_series_toc_setcurrent', series_code=series.code, ch=ch)}}";
+			$.post(url, function(data) {
+				if(data.status != 'ok') {
+					var msg = `An unexpected error occurred while trying to set this as the current chapter`;
+					createFlashMessage(msg, "warning", "#chapter_flashpanel");
+				}
+			});
+		}
 	});
 {% endblock%}
 
@@ -92,7 +125,7 @@
 	{% if data.type == "text" %}
 		<div class="content_line_div">
 			<p class="content_line" id="l{{data.line_id}}">
-				{{data.text}}
+				{{data.text|safe}}
 			</p>
 			<p class="content_raw notranslate" id="r{{data.line_id}}">
 				<a href="{{data.gt_link}}" class="no_decoration" target="_blank">
@@ -113,19 +146,23 @@
 {% macro render_toolbelt() %}
 	<div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 100%;">
 		{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
-		<button type="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter">
+		<a role="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter" {{'disabled' if ch == 1}}>
 			<ion-icon name="return-up-back-outline"></ion-icon>
-		</button>
-		<button type="button" class="btn btn-secondary chapter_toolbelt_btn chapter_toc_btn" id="toc_btn" title="Table of Contents"
-			onclick="location.href='{{series_toc_url}}'">
+		</a>
+		<a role="button" class="btn special-color-dark chapter_toolbelt_btn chapter_toc_btn" id="toc_btn" title="Table of Contents"
+			href="{{series_toc_url}}">
 			<ion-icon name="library-outline"></ion-icon>
-		</button>
+		</a>
 		<button type="button" class="btn chapter_toolbelt_btn chapter_day_night_toggle_btn" id="day_night_toggle_btn" title="Day/Night Mode"
 			style="color: #fff">
 			<ion-icon name="moon-outline"></ion-icon>
 		</button>
-		<button type="button" class="btn btn-dark chapter_toolbelt_btn chapter_next_btn" id="next_btn" title="Next Chapter">
+		<a role="button" class="btn btn-dark chapter_toolbelt_btn chapter_next_btn" id="next_btn" title="Next Chapter" {{'disabled' if ch == series.latest_ch}}>
 			<ion-icon name="return-up-forward-outline"></ion-icon>
-		</button>
+		</a>
 	</div>
+{% endmacro %}
+
+{% macro define_metavar_dict(id, trans, comment) %}
+	<meta id="mdata_definition_{{id}}" data-translation="{{trans}}" data-comment="{{comment}}">
 {% endmacro %}
