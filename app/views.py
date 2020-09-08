@@ -531,6 +531,14 @@ def dictionaries_edit(dict_fname):
 		dict_fname=dict_fname,
 		dict_content=dict_content)
 
+# Route for downloading all dict files in user/dicts
+@app.route("/dictionaries/edit/<dict_fname>/save", methods=["POST"])
+def dictionaries_edit_save(dict_fname):
+	content = request.form['content']
+	if not dictionary.saveContentToDict(dict_fname, content):
+		return jsonify(status='error')
+
+	return jsonify(status='ok')
 
 # Route for Tutorial page
 @app.route("/tutorial")

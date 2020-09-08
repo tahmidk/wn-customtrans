@@ -122,7 +122,7 @@ function setupCommentPopover(word_id, word_metaid){
 }
 
 /*
- *  Creates a client created flash message. JS equivalent of Flask's flash()
+ *  Creates a client-side created flash message. JS equivalent of Flask's flash()
  * 		message - the message to display
  * 		category - flash message's category
  * 		flash_loc - the complete flash message's display destination
@@ -154,7 +154,44 @@ function createFlashMessage(message, category, flash_loc){
 	flash_div.appendChild(message_span);
 	flash_div.appendChild(close_btn);
 	flash_div_wrapper.appendChild(flash_div);
-	$(flash_loc)[0].appendChild(flash_div_wrapper);
+	$(flash_loc).append(flash_div_wrapper);
+}
+
+/*
+ *  Creates and flashes a client-side created toast message. Only displays
+ * 	a toast if its id is not the same as an existing toast
+ * 		message - the message to display
+ * 		category - flash message's category
+ * 		id - the new toast's id value (not prepended by '#')
+ * 		toast_loc - the complete toast message's display destination
+ */
+function createToast(message, category, id, toast_loc){
+	if($('#'+id).length == 0){
+		var toast_div = document.createElement("div");
+		toast_div.setAttribute("id", id);
+		toast_div.classList.add("toast_cust");
+		toast_div.classList.add(`toast_${category}`);
+		var toast_message = document.createElement("div");
+		toast_message.classList.add("toast_message");
+		toast_message.innerText = message;
+
+		toast_div.appendChild(toast_message);
+		$(toast_loc).append(toast_div);
+
+		// Display toast for a few seconds
+		const toast_duration = 3000; 			// 3 sec
+		const animation_duration = 400; 		// should match the css transition property under 'toast_cust'
+		setTimeout(function () {
+			$(toast_div).addClass("toast_cust_visible");
+			setTimeout(function(){
+				$(toast_div).removeClass("toast_cust_visible");
+				setTimeout(function(){
+					// You're served your purpose well toast, time to die...
+					$(toast_div).remove();
+				}, animation_duration);
+			}, toast_duration);
+		}, animation_duration);
+	}
 }
 
 function handleUploadDict(input){
@@ -723,25 +760,10 @@ function setupDictionary(){
 }
 
 function setupDictionaryEdit(){
-	// Define a super simple lexer for the dictionary syntax
-	/*CodeMirror.defineSimpleMode("dictionary_mode", {
-		// The start state contains the rules that are intially used
-		start: [
-			{regex: /\|/, token: "dict-namesplit"},
-			{regex: /\/\/.*<remove this>/, token: "dict-comment"},
-			{regex: /\s*(@name)\{(.+),(.+)\}/, token: ["dict-nametag"]},
-			{regex: /-->/, token: "dict-divider"}
-		],
-		// The multi-line comment state.
-		comment: [
-			{regex: /.*?\*\//, token: "comment", next: "start"},
-			{regex: /.*<remove this>/, token: "comment"}
-		],
-		meta: {
-			dontIndentStates: ["comment"],
-			lineComment: "//"
-		}
-	});*/
+	const dictionary_edit_toastpanel = "#dictionary_edit_toastpanel";
+	var editor_dirty = false;
+
+	// Define a simple lexer for the dictionary syntax
 	CodeMirror.defineMode("dictionary_mode", function() {
 		return {
 			startState: function() {
@@ -752,8 +774,14 @@ function setupDictionaryEdit(){
 				};
 			},
 			token: function(stream, state) {
+				// Rule for detecting meta header comments
+				if(stream.match(/\s*\/\/\s*series_(?:title|abbr|link)\s*:(?:.*)/)){
+					stream.skipToEnd();
+					return "dict-meta";
+				}
+
 				// Rule for detecting comments '//'
-				if(stream.match(/\/\/.*/)) {
+				if(stream.match(/\s*\/\/.*/)) {
 					stream.skipToEnd();       // Rest of the line is comment
 					return "dict-comment";
 				}
@@ -845,15 +873,82 @@ function setupDictionaryEdit(){
 		};
 	});
 
+	// Create the custom CodeMirror text area
 	var dict_editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
 		mode: "dictionary_mode",
 		lineNumbers: true,
 		autoCloseBrackets: true,
 		indentWithTabs: false,
 		tabSize: 8
-	})
+	});
+
+	// When user makes changes on the CodeMirror editor, determine if the editor is "dirty"
+	dict_editor.on('change', function(){
+		curr_content = dict_editor.getDoc().getValue();
+		old_content = $('#dictionary_editor').text();
+		if(curr_content == old_content){
+			editor_dirty = false;
+		}
+		else {
+			editor_dirty = true;
+		}
+	});
+
+	// On Ctrl-S, if the CodeMirror editor's textarea is in focus, act as an alibi for Save button
+	$(".CodeMirror").bind('keydown', function(event) {
+		if (event.ctrlKey || event.metaKey) {
+			switch (String.fromCharCode(event.which).toLowerCase()) {
+				case 's':{
+					event.preventDefault();
+					$('#menu_dictionary_edit_save_btn').click();
+					break;
+				}
+			}
+		}
+	});
 
 	// Editor toolbelt button functions
+	$('#menu_dictionary_edit_save_btn').click(function(){
+		const url = $(this).attr('action');
+		const content = dict_editor.getDoc().getValue();
+
+		// Send the data to be saved in a POST request
+		if(editor_dirty){
+			$.post(url, {"content": content}, function(data){
+				if(data.status == 'ok'){
+					createToast("Your changes were saved",
+						"success",
+						"successful_save",
+						dictionary_edit_toastpanel);
+					createToast("Your changes were saved 2",
+						"success",
+						"successful_save",
+						dictionary_edit_toastpanel);
+					$('#dictionary_editor').text(content);
+					editor_dirty = false;
+				}
+				else{
+					createToast("Ran into an error! Sorry",
+						"danger",
+						"error_on_save",
+						dictionary_edit_toastpanel);
+				}
+			});
+		}
+	});
+
+	$('#confirm_discard_btn').click(function(){
+		// Update CodeMirror to show the old contents
+		if(editor_dirty){
+			const old_content = $('#dictionary_editor').text();
+			dict_editor.getDoc().setValue(old_content);
+			createToast("Your changes were discarded",
+				"success",
+				"successful_discard",
+				dictionary_edit_toastpanel);
+		}
+	});
+
 	$('#menu_dictionary_edit_fullscreen_btn').click(function(){
 		$('.dictionary_edit_body').toggleClass('fullscreen');
 	});

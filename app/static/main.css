@@ -168,6 +168,7 @@ ion-icon .icon-inner{
   border: none !important;
   outline: none !important;
   cursor: pointer;
+  transition: filter 0.2s;
 
   /* Make it unselectable */
   user-select: none;
@@ -561,6 +562,7 @@ section.section_library{
   box-shadow: 0 0 0 0.07rem var(--library_color_primary);
   margin: 0.5em 0;
   padding: 1em 2em;
+  transition: background 0.2s;
 }
 .library_series_entry:hover{
   color: white;
@@ -1029,18 +1031,22 @@ table.entry_info_table{
   filter: hue-rotate(125deg);
   margin: 2rem 0;
 }
-.dictionary_entry_disabled{
-  filter: grayscale(1) !important;
+#dict_Common.dictionary_entry_disabled{
+  filter: hue-rotate(125deg) grayscale(1);
 }
 .dictionary_entry{
   position: relative;
   display: flex;
+  height: 5rem;
+  margin: 0.75rem 0;
   border: 1px solid #ff8f2c;
   border-right: none;
   border-left: none;
-  margin: 0.75rem 0;
   box-sizing: border-box;
-  height: 5rem;
+  transition: filter 0.3s;
+}
+.dictionary_entry_disabled{
+  filter: grayscale(1);
 }
 .dictionary_entry:hover .dictionary_entry_action_bar{
   visibility: visible;
@@ -1156,6 +1162,9 @@ table.entry_info_table{
   padding: 1rem;
   background: white;
 }
+.fullscreen .CodeMirror{
+  height: 100% !important;
+}
 #dictionary_edit_icon{
   background: var(--dictionary_edit_color_primary);
 }
@@ -1196,11 +1205,12 @@ table.entry_info_table{
   border-top: 5px solid var(--dictionary_edit_color_primary);
 }
 /* Lexer token styles */
-.cm-dict-nametag   { color: #ff0071; }
+.cm-dict-nametag   { color: #ff0071; font-weight: bold; }
 .cm-dict-nameargs  { color: #fff; }
 .cm-dict-namesplit { color: #3cc500; }
 .cm-dict-divider   { color: #ff7a00; }
 .cm-dict-comment   { color: #adadad; }
+.cm-dict-meta      { color: #9b74ff; }
 .dict-error{
   margin: -1px 0 !important;
   border: 1px solid red;
@@ -1208,4 +1218,66 @@ table.entry_info_table{
   border-right: none !important;
   border-style: dashed;
   border-width: 1px !important;
+}
+
+.dict_discard_changes_modal_header_cust{
+  background: var(--danger);
+  color: #fff;
+  font-variant: all-petite-caps;
+  font-size: 1.5rem;
+}
+
+.dict_discard_changes_modal_body_cust{
+  font-size: 0.95rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.toastpanel{
+  position: fixed;
+  display: flex;
+  flex-direction: column-reverse;
+  bottom: 0;
+  right: 0;
+  margin: 1rem;
+}
+
+.toast_success  { background: var(--success); }
+.toast_warning  { background: var(--warning); }
+.toast_danger   { background: var(--danger); }
+.toast_cust{
+  display: flex;
+  color: #fff;
+  margin: 0.5rem 0;
+  padding: 1rem 3rem;
+  padding-right: 2rem;
+  font-size: 1.3rem;
+  font-variant: all-petite-caps;
+
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-3vw, 0);
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0.4s, opacity 0.4s;
+}
+.toast_cust_visible{
+  visibility: visible;
+  opacity: 1;
+  transform: translate(0);
+}
+.toast_message{
+  margin-right: 2rem;
+}
+.toast_close_btn{
+  color: #1d1d1d;
+  margin: auto;
+  margin-left: 2rem;
+  font-size: 2rem;
+  line-height: 1rem;
+  background: none;
+  outline: none;
+  border: none;
+  mix-blend-mode: overlay;
+}
+.toast_close_btn:focus{
+  outline: none !important;
 }

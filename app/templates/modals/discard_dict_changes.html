@@ -1,0 +1,27 @@
+{% macro discard_dict_changes() %}
+<div class="modal fade" id="dict_discard_changes_modal" tabindex="-1" role="dialog" aria-labelledby="discardConfirmationModal"
+    aria-hidden="true">
+    <!-- Add .modal-dialog-centered to .modal-dialog to vertically center the modal -->
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header dict_discard_changes_modal_header_cust">
+                <h5 class="modal-title" id="dict_discard_changes_modal_title">Confirm Discard</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body dict_discard_changes_modal_body_cust" style="font-size: 0.95rem;">
+                Revert all changes made during this session?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-danger waves-effect waves-light" id="confirm_discard_btn" data-dismiss="modal">
+                    Discard
+                </button>
+                <button type="button" class="btn btn-sm modal_cancel_btn waves-effect waves-light" data-dismiss="modal">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
