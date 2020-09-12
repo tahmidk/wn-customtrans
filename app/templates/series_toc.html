@@ -4,7 +4,7 @@
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_toc">
-		<!-- Back button -->
+		<!-- Navigation bar -->
 		{% if back_href is defined %}
 			{{super_navpanel(back_href)}}
 		{% endif%}
@@ -30,11 +30,11 @@
 						<ion-icon name="sync-outline"></ion-icon>
 						<span>Update</span>
 					</button>
-					<button type="button" class="btn btn-amber superpanel_menu_btn" id="series_dictionary_btn" title="Edit this series' dictionary"
-						action="{{url_for('library_series_update', series_code=series.code)}}">
+					<a type="button" class="btn btn-amber superpanel_menu_btn" id="series_dictionary_btn" title="Edit this series' dictionary"
+						href="{{url_for('dictionaries_edit', dict_fname=dict_fname)}}">
 						<ion-icon name="reader-outline"></ion-icon>
 						<span>Dictionary</span>
-					</button>
+					</a>
 					<button type="button" class="btn btn-danger superpanel_menu_btn" id="rmv_all_bkmk_btn" title="Remove all bookmarks under this series"
 						action="{{url_for('library_series_toc_bookmark_all', series_code=series.code)}}" {{'disabled' if series.latest_ch == 0}}>
 						<ion-icon name="bookmarks" style="font-size: 1rem; margin-bottom: -0.1rem;"></ion-icon>

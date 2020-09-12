@@ -1,0 +1,69 @@
+{% from "misc/super_navpanel.html" import super_navpanel %}
+{% from "misc/flash_alert.html" import flash_alert %}
+{% from "subcomponents/honorific_entry.html" import honorific_entry %}
+
+{% extends 'general_layout.html' %}
+{% block content %}
+	<section class="section_honorifics">
+		<!-- Navigation bar -->
+		{% if back_href is defined %}
+			{{super_navpanel(back_href)}}
+		{% endif%}
+
+		<!-- Main content -->
+		<div class="banner" id="honorifics_banner">
+			<div class="banner_icon" id="honorifics_icon">
+				<ion-icon name="earth"></ion-icon>
+			</div>
+			<div class="banner_title" id="honorifics_title">Honorifics</div>
+		</div>
+		<div class="honorifics_body">
+			<div class="superpanel" id="honorifics_superpanel">
+				<!-- Toggle All button -->
+				<button type="button" class="btn btn-unique superpanel_menu_btn" id="menu_honorifics_toggleall_btn" title="Toggle all honorifics">
+					<ion-icon name="toggle"></ion-icon>
+					<span> Toggle All </span>
+				</button>
+				<!-- Add Honorific button -->
+				<button type="button" class="btn btn-light-green superpanel_menu_btn modal_trigger" id="menu_honorifics_add_btn" data-toggle="modal"
+					data-target="#register_novel_modal_push" title="Add an honorific">
+					<ion-icon name="add-outline"></ion-icon>
+					<span> Add Honorific </span>
+				</button>
+			</div>
+
+			<div class="superpanel_menu_searchbar_div" id="menu_honorifics_searchbar_div">
+				<div class="md-form active-cyan-2 mb-3" id="menu_honorifics_searchbar">
+					<input class="form-control" type="text" placeholder="Search Honorifics" aria-label="Search">
+				</div>
+			</div>
+
+			<div class="flashpanel" id="honorifics_flashpanel">
+				<!-- Flashed messages -->
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{{ flash_alert(messages) }}
+				{% endwith %}
+			</div>
+
+			<div class="mainpanel" id="honorifics_mainpanel">
+				<!-- Novel entries -->
+				{% if honorifics|length == 0 %}
+					<!-- No chapters to display -->
+					<div class="page_empty_div" id="no_series_div">
+						<div class="page_empty_img_div" id="no_series_img_div">
+							<img src="{{url_for('static', filename='library_nothing_here.jpg')}}" class="page_empty_img" id="no_series_img">
+						</div>
+						<div class="page_empty_text_div "id="no_series_text_div">
+							No honorifics! Start by hitting <span class="light-green-text font-weight-bold">Add Honorific</span>
+						</div>
+					</div>
+				{% else %}
+					{% for honorific in honorifics %}
+						{{ honorific_entry(honorific) }}
+					{% endfor %}
+				{% endif %}
+			</div>
+		</div>
+
+	</section>
+{% endblock %}

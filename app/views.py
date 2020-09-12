@@ -233,10 +233,12 @@ def library_series_toc(series_code):
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
+	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 	return render_template('series_toc.html',
 		title=series_entry.abbr,
 		back_href=url_for('library'),
 		series=series_entry,
+		dict_fname=dict_entry.fname,
 		series_url=host_mgr.generateSeriesUrl(series_entry.code))
 
 
@@ -531,6 +533,7 @@ def dictionaries_edit(dict_fname):
 		dict_fname=dict_fname,
 		dict_content=dict_content)
 
+
 # Route for downloading all dict files in user/dicts
 @app.route("/dictionaries/edit/<dict_fname>/save", methods=["POST"])
 def dictionaries_edit_save(dict_fname):
@@ -539,6 +542,15 @@ def dictionaries_edit_save(dict_fname):
 		return jsonify(status='error')
 
 	return jsonify(status='ok')
+
+# Route for Tutorial page
+@app.route("/dictionaries/honorifics")
+def honorifics():
+	honorifics = HonorificsTable.query.all()
+	return render_template("honorifics.html",
+		title="Honorifics",
+		back_href=url_for('index'),
+		honorifics=honorifics)
 
 # Route for Tutorial page
 @app.route("/tutorial")

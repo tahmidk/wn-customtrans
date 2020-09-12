@@ -1,0 +1,29 @@
+{% macro honorific_entry(honorific) %}
+	<div class="honorific_entry {{'honorific_entry_disabled' if not honorific.enabled}}" id="honorific_{{honorific.id}}"
+		data-id="{{honorific.id}}"
+		data-raw="{{honorific.raw}}"
+		data-trans="{{honorific.trans}}">
+		<div class="honorific_entry_enable_div">
+			<ion-icon name="{{'checkbox' if honorific.enabled else 'square-outline'}}"></ion-icon>
+		</div>
+		<div class="honorific_entry_body">
+			<div class="honorific_entry_details">
+				<span class="honorific_span">{{honorific.raw}}</span>
+				&rarr;
+				<span class="honorific_span">{{honorific.trans}}</span>
+			</div>
+			<div class="honorific_entry_action_bar">
+				<div class="honorific_entry_action_div honorific_entry_edit">
+					<button type="button" class="entry_action_button modal_trigger" data-toggle="modal" data-target="#edit_honorific_modal_push" title="Edit Honorific" id="edit_{{honorific.id}}">
+						<ion-icon name="create"></ion-icon>
+					</button>
+				</div>
+				<div class="honorific_entry_action_div honorific_entry_trash">
+					<button type="button" class="entry_action_button modal_trigger" data-toggle="modal" data-target="#remove_honorific_modal_push" title="Delete Honorific" id="rmv_{{honorific.id}}">
+						<ion-icon name="trash"></ion-icon>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
