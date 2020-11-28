@@ -1312,6 +1312,9 @@ table.entry_info_table{
   display: flex;
   margin: 1px;
 }
+.honorific_entry_disabled{
+  filter: grayscale(1);
+}
 .honorific_entry:hover{
   outline: 1px dashed var(--honorifics_color_primary);
 }

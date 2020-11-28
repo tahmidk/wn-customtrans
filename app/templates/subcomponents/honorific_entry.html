@@ -3,7 +3,8 @@
 		data-id="{{honorific.id}}"
 		data-raw="{{honorific.raw}}"
 		data-trans="{{honorific.trans}}">
-		<div class="honorific_entry_enable_div">
+		<div class="honorific_entry_enable_div action_toggle_enable" title="Enable/Disable honorific"
+			action="{{url_for('honorifics_toggle_entry', hon_id=honorific.id)}}">
 			<ion-icon name="{{'checkbox' if honorific.enabled else 'square-outline'}}"></ion-icon>
 		</div>
 		<div class="honorific_entry_body">

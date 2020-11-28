@@ -8,10 +8,10 @@
 # Severity level to display if message is displayed as a flashed message
 # Creates a strong tag with text
 def strong(text):
-	return "<strong>%s</strong>" % text
+	return "<strong>%s</strong>" % str(text)
 # Creates a monspace span with text
 def mono(text):
-	return "<span class=\"mono\">%s</span>" % text
+	return "<span class=\"mono\">%s</span>" % str(text)
 
 SUCCESS = 'success'
 WARNING = 'warning'
@@ -41,6 +41,12 @@ class DictEntryDNEException(CustomException):
 	def __init__(self, dict_fname):
 		msg = "%s The dictionary entry %s is not registered" % \
 			(CRITICAL_BOLD, mono(dict_fname))
+		super().__init__(msg, CRITICAL)
+
+class HonorificDNEException(CustomException):
+	def __init__(self, hon_id):
+		msg = "%s Honorific with id %s is not registered" % \
+			(CRITICAL_BOLD, mono(hon_id))
 		super().__init__(msg, CRITICAL)
 
 class FileTooLargeException(CustomException):

@@ -650,9 +650,6 @@ function setupDictionary(){
 	$('#menu_dictionary_dlall_btn').click(function() {
 		window.location.href = this.getAttribute('action');
 	});
-	$('#menu_dictionary_honorifics_btn').click(function() {
-		alert("Honorifics clicked");
-	});
 	$('#menu_dictionary_toggleall_btn').click(function() {
 		var url = $(this).attr('action');
 
@@ -963,5 +960,71 @@ function setupDictionaryEdit(){
 
 	$('#menu_dictionary_edit_fullscreen_btn').click(function(){
 		$('.dictionary_edit_body').toggleClass('fullscreen');
+	});
+}
+
+function setupHonorifics(){
+	const honorifics_flashpanel = '#honorifics_flashpanel'
+
+	$('#menu_honorifics_toggleall_btn').click(function() {
+		var url = $(this).attr('action');
+
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				const master_toggle = data.toggle;
+				$('.honorific_entry').each(function(index){
+					if(($(this).hasClass('honorific_entry_disabled') && master_toggle) ||
+						(!$(this).hasClass('honorific_entry_disabled') && !master_toggle))
+					{
+						var toggle = $(this).find(".action_toggle_enable ion-icon").first();
+						$(this).toggleClass('honorific_entry_disabled');
+						if(data.toggle){
+							toggle.attr("name", "checkbox");
+						}else{
+							toggle.attr("name", "square-outline");
+						}
+					}
+				});
+			}
+		});
+
+		// Next click toggles dictionaries to the other state (basically toggle the url between
+		// '/dictionary/toggleall/on' and '/dictionary/toggleall/off')
+		var url_split = url.split('/');
+		if(url_split[url_split.length-1] == 'on'){
+			url_split[url_split.length-1] = 'off';
+		}
+		else{
+			url_split[url_split.length-1] = 'on';
+		}
+		$(this).attr('action', url_split.join('/'));
+	});
+
+	// Honorific entry button functions
+	$('.action_toggle_enable ion-icon').click(function() {
+		var url = $(this).parent().attr("action");
+		var hon_entry = $(this).closest('.honorific_entry');
+		const hon_id = strong(hon_entry.data('id'));
+
+		var toggle = this;
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				hon_entry.toggleClass('honorific_entry_disabled');
+				if(data.toggle){
+					toggle.setAttribute("name", "checkbox");
+				}else{
+					toggle.setAttribute("name", "square-outline");
+				}
+			}
+			else if(data.status == 'hon_nf'){
+				createFlashMessage(data.msg, data.severity, hon_flashpanel);
+			}
+			else{
+				createFlashMessage(
+					`${CRITICAL_BOLD} An unexpected error occurred`,
+					CRITICAL,
+					hon_flashpanel);
+			}
+		})
 	});
 }

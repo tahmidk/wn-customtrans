@@ -403,7 +403,7 @@ def dictionaries_toggleall(enable):
 	master_toggle = True if enable == 'on' else False
 	for dict_entry in DictionaryTable.query.all():
 		dict_entry.enabled = master_toggle
-		db.session.commit()
+	db.session.commit()
 
 	data = {
 		"status": "ok",
@@ -551,6 +551,42 @@ def honorifics():
 		title="Honorifics",
 		back_href=url_for('index'),
 		honorifics=honorifics)
+
+
+# Route for enabling/disabling honorifics
+@app.route("/dictionaries/honorifics/toggle/<hon_id>", methods=["POST"])
+def honorifics_toggle_entry(hon_id):
+	try:
+		hon_entry = HonorificsTable.query.filter_by(id=hon_id).first()
+		if hon_entry is None:
+			raise HonorificDNEException(hon_id)
+	except CustomException as err:
+		return jsonify(status='hon_nf', msg=str(err), severity=err.severity)
+
+	hon_entry.enabled = not hon_entry.enabled
+	db.session.commit()
+
+	data = {
+		"status": "ok",
+		"toggle": hon_entry.enabled
+	}
+	return jsonify(data)
+
+
+# Route for toggle all honorifics to the given enable status
+@app.route("/dictionaries/honorifics/toggleall/<enable>", methods=["POST"])
+def honorifics_toggleall(enable):
+	master_toggle = True if enable == 'on' else False
+	for hon_entry in HonorificsTable.query.all():
+		hon_entry.enabled = master_toggle
+	db.session.commit()
+
+	data = {
+		"status": "ok",
+		"toggle": master_toggle
+	}
+	return jsonify(data)
+
 
 # Route for Tutorial page
 @app.route("/tutorial")
