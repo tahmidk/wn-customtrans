@@ -14,6 +14,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import BooleanField
+from wtforms import RadioField
 from wtforms import SelectField
 from wtforms import ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
@@ -26,6 +27,7 @@ from app.models import SeriesTable
 from app.models import HostTable
 from app.scripts.dictionary import COMMON_DICT_ABBR
 from app.scripts.custom_errors import mono
+from app.scripts.hostmanager import Language
 
 class RegisterNovelForm(FlaskForm):
 	'''
@@ -49,14 +51,10 @@ class RegisterNovelForm(FlaskForm):
 	abbr = StringField('Abbreviation', validators=abbr_validators)
 
 	# Field: series_host - The host configuration for this series
-	#if __name__ == '__main__':
-	# host_entries = HostTable.query.all()
-	# host_selection = [(host.host_type.value, host.host_name) for host in host_entries]
-	# series_host = SelectField("Host", choices=host_selection, coerce=int, default=host_selection[0])
 	series_host = QuerySelectField( "Host",
-						query_factory=lambda: HostTable.query,
-						get_label='host_name',
-						allow_blank=False )
+									query_factory=lambda: HostTable.query,
+									get_label='host_name',
+									allow_blank=False )
 
 	# Field: series_code - The identifying code for this series
 	series_code_validators = [
@@ -65,7 +63,7 @@ class RegisterNovelForm(FlaskForm):
 	series_code = StringField('Series Code', validators=series_code_validators)
 
 	# Submit form
-	submit = SubmitField('Register', )
+	submit = SubmitField('Register')
 
 	# Custom validator for title
 	def validate_title(self, title):
@@ -134,3 +132,44 @@ class RemoveNovelForm(FlaskForm):
 	opt_keep_dict = BooleanField("Keep the dictionary associated with this series?", default=True)
 
 	submit = SubmitField('Remove')
+
+class AddHonorificForm(FlaskForm):
+	'''
+		This form is used when displaying the "Add Honorific" modal to the user
+		in the /honorifics route
+	'''
+
+	# Field: hraw - The raw honorific entry in its native language
+	hraw_validators = [
+		DataRequired(),
+		Length(min=1, max=20)
+	]
+	hraw = StringField('Raw', validators=hraw_validators)
+
+	# Field: hraw - The raw honorific entry in its native language
+	htrans_validators = [
+		DataRequired(),
+		Length(min=1, max=50)
+	]
+	htrans = StringField('Translation', validators=htrans_validators)
+
+	# Field: lang - The native language of the raw honorific provided
+	lang_selection = sorted([(l.value, l.name) for l in Language])
+	lang = SelectField("Language", choices=lang_selection, coerce=int, default=lang_selection[0])
+
+	# Field: affix - Treat this honorific as a suffix or prefix?
+	affix_validators = [
+		DataRequired(),
+	]
+	affix = RadioField('Affix', validators=affix_validators, choices=[('1', 'Prefix'), ('2', 'Suffix')],
+		default='2')
+
+	# Field: opt_with_dash - Option to append a dash character between subject and honorific
+	opt_with_dash = BooleanField("Append dash", default=True)
+
+	# Field: opt_standalone - Option to indicate that this honorific can potentially be found
+	# w/out being attached to a subject
+	opt_standalone = BooleanField("Standalone", default=False)
+
+	# Submit form
+	submit = SubmitField('Save')

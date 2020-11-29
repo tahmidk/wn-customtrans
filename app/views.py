@@ -32,6 +32,7 @@ from app import csrf
 from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
+from app.forms import AddHonorificForm
 
 from app.models import *
 
@@ -546,11 +547,14 @@ def dictionaries_edit_save(dict_fname):
 # Route for Tutorial page
 @app.route("/dictionaries/honorifics")
 def honorifics():
+	add_honorific_form = AddHonorificForm()
+
 	honorifics = HonorificsTable.query.all()
 	return render_template("honorifics.html",
 		title="Honorifics",
 		back_href=url_for('index'),
-		honorifics=honorifics)
+		honorifics=honorifics,
+		add_form=add_honorific_form)
 
 
 # Route for enabling/disabling honorifics
@@ -587,6 +591,27 @@ def honorifics_toggleall(enable):
 	}
 	return jsonify(data)
 
+# Background route to process register novel form
+@app.route("/dictionaries/honorifics/add_entry", methods=["POST"])
+def honorifics_add_entry():
+	return "404"
+	# register_novel_form = RegisterNovelForm()
+	# if register_novel_form.validate_on_submit():
+	# 	try:
+	# 		series_entry = utils.registerSeriesToDatabase(register_novel_form)
+	# 		if series_entry.latest_ch == 0:
+	# 			flash("%s Couldn't pull latest chapter for %s from host. \
+	# 				Try hitting \'Update\' later" % (WARNING_BOLD, strong(series_entry.abbr)),
+	# 				"warning")
+	# 		msg = "%s %s was successfully registered!" % (SUCCESS_BOLD, strong(series_entry.abbr))
+	# 		flash(msg, "success")
+	# 		return jsonify(status='ok')
+	# 	except CustomException as err:
+	# 		return jsonify(status='error', msg=str(err), severity=err.severity)
+
+
+	# data = json.dumps(register_novel_form.errors, ensure_ascii=False)
+	# return jsonify(data)
 
 # Route for Tutorial page
 @app.route("/tutorial")

@@ -1,0 +1,70 @@
+{% macro add_honorific_modal(form) %}
+<div class="modal fade" id="add_honorific_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
+    <!-- Modal Form Content-->
+    <form class="modal-content text-center modal_cust add_honorific_modal_cust" id="add_honorific_form" action="{{ url_for('honorifics_add_entry') }}">
+      <!--Modal Header-->
+      <div class="modal-header modal_header_cust mdb-color lighten-1 d-flex justify-content-center" id="add_honorific_header">
+        <p style="margin: 0.5rem 0"> Add Honorific </p>
+      </div>
+
+      <!--Modal Body-->
+      <div class="modal-body modal_body_cust">
+          {{ form.hidden_tag() }}
+          <fieldset class="form-group" style="margin: 0">
+            <div class="form-group form_group_cust">
+              {{ form.lang.label(class="form-control-label label_cust") }}
+              <div class="form_input_div md-form">
+                {{ form.lang(class="form-control input_cust") }}
+              </div>
+            </div>
+            <div class="form-group form_group_cust">
+              <div class="form_input_div md-form">
+                {{ form.hraw(class="form-control input_cust", placeholder=form.hraw.label.text) }}
+              </div>
+              &rarr;
+              <div class="form_input_div md-form">
+                {{ form.htrans(class="form-control input_cust", placeholder=form.htrans.label.text) }}
+              </div>
+            </div>
+            <div class="form-group form_group_cust mb-0">
+              {{ form.affix.label(class="form-control-label label_cust") }}
+              <div class="form_input_div">
+                <div style="display: flex; height: 1rem;">
+                  {% for subfield in form.affix %}
+                  <div class="form_radio_div">
+                    {{ subfield }}
+                    {{ subfield.label }}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <div class="form-group form_group_cust mb-0">
+              {{ form.opt_with_dash.label(class="form-control-label label_cust") }}
+              <div class="form_input_div form_checkbox_div md-form">
+                {{ form.opt_with_dash(class="form-control input_cust") }}
+              </div>
+            </div>
+            <div class="form-group form_group_cust mb-0">
+              {{ form.opt_standalone.label(class="form-control-label label_cust") }}
+              <div class="form_input_div form_checkbox_div md-form">
+                {{ form.opt_standalone(class="form-control input_cust") }}
+              </div>
+            </div>
+          </fieldset>
+      </div>
+
+      <!--Modal Footer-->
+      <div class="modal-footer flex">
+        <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="add_honorific_spinner">
+          <span class="sr-only"></span>
+        </div>
+        {{ form.submit(class="btn btn-success btn_cust", id="add_honorific_submit_btn") }}
+        <button class="btn btn-outline-danger btn_cust modal_cancel_btn" data-dismiss="modal"> Cancel </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endmacro %}

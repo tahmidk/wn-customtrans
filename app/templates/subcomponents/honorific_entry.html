@@ -1,9 +1,11 @@
-{% macro honorific_entry(honorific) %}
-	<div class="honorific_entry {{'honorific_entry_disabled' if not honorific.enabled}}" id="honorific_{{honorific.id}}"
+{% macro honorific_entry(honorific, lang) %}
+	<div class="honorific_entry honorific_entry_{{lang}} {{'honorific_entry_disabled' if not honorific.enabled}}" id="honorific_{{honorific.id}}"
 		data-id="{{honorific.id}}"
 		data-raw="{{honorific.raw}}"
+		data-lang="{{lang}}"
 		data-trans="{{honorific.trans}}">
-		<div class="honorific_entry_enable_div action_toggle_enable" title="Enable/Disable honorific"
+		<div class="honorific_entry_enable_div action_toggle_enable"
+			title="Enable/Disable honorific"
 			action="{{url_for('honorifics_toggle_entry', hon_id=honorific.id)}}">
 			<ion-icon name="{{'checkbox' if honorific.enabled else 'square-outline'}}"></ion-icon>
 		</div>

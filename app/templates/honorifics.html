@@ -1,6 +1,7 @@
 {% from "misc/super_navpanel.html" import super_navpanel %}
 {% from "misc/flash_alert.html" import flash_alert %}
 {% from "subcomponents/honorific_entry.html" import honorific_entry %}
+{% from "modals/add_honorific.html" import add_honorific_modal %}
 
 {% extends 'general_layout.html' %}
 {% block content %}
@@ -9,6 +10,9 @@
 		{% if back_href is defined %}
 			{{super_navpanel(back_href)}}
 		{% endif%}
+
+		<!-- Set up the modals needed for this  -->
+		{{ add_honorific_modal(add_form) }}
 
 		<!-- Main content -->
 		<div class="banner" id="honorifics_banner">
@@ -26,8 +30,7 @@
 					<span> Toggle All </span>
 				</button>
 				<!-- Add Honorific button -->
-				<button type="button" class="btn btn-light-green superpanel_menu_btn modal_trigger" id="menu_honorifics_add_btn" data-toggle="modal"
-					data-target="#register_novel_modal_push" title="Add an honorific">
+				<button type="button" class="btn mdb-color lighten-1 superpanel_menu_btn modal_trigger" id="menu_honorifics_add_btn" data-toggle="modal" data-target="#add_honorific_modal_push" title="Add honorific">
 					<ion-icon name="add-outline"></ion-icon>
 					<span> Add Honorific </span>
 				</button>
@@ -59,8 +62,26 @@
 						</div>
 					</div>
 				{% else %}
+					{% set jp_hdr = namespace(visible=false) %}
+					{% set cn_hdr = namespace(visible=false) %}
 					{% for honorific in honorifics %}
-						{{ honorific_entry(honorific) }}
+						<!-- Japanese honorifics -->
+						{% if honorific.lang.value == 1 %}
+							{% if jp_hdr.visible is not sameas true %}
+							<div class="honorifics_lang_div jp_lang_div"> Japanese </div>
+							{% set jp_hdr.visible = true %}
+							{% endif %}
+							{{ honorific_entry(honorific, "jp") }}
+						{% endif %}
+
+						<!-- Chinese honorifics -->
+						{% if honorific.lang.value == 2 %}
+							{% if cn_hdr.visible is not sameas true %}
+							<div class="honorifics_lang_div cn_lang_div"> Chinese </div>
+							{% set cn_hdr.visible = true %}
+							{% endif %}
+							{{ honorific_entry(honorific, "cn") }}
+						{% endif %}
 					{% endfor %}
 				{% endif %}
 			</div>
