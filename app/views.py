@@ -146,11 +146,11 @@ def library_update():
 
 
 # Background route to process edit novel form
-@app.route("/library/edit_novel/<series_id>", methods=["POST"])
+@app.route("/library/edit_novel/<int:series_id>", methods=["POST"])
 def library_edit_novel(series_id):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
-		series_entry = SeriesTable.query.filter_by(id=int(series_id)).first()
+		series_entry = SeriesTable.query.filter_by(id=series_id).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 		host_manager = hostmanager.createManager(host_entry.host_type)
@@ -170,7 +170,7 @@ def library_edit_novel(series_id):
 			dictionary.createDictFile(fname_new,
 				new_title,
 				new_abbr,
-				host_manager.generateSeriesUrl(series_code))
+				host_manager.generateSeriesUrl(series_entry.code))
 		# It exists so reprocess it
 		else:
 			# Rename the associated dict according to new abbreviation
@@ -180,7 +180,7 @@ def library_edit_novel(series_id):
 				dictionary.createDictFile(fname_new,
 					new_title,
 					new_abbr,
-					host_manager.generateSeriesUrl(series_code))
+					host_manager.generateSeriesUrl(series_entry.code))
 			# Otherwise, just update the meta
 			else:
 				dictionary.updateDictMetaHeader(fname_new, new_title, new_abbr)
@@ -199,11 +199,11 @@ def library_edit_novel(series_id):
 
 
 # Background route to process remove novel form
-@app.route("/library/remove_novel/<series_code>", methods=["POST"])
-def library_remove_novel(series_code):
+@app.route("/library/remove_novel/<int:series_id>", methods=["POST"])
+def library_remove_novel(series_id):
 	remove_novel_form = RemoveNovelForm()
 	if remove_novel_form.validate_on_submit():
-		series_entry = SeriesTable.query.filter_by(code=series_code).first()
+		series_entry = SeriesTable.query.filter_by(id=series_id).first()
 		series_abbr = series_entry.abbr
 		if not remove_novel_form.opt_keep_dict.data:
 			dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
@@ -554,14 +554,14 @@ def honorifics():
 	honorifics = HonorificsTable.query.all()
 	return render_template("honorifics.html",
 		title="Honorifics",
-		back_href=url_for('index'),
+		back_href=url_for('dictionaries'),
 		honorifics=honorifics,
 		add_form=add_honorific_form,
 		edit_form=edit_honorific_form)
 
 
 # Route for enabling/disabling honorifics
-@app.route("/dictionaries/honorifics/toggle/<hon_id>", methods=["POST"])
+@app.route("/dictionaries/honorifics/toggle/<int:hon_id>", methods=["POST"])
 def honorifics_toggle_entry(hon_id):
 	try:
 		hon_entry = HonorificsTable.query.filter_by(id=hon_id).first()
@@ -614,12 +614,12 @@ def honorifics_add_entry():
 
 
 # Background route to process Edit Honorific form
-@app.route("/dictionaries/honorifics/edit_entry/<hon_id>", methods=["POST"])
+@app.route("/dictionaries/honorifics/edit_entry/<int:hon_id>", methods=["POST"])
 def honorifics_edit_entry(hon_id):
 	edit_honorific_form = EditHonorificForm()
 	if edit_honorific_form.validate_on_submit():
 		try:
-			if utils.editHonorific(int(hon_id), edit_honorific_form) is None:
+			if utils.editHonorific(hon_id, edit_honorific_form) is None:
 				err_msg = "%s Encountered an unexpected issue" % CRITICAL_BOLD
 				return jsonify(status='error', msg=str(err_msg), severity=CRITICAL)
 			flash("%s Honorific successfully updated!" % SUCCESS_BOLD, SUCCESS)
@@ -632,9 +632,9 @@ def honorifics_edit_entry(hon_id):
 
 
 # Background route to process Edit Honorific form
-@app.route("/dictionaries/honorifics/remove_entry/<hon_id>", methods=["POST"])
+@app.route("/dictionaries/honorifics/remove_entry/<int:hon_id>", methods=["POST"])
 def honorifics_remove_entry(hon_id):
-	hon_entry = HonorificsTable.query.filter_by(id=int(hon_id)).first()
+	hon_entry = HonorificsTable.query.filter_by(id=hon_id).first()
 	if hon_entry is None:
 		err_msg = "%s This honorific entry does not exist in the database" % CRITICAL_BOLD
 		return jsonify(status='error', msg=str(err_msg), severity=CRITICAL)

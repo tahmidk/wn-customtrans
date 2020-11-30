@@ -351,10 +351,12 @@ function setupLibrary(){
 	// On show Remove Modal events
 	$(remove_novel_modal).on('shown.bs.modal', function (event) {
 		var series_entry = $(event.relatedTarget).closest('.library_series_entry');
-		var code = series_entry.data('code');
+		var abbr = series_entry.data('abbr');
+		var id = series_entry.data('id');
 
 		// Customize the remove form's action to the specific series
-		$(remove_novel_form).attr('action', `${remove_novel_action_base}/${code}`);
+		$(`${remove_novel_form} span[name="series_abbr"]`).text(abbr)
+		$(remove_novel_form).attr('action', `${remove_novel_action_base}/${id}`);
 	});
 
 	// Update button event sets up an SSE and listens for update progress
@@ -605,17 +607,23 @@ function setupChapter(){
 	});
 
 	// Add functionality of prev, toc, and next buttons
-	var url = this.location.href;
+	const ch = parseInt($(`#mdata_ch`).data("value"));
+	const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
+	const url = this.location.href;
 	if(!$(".chapter_prev_btn")[0].hasAttribute('disabled')){
 		$('.chapter_prev_btn').click(function() {
 			var prev = ch - 1;
-			location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
+			if(prev > 0){
+				location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
+			}
 		});
 	}
 	if(!$(".chapter_next_btn")[0].hasAttribute('disabled')){
 		$('.chapter_next_btn').click(function() {
 			var next = ch + 1;
-			location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
+			if(next <= latest_ch){
+				location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
+			}
 		});
 	}
 

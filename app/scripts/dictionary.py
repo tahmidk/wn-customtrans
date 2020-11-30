@@ -247,10 +247,10 @@ def generateNameVariants(rn, tn, comment, lang):
 		def gen_trans(t_name):
 			if honorific_entry.affix == HonorificAffix.SUFFIX:
 				# Process suffixed honorific translation
-				t_processed = ("-" if honorific_entry.opt_with_dash else "").join([t_name, h_trans])
+				t_processed = ("-" if honorific_entry.opt_with_dash else " ").join([t_name, h_trans])
 			else:
 				# Process prefixed honorific translation
-				t_processed = h_trans + t_name
+				t_processed = "%s %s" % (h_trans, t_name)
 			return t_processed
 
 		# Process the honorific

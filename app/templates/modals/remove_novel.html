@@ -2,10 +2,12 @@
 <div class="modal fade" id="remove_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal_cust remove_modal_cust" id="remove_novel_form" action="{{ url_for('library_remove_novel', series_code='UNDEF') }}">
+    <form class="modal-content text-center modal_cust remove_modal_cust" id="remove_novel_form" action="{{ url_for('library_remove_novel', series_id=0) }}">
       <!--Modal Header-->
       <div class="modal-header modal_header_cust d-flex justify-content-center" id="remove_novel_header">
-        <p style="margin: 0.5rem 0"> Remove this Novel </p>
+        <p style="margin: 0.5rem 0">
+          Remove <span style="font-weight: bold" name="series_abbr"></span>
+        </p>
       </div>
 
       <!--Modal Body-->
