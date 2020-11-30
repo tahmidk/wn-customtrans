@@ -402,5 +402,15 @@
         }
     ],
     "Language.CN":[
+        {
+            "raw": "bro",
+            "trans": "Bro",
+            "standalone": false
+        },
+        {
+            "raw": "た",
+            "trans": "Senior Sister",
+            "standalone": false
+        }
     ]
 }

@@ -1,6 +1,6 @@
-{% from "series_entry.html" import series_entry %}
-{% from "flash_alert.html" import flash_alert %}
-{% from "super_navpanel.html" import super_navpanel %}
+{% from "misc/flash_alert.html" import flash_alert %}
+{% from "misc/super_navpanel.html" import super_navpanel %}
+{% from "subcomponents/series_entry.html" import series_entry %}
 {% from "modals/register_novel.html" import register_novel_modal %}
 {% from "modals/edit_novel.html" import edit_novel_modal %}
 {% from "modals/remove_novel.html" import remove_novel_modal %}
@@ -8,7 +8,7 @@
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_library">
-		<!-- Back button -->
+		<!-- Navigation bar -->
 		{% if back_href is defined %}
 			{{super_navpanel(back_href)}}
 		{% endif%}

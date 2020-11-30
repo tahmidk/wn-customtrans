@@ -1,9 +1,9 @@
-{% extends 'general_layout.html' %}
-{% from "super_navpanel.html" import super_navpanel %}
+{% from "misc/super_navpanel.html" import super_navpanel %}
 {% from "general_layout.html" import define_metavar%}
-{% from "flash_alert.html" import flash_alert %}
+{% from "misc/flash_alert.html" import flash_alert %}
 
 
+{% extends 'general_layout.html' %}
 {% block theme %}{{default_theme if default_theme is defined}}{% endblock %}
 {%- block metavars -%}
 	{{ define_metavar('ch', ch) }}
@@ -20,7 +20,7 @@
 
 {% block content %}
 <section class="section_chapter">
-	<!-- Back button -->
+	<!-- Navigation bar -->
 	{% if back_href is defined %}
 		{{super_navpanel(back_href)}}
 	{% endif%}

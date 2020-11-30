@@ -103,9 +103,9 @@ def registerSeriesToDatabase(reg_form):
 		------------------------------------------------------------------
 	"""
 	# Rip relevant information
-	series_title = str(reg_form.title.data)
-	series_abbr = str(reg_form.abbr.data)
-	series_code = str(reg_form.series_code.data)
+	series_title = reg_form.title.data.strip()
+	series_abbr = reg_form.abbr.data.strip()
+	series_code = reg_form.series_code.data.strip()
 
 	host_entry = reg_form.series_host.data
 	dict_fname = generateDictFilename(series_abbr, host_entry.host_name, series_code)
@@ -189,7 +189,6 @@ def updateSeries(series_entry):
 	latest = getLatestChapter(series_entry.code, host_entry)
 	ret = latest - series_entry.latest_ch;
 	series_entry.latest_ch = latest
-	db.session.add(series_entry)
 	db.session.commit()
 
 	return ret
@@ -197,11 +196,12 @@ def updateSeries(series_entry):
 def applyDictionaryToContent(content, series_dict):
 	"""-------------------------------------------------------------------
 		Function:		[applyDictionaryToContent]
-		Description:	Applies the
+		Description:	Applies the designated series dictionary to the given
+						story content
 		Input:
 		  [series_abbr] The abbreviation of the series
 		  [content]		Formatted chapter content gotten from hostmanager
-		Return:
+		Return: 		None, mutates content
 		------------------------------------------------------------------
 	"""
 	# Helper function that generates a placeholder element with the given id
@@ -216,6 +216,67 @@ def applyDictionaryToContent(content, series_dict):
 				(def_raw, (def_trans, def_comment)) = series_dict_list[j]
 				if def_raw in content[i]["text"]:
 					content[i]["text"] = content[i]["text"].replace(def_raw, generatePlaceholder(j+1))
+
+def addHonorificToDatabase(honorific_add_form):
+	"""-------------------------------------------------------------------
+		Function:		[addHonorificToDatabase]
+		Description:	Adds the honorific indicated in the form to the database
+		Input:
+		  [honorific_add_form] The submitted Honorific Add form
+		Return: 		Returns new honorific entry on success, None otherwise
+		------------------------------------------------------------------
+	"""
+	# Rip relevant information
+	lang = Language(honorific_add_form.lang.data)
+	hraw = honorific_add_form.hraw.data.strip()
+	htrans = honorific_add_form.htrans.data.strip()
+
+	affix = HonorificAffix(honorific_add_form.affix.data)
+	opt_with_dash = honorific_add_form.opt_with_dash.data
+	opt_standalone = honorific_add_form.opt_standalone.data
+
+	honorific_entry = HonorificsTable(
+		lang=lang,
+		raw=hraw,
+		trans=htrans,
+		affix=affix,
+		opt_with_dash=opt_with_dash,
+		opt_standalone=opt_standalone,
+		enabled=True
+	)
+	db.session.add(honorific_entry)
+	db.session.commit()
+
+	return honorific_entry
+
+def editHonorific(hon_id, honorific_edit_form):
+	"""-------------------------------------------------------------------
+		Function:		[addHonorificToDatabase]
+		Description:	Changes the data of the honorific with the designated id
+						in the database
+		Input:
+		  [honorific_edit_form] The submitted Honorific Edit form
+		Return: 		Returns edited honorific entry on success, None otherwise
+		------------------------------------------------------------------
+	"""
+	try:
+		hon_entry = HonorificsTable.query.filter_by(id=hon_id).first()
+		if hon_entry is None:
+			raise HonorificDNEException(hon_id)
+
+		# Apply edits
+		hon_entry.lang = Language(honorific_edit_form.lang.data)
+		hon_entry.raw = honorific_edit_form.hraw.data.strip()
+		hon_entry.trans = honorific_edit_form.htrans.data.strip()
+		hon_entry.affix = HonorificAffix(honorific_edit_form.affix.data)
+		hon_entry.opt_with_dash = honorific_edit_form.opt_with_dash.data
+		hon_entry.opt_standalone = honorific_edit_form.opt_standalone.data
+
+		db.session.commit()
+		return hon_entry
+	except:
+		return None
+
 
 def customTrans(series_entry, ch):
 	"""-------------------------------------------------------------------
@@ -309,7 +370,7 @@ def seedSeries(series_json_path, mode='append'):
 				host_id=host_entry.id
 			)
 			db.session.add(series_entry)
-			db.session.commit()
+		db.session.commit()
 
 def seedHosts(hosts_json_path, mode='append'):
 	"""-------------------------------------------------------------------
@@ -339,7 +400,7 @@ def seedHosts(hosts_json_path, mode='append'):
 				host_url=entry['host_url'],
 				host_search_engine=entry['host_search_engine'])
 			db.session.add(host_entry)
-			db.session.commit()
+		db.session.commit()
 
 def seedHonorifics(honorifics_json_path, mode='append'):
 	"""-------------------------------------------------------------------
@@ -370,4 +431,4 @@ def seedHonorifics(honorifics_json_path, mode='append'):
 					opt_standalone=entry["standalone"],
 				)
 				db.session.add(honorific_entry)
-				db.session.commit()
+		db.session.commit()

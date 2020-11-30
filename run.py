@@ -29,7 +29,7 @@ def initializeDatabase():
 		Function:		[initializeHosts]
 		Description:	Initializes
 		Input:			None
-		Return: 		None, initializes HostTable on app start if it's empty
+		Return: 		None, initializes the database on app start
 		------------------------------------------------------------------
 	"""
 	# HostTable can't be empty on execution of the flask app
@@ -60,14 +60,7 @@ def initializeDatabase():
 			mode='overwrite')
 
 
+# By running
 if __name__ == '__main__':
-	# utils.seedHosts(
-	# 	os.path.join(app.config['SEED_DATA_PATH'], "hosts.json"),
-	# 	mode='overwrite')
-	# utils.seedHonorifics(
-	# 	os.path.join(app.config['SEED_DATA_PATH'], "honorifics.json"),
-	# 	mode='overwrite')
-	# utils.seedSeries(
-	# 	os.path.join(app.config['SEED_DATA_PATH'], "test_series.json"),
-	# 	mode='overwrite')
+	initializeDatabase()
 	app.run()

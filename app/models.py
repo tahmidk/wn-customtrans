@@ -53,9 +53,9 @@ class HonorificsTable(db.Model):
 	lang = db.Column(db.Enum(Language), nullable=False)
 	raw = db.Column(db.String, unique=True, nullable=False)
 	trans = db.Column(db.String, nullable=False)
-	opt_affix = db.Column(db.Enum(HonorificAffix), default=HonorificAffix.SUFFIX)
-	opt_standalone = db.Column(db.Boolean, default=False)
+	affix = db.Column(db.Enum(HonorificAffix), default=HonorificAffix.SUFFIX)
 	opt_with_dash = db.Column(db.Boolean, default=True)
+	opt_standalone = db.Column(db.Boolean, default=False)
 	enabled = db.Column(db.Boolean, default=True)
 
 	def __repr__(self):

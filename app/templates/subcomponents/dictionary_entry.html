@@ -1,6 +1,6 @@
 {% macro dictionary_entry(dictionary) %}
-	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="dict_{{dictionary.abbr}}"
-		data-dictid="{{dictionary.id}}"
+	<div class="dictionary_entry {{'dictionary_entry_disabled' if not dictionary.enabled}}" id="dict_{{dictionary.id}}"
+		data-id="{{dictionary.id}}"
 		data-fname="{{dictionary.fname}}"
 		data-abbr="{{dictionary.abbr}}">
 		<div class="dictionary_entry_abbr">

@@ -13,7 +13,7 @@ html{
   --library_color_primary: #d83939;
   --dictionary_color_primary: #f58e38;
   --tutorial_color_primary: #9fde44;
-  --settings_color_primary: #7ae2f9;
+  --settings_color_primary: #31daff;
 
   /* Library palette */
   --update_library_button_color: #ffc545;
@@ -42,12 +42,17 @@ html{
 
   /* Dictionary palette */
   --dictionary_dlall_button_color: #09437b;
-  --dictionary_honorifics_button_color: #d20091;
   --dictionary_toggleall_button_color: #f77808;
   --dictionary_entry_color_primary: #ff8f2c;
 
   /* Dictionary edit palette */
   --dictionary_edit_color_primary: #ff702c;
+
+  /* Honorifics palette */
+  --honorifics_color_primary: #ce227d;
+  --honorifics_color_primary_dark: #880e4f;
+  --honorifics_jp_color: #ce225b;
+  --honorifics_cn_color: #226fce;
 }
 html[data-theme='dark']{
   --html_background_color: #181818;
@@ -190,7 +195,8 @@ ion-icon .icon-inner{
   font-variant: all-small-caps;
 }
 .modal_cust{
-  border-radius: 1rem !important;
+  color: white;
+  border-radius: 4px !important;
   overflow: hidden;
 }
 .modal_header_cust{
@@ -225,7 +231,21 @@ ion-icon .icon-inner{
 .form_input_div{
   width: -webkit-fill-available;
   padding: 0 1rem;
-  margin: 0;
+  margin: auto;
+}
+.form_input_div input:focus{
+  border-bottom: 1px solid #00d0be !important;
+  -webkit-box-shadow: 0 1px 0 0 #00d0be !important;
+  box-shadow: 0 1px 0 0 #00d0be !important;
+}
+.form_radio_div{
+  width: fit-content;
+  margin: 0 1rem;
+  font-size: 0.9rem;
+}
+.form_checkbox_div input{
+  width: fit-content;
+  margin: 0.8rem !important;
 }
 .invalid_feedback_cust{
   font-size: 90%;
@@ -395,8 +415,8 @@ ion-icon .icon-inner{
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
-section.section_index{
-  padding: 1em;
+.section_index{
+  padding: 1rem;
 }
 
 /* Stylings for the site logo */
@@ -485,8 +505,8 @@ section.section_index{
 
 
 /*-----------------------[-Library Page Stylings ]----------------------*/
-section.section_library{
-  padding: 1em;
+.section_library{
+  padding: 1rem;
 }
 #library_icon{
   background: var(--library_color_primary);
@@ -654,7 +674,7 @@ table.entry_info_table{
   text-align: center;
   font-size: 1.2rem;
   font-variant: all-small-caps;
-  border-radius: 0.5rem;
+  border-radius: 4px;
   cursor: pointer;
 
   /* Make it unselectable */
@@ -673,17 +693,9 @@ table.entry_info_table{
 }
 
 
-.modal_cust{
-  color: white;
-}
 .modal_cancel_btn:hover{
   background: #ff3547  !important;
   color: white !important;
-}
-.form_input_div input:focus{
-  border-bottom: 1px solid #00d0be !important;
-  -webkit-box-shadow: 0 1px 0 0 #00d0be !important;
-  box-shadow: 0 1px 0 0 #00d0be !important;
 }
 
 /*----------------------[ Register Novel Modal stylings ]----------------------*/
@@ -778,9 +790,12 @@ table.entry_info_table{
 }
 .toc_chapter_actionbar{
   position: absolute;
-  display: none;
+  display: flex;
   right: 0;
   top: 0;
+
+  opacity: 0;
+  visibility: hidden;
 }
 .toc_chapter_setcurrent:hover{
   color: var(--toc_current_chapter_highlight);
@@ -808,7 +823,8 @@ table.entry_info_table{
   color: var(--toc_bookmarked_highlight) !important;
 }
 .toc_chapter:hover > .toc_chapter_actionbar{
-  display: flex;
+  opacity: 1;
+  visibility: visible;
 }
 .viewed_chapter{
   color: var(--toc_viewed_chapter_highlight);
@@ -1005,7 +1021,7 @@ table.entry_info_table{
 
 /* Dictionary page stylings */
 .section_dictionary{
-  padding: 1em;
+  padding: 1rem;
 }
 #dictionary_icon{
   background: var(--dictionary_color_primary);
@@ -1027,11 +1043,12 @@ table.entry_info_table{
 #no_dictionaries_div{
   margin-top: 5rem;
 }
-#dict_Common{
+/* Common dict is always dict_1 */
+#dict_1{
   filter: hue-rotate(125deg);
   margin: 2rem 0;
 }
-#dict_Common.dictionary_entry_disabled{
+#dict_1.dictionary_entry_disabled{
   filter: hue-rotate(125deg) grayscale(1);
 }
 .dictionary_entry{
@@ -1144,6 +1161,7 @@ table.entry_info_table{
 
 /* Dictionary Edit page stylings */
 .section_dictionary_edit{
+  padding: 1rem;
 }
 .dictionary_edit_body{
   margin-top: 3rem;
@@ -1280,4 +1298,115 @@ table.entry_info_table{
 }
 .toast_close_btn:focus{
   outline: none !important;
+}
+
+
+
+/* Honorifics page stylings */
+.section_honorifics{
+  padding: 1rem;
+}
+#honorifics_icon{
+  background: var(--honorifics_color_primary);
+}
+#honorifics_title{
+  color: var(--honorifics_color_primary);
+}
+#menu_honorifics_searchbar input:focus{
+  border-bottom: 1px solid var(--honorifics_color_primary);
+  -webkit-box-shadow: 0 1px 0 0 var(--honorifics_color_primary);
+  box-shadow: 0 1px 0 0 var(--honorifics_color_primary);
+}
+.honorifics_lang_div{
+  color: #fff;
+  font-size: 1.3rem;
+  margin: 1rem 0 0.3rem;
+  padding: 1rem 1.5rem;
+}
+.jp_lang_div{
+  background: var(--honorifics_jp_color);
+}
+.cn_lang_div{
+  background: var(--honorifics_cn_color);
+}
+.honorific_entry{
+  display: flex;
+  margin: 1px;
+}
+.honorific_entry_disabled{
+  filter: grayscale(1) brightness(0.7);
+}
+.honorific_entry_jp:hover{
+  outline: 1px dashed var(--honorifics_jp_color);
+  color: var(--honorifics_jp_color);
+}
+.honorific_entry_cn:hover{
+  outline: 1px dashed var(--honorifics_cn_color);
+  color: var(--honorifics_cn_color);
+}
+.honorific_entry:hover .honorific_entry_action_bar{
+  opacity: 1;
+  visibility: visible;
+}
+.honorific_entry_enable_div{
+  color: white;
+  width: fit-content;
+  padding: 0.5em 1em;
+}
+.honorific_entry_jp .honorific_entry_enable_div{
+  background: var(--honorifics_jp_color);
+}
+.honorific_entry_cn .honorific_entry_enable_div{
+  background: var(--honorifics_cn_color);
+}
+.honorific_entry_body{
+  display: flex;
+  width: 100%;
+}
+.honorific_entry_details{
+  height: fit-content;
+  width: -webkit-fill-available;
+  margin: auto 1em;
+}
+.honorific_span{
+  font-size: 1.2rem;
+  /*color: var(--honorifics_color_primary_dark);*/
+}
+.honorific_entry_action_bar{
+  display: flex;
+  /*color: var(--honorifics_color_primary_dark);*/
+  font-size: 1.3rem;
+  margin: auto 1rem;
+  opacity: 0;
+  visibility: 0;
+}
+.honorific_entry_action_bar > *{
+  margin-left: 0.5rem;
+}
+.honorific_entry_action_div{
+  height: fit-content;
+}
+.honorifics_form_help{
+  display: inline;
+}
+.remove_honorific_modal_header_cust{
+  background: var(--danger);
+  color: #fff;
+  font-variant: all-petite-caps;
+  font-size: 1.5rem;
+}
+.remove_honorific_modal_body_cust{
+  font-size: 0.95rem;
+  padding: 2rem;
+  text-align: center;
+}
+.remove_honorific_modal_data_display{
+  width: fit-content;
+  margin: 1rem auto 0 auto;
+  padding: 5px 20px;
+  border: 1px solid;
+  font-size: 1.2rem;
+}
+.remove_honorific_modal_data_display span{
+  margin: 0 1rem;
 }

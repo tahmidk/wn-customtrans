@@ -1,11 +1,11 @@
-{% from "super_navpanel.html" import super_navpanel %}
-{% from "flash_alert.html" import flash_alert %}
-{% from "dictionary_entry.html" import dictionary_entry %}
+{% from "misc/super_navpanel.html" import super_navpanel %}
+{% from "misc/flash_alert.html" import flash_alert %}
+{% from "subcomponents/dictionary_entry.html" import dictionary_entry %}
 
 {% extends 'general_layout.html' %}
 {% block content %}
 	<section class="section_dictionary">
-		<!-- Back button -->
+		<!-- Navigation bar -->
 		{%- if back_href is defined -%}
 			{{ super_navpanel(back_href) }}
 		{%- endif -%}
@@ -19,18 +19,18 @@
 		</div>
 		<div class="dictionary_body">
 			<div class="superpanel" id="dictionary_superpanel">
-				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" action="{{url_for('dictionaries_toggleall', enable='on')}}"
-					{{'disabled' if dictionaries|length == 0}} style="float: right;">
+				<button type="button" class="btn btn-deep-orange superpanel_menu_btn" id="menu_dictionary_toggleall_btn" title="Toggle all dictionaries"
+					action="{{url_for('dictionaries_toggleall', enable='on')}}" {{'disabled' if dictionaries|length == 0}} style="float: right;">
 					<ion-icon name="toggle"></ion-icon>
 					<span> Toggle All </span>
 				</button>
-				<button type="button" class="btn btn-mdb-color superpanel_menu_btn" id="menu_dictionary_dlall_btn"
+				<button type="button" class="btn btn-mdb-color superpanel_menu_btn" id="menu_dictionary_dlall_btn" title="Download all dictionaries"
 					action="{{url_for('dictionaries_download_all')}}" {{'disabled' if dictionaries|length == 0}}>
 					<ion-icon name="download-outline"></ion-icon>
 					<span> Download All </span>
 				</button>
-				<a role="button" class="btn btn-unique superpanel_menu_btn" id="menu_dictionary_honorifics_btn"
-					href="{{url_for('tutorial')}}">
+				<a role="button" class="btn btn-unique superpanel_menu_btn" id="menu_dictionary_honorifics_btn" title="Go to Honorifics page"
+					href="{{url_for('honorifics')}}">
 					<ion-icon name="earth"></ion-icon>
 					<span> Honorifics </span>
 				</a>

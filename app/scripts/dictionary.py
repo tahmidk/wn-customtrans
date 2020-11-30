@@ -245,7 +245,7 @@ def generateNameVariants(rn, tn, comment, lang):
 
 		# Helper function to generate honorific'ed name translations
 		def gen_trans(t_name):
-			if honorific_entry.opt_affix == HonorificAffix.SUFFIX:
+			if honorific_entry.affix == HonorificAffix.SUFFIX:
 				# Process suffixed honorific translation
 				t_processed = ("-" if honorific_entry.opt_with_dash else "").join([t_name, h_trans])
 			else:
