@@ -63,16 +63,18 @@ function setupModalForm(btn_id, modal_id, form_id, flashpanel){
 					if (errors_dict.hasOwnProperty(field)) {
 						var erroneous_input_id = '#' + field;
 						var erroneous_input = $(modal_id)[0].querySelector(erroneous_input_id);
-						erroneous_input.classList.add('is-invalid');
-						var invalid_feedback_div = document.createElement('div');
-						invalid_feedback_div.classList.add('invalid-feedback');
-						for(var i in errors_dict[field]){
-							var err_span = document.createElement('span');
-							err_span.classList.add('invalid_feedback_cust');
-							err_span.innerHTML = errors_dict[field][i];
-							invalid_feedback_div.appendChild(err_span);
+						if(erroneous_input != null){
+							erroneous_input.classList.add('is-invalid');
+							var invalid_feedback_div = document.createElement('div');
+							invalid_feedback_div.classList.add('invalid-feedback');
+							for(var i in errors_dict[field]){
+								var err_span = document.createElement('span');
+								err_span.classList.add('invalid_feedback_cust');
+								err_span.innerHTML = errors_dict[field][i];
+								invalid_feedback_div.appendChild(err_span);
+							}
+							erroneous_input.parentElement.appendChild(invalid_feedback_div);
 						}
-						erroneous_input.parentElement.appendChild(invalid_feedback_div);
 					}
 				}
 			}
@@ -320,14 +322,14 @@ function setupLibrary(){
 	const edit_novel_submit = '#edit_novel_submit_btn';
 	const edit_novel_modal = '#edit_modal_push';
 	const edit_novel_form = '#edit_novel_form';
-	const edit_novel_action_base = $(edit_novel_form)[0].action.substr(0,
-		$(edit_novel_form)[0].action.lastIndexOf("/"));
+	const edit_novel_action_base = $(edit_novel_form).attr('action').substr(0,
+		$(edit_novel_form).attr('action').lastIndexOf("/"));
 	// Remove novel components
 	const remove_novel_submit = '#remove_novel_submit_btn';
 	const remove_novel_modal = '#remove_modal_push';
 	const remove_novel_form = '#remove_novel_form';
-	const remove_novel_action_base = $(remove_novel_form)[0].action.substr(0,
-		$(remove_novel_form)[0].action.lastIndexOf("/"));
+	const remove_novel_action_base = $(remove_novel_form).attr('action').substr(0,
+		$(remove_novel_form).attr('action').lastIndexOf("/"));
 
 	// On show Edit Modal events
 	$(edit_novel_modal).on('shown.bs.modal', function (event) {
@@ -964,7 +966,56 @@ function setupDictionaryEdit(){
 }
 
 function setupHonorifics(){
+	$('[data-toggle="tooltip"]').tooltip();
+
 	const honorifics_flashpanel = '#honorifics_flashpanel'
+	// Add honorific modal components
+	const add_honorific_submit = '#add_honorific_submit_btn';
+	const add_honorific_modal = '#add_honorific_modal_push';
+	const add_honorific_form = '#add_honorific_form';
+	// Edit honorific modal components
+	const edit_honorific_submit = '#edit_honorific_submit_btn';
+	const edit_honorific_modal = '#edit_honorific_modal_push';
+	const edit_honorific_form = '#edit_honorific_form';
+	const edit_honorific_action_base = $(edit_honorific_form).attr('action').substr(0,
+		$(edit_honorific_form).attr('action').lastIndexOf("/"));
+	// Remove honorific modal components
+	const remove_honorific_modal = '#remove_honorific_modal';
+	const remove_honorific_action_base = $(remove_honorific_modal).attr('action').substr(0,
+		$(remove_honorific_modal).attr('action').lastIndexOf("/"));
+
+
+	// On show Edit Modal events
+	$(edit_honorific_modal).on('shown.bs.modal', function (event) {
+		var hon_entry = $(event.relatedTarget).closest('.honorific_entry');
+		var id = hon_entry.data('id');
+		var lang_val = hon_entry.data('lang-val');
+		var hraw = hon_entry.data('hraw');
+		var htrans = hon_entry.data('htrans');
+		var affix_val = hon_entry.data('affix-val');
+		var opt_with_dash = (hon_entry.data('opt-with-dash').toLowerCase() == "true");
+		var opt_standalone = (hon_entry.data('opt-standalone').toLowerCase() == "true");
+
+		// Set the defaults for the form fields
+		$(`${edit_honorific_modal} #lang`).val(lang_val);
+		$(`${edit_honorific_modal} #hraw`).val(hraw);
+		$(`${edit_honorific_modal} #htrans`).val(htrans);
+		$(`${edit_honorific_modal} #affix-${affix_val-1}`).prop('checked', true);
+		$(`${edit_honorific_modal} #opt_with_dash`).prop('checked', opt_with_dash);
+		$(`${edit_honorific_modal} #opt_standalone`).prop('checked', opt_standalone);
+
+		// Customize the edit form's action and id to that of the honorific entry that triggered
+		// the Edit Honorific modal
+		$(`${edit_honorific_modal} input[name="hon_id"]`).val(id)
+		$(edit_honorific_form).attr('action', `${edit_honorific_action_base}/${id}`);
+	});
+
+	// Setup the Add Honorific modal
+	setupModalForm(add_honorific_submit, add_honorific_modal, add_honorific_form,
+		honorifics_flashpanel);
+	// Setup the Edit Honorific modal
+	setupModalForm(edit_honorific_submit, edit_honorific_modal, edit_honorific_form,
+		honorifics_flashpanel);
 
 	$('#menu_honorifics_toggleall_btn').click(function() {
 		var url = $(this).attr('action');
@@ -1017,13 +1068,40 @@ function setupHonorifics(){
 				}
 			}
 			else if(data.status == 'hon_nf'){
-				createFlashMessage(data.msg, data.severity, hon_flashpanel);
+				createFlashMessage(data.msg, data.severity, honorifics_flashpanel);
 			}
 			else{
 				createFlashMessage(
 					`${CRITICAL_BOLD} An unexpected error occurred`,
 					CRITICAL,
-					hon_flashpanel);
+					honorifics_flashpanel);
+			}
+		})
+	});
+
+	// On show Remove Modal events
+	$(remove_honorific_modal).on('shown.bs.modal', function (event) {
+		var hon_entry = $(event.relatedTarget).closest('.honorific_entry');
+		var id = hon_entry.data('id');
+		var hraw = hon_entry.data('hraw');
+		var htrans = hon_entry.data('htrans');
+
+		$(remove_honorific_modal).attr('action', `${remove_honorific_action_base}/${id}`);
+		$(`${remove_honorific_modal} span[name="hraw"]`).text(hraw);
+		$(`${remove_honorific_modal} span[name="htrans"]`).text(htrans);
+	});
+
+	$('#confirm_delete_honorific_btn').click(function(){
+		var url = $(remove_honorific_modal).attr('action');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				location.reload();
+			}
+			else{
+				createFlashMessage(
+					`${CRITICAL_BOLD} ${data.msg}`,
+					data.severity,
+					honorifics_flashpanel);
 			}
 		})
 	});

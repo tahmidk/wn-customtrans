@@ -33,6 +33,7 @@ from app.forms import RegisterNovelForm
 from app.forms import EditNovelForm
 from app.forms import RemoveNovelForm
 from app.forms import AddHonorificForm
+from app.forms import EditHonorificForm
 
 from app.models import *
 
@@ -111,9 +112,9 @@ def library_register_novel():
 			if series_entry.latest_ch == 0:
 				flash("%s Couldn't pull latest chapter for %s from host. \
 					Try hitting \'Update\' later" % (WARNING_BOLD, strong(series_entry.abbr)),
-					"warning")
+					WARNING)
 			msg = "%s %s was successfully registered!" % (SUCCESS_BOLD, strong(series_entry.abbr))
-			flash(msg, "success")
+			flash(msg, SUCCESS)
 			return jsonify(status='ok')
 		except CustomException as err:
 			return jsonify(status='error', msg=str(err), severity=err.severity)
@@ -154,10 +155,10 @@ def library_edit_novel(series_code):
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 		host_manager = hostmanager.createManager(host_entry.host_type)
 
-		new_title = edit_novel_form.title.data
-		new_abbr  = edit_novel_form.abbr.data
+		new_title = edit_novel_form.title.data.strip()
+		new_abbr  = edit_novel_form.abbr.data.strip()
 		fname_new = dictionary.generateDictFilename(
-			edit_novel_form.abbr.data,
+			edit_novel_form.abbr.data.strip(),
 			host_entry.host_name,
 			series_entry.code
 		)
@@ -190,7 +191,7 @@ def library_edit_novel(series_code):
 		dict_entry.fname = fname_new
 		db.session.commit()
 
-		flash("%s Your changes have been applied!" % SUCCESS_BOLD, "success")
+		flash("%s Your changes have been applied!" % SUCCESS_BOLD, SUCCESS)
 		return jsonify(status='ok')
 
 	data = json.dumps(edit_novel_form.errors, ensure_ascii=False)
@@ -212,13 +213,13 @@ def library_remove_novel(series_code):
 			db.session.delete(dict_entry)
 			db.session.commit()
 			flash("%s Removed the following dictionary: %s" % (SUCCESS_BOLD, mono(dict_entry.fname)),
-				"success")
+				SUCCESS)
 
 		# Remove series from database
 		db.session.delete(series_entry)
 		db.session.commit()
 
-		flash("%s Removed %s!" % (SUCCESS_BOLD, strong(series_abbr)), "success")
+		flash("%s Removed %s!" % (SUCCESS_BOLD, strong(series_abbr)), SUCCESS)
 		return jsonify(status='ok')
 
 	data = json.dumps(remove_novel_form.errors, ensure_ascii=False)
@@ -321,7 +322,7 @@ def library_series_chapter(series_code, ch):
 	try:
 		chapter_data = utils.customTrans(series_entry, ch)
 	except CustomException as err:
-		flash(str(err), "danger")
+		flash(str(err), CRITICAL)
 		return render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			back_href=back_href,
@@ -440,15 +441,14 @@ def dictionaries_upload_dict(dict_fname):
 
 			# Flash success
 			flash("%s File has successfully uploaded and replaced %s" % \
-				(SUCCESS_BOLD, mono(dict_entry.fname)),
-				"success")
+				(SUCCESS_BOLD, mono(dict_entry.fname)), SUCCESS)
 		except CustomException as err:
 			flash(str(err), err.severity)
 		except Exception as err:
 			flash("%s Encountered an unexpected server-side error" % CRITICAL_BOLD,
-				"danger")
+				CRITICAL)
 	else:
-		flash("%s File upload failed" % CRITICAL, "danger")
+		flash("%s File upload failed" % CRITICAL_BOLD, CRITICAL)
 
 	return redirect(url_for('dictionaries'))
 
@@ -513,11 +513,11 @@ def dictionaries_edit(dict_fname):
 	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	if not os.path.exists(dict_path):
 		dictionary.createDictFile(dict_fname, series_title, series_abbr, series_url)
-		flash("Dictionary file %s was newly created" % mono(dict_fname), "success")
+		flash("Dictionary file %s was newly created" % mono(dict_fname), SUCCESS)
 	elif os.path.getsize(dict_path) == 0:
 		dictionary.createDictFile(dict_fname, series_title, series_abbr, series_url)
 		flash("Dictionary file %s was found empty. The header metadata was reinitialized" % \
-			mono(dict_fname), "success")
+			mono(dict_fname), SUCCESS)
 
 	dict_content = ""
 	try:
@@ -525,7 +525,7 @@ def dictionaries_edit(dict_fname):
 			dict_content = dict_file.read()
 	except Exception as err:
 		flash("%s Ran into an issue opening the file %s" % \
-			(WARNING_BOLD, mono(dict_fname)), "warning")
+			(WARNING_BOLD, mono(dict_fname)), WARNING)
 
 	return render_template("dictionary_edit.html",
 		title="Edit %s" % series_abbr,
@@ -544,17 +544,20 @@ def dictionaries_edit_save(dict_fname):
 
 	return jsonify(status='ok')
 
+
 # Route for Tutorial page
 @app.route("/dictionaries/honorifics")
 def honorifics():
 	add_honorific_form = AddHonorificForm()
+	edit_honorific_form = EditHonorificForm()
 
 	honorifics = HonorificsTable.query.all()
 	return render_template("honorifics.html",
 		title="Honorifics",
 		back_href=url_for('index'),
 		honorifics=honorifics,
-		add_form=add_honorific_form)
+		add_form=add_honorific_form,
+		edit_form=edit_honorific_form)
 
 
 # Route for enabling/disabling honorifics
@@ -591,27 +594,56 @@ def honorifics_toggleall(enable):
 	}
 	return jsonify(data)
 
-# Background route to process register novel form
+
+# Background route to process Add Honorific form
 @app.route("/dictionaries/honorifics/add_entry", methods=["POST"])
 def honorifics_add_entry():
-	return "404"
-	# register_novel_form = RegisterNovelForm()
-	# if register_novel_form.validate_on_submit():
-	# 	try:
-	# 		series_entry = utils.registerSeriesToDatabase(register_novel_form)
-	# 		if series_entry.latest_ch == 0:
-	# 			flash("%s Couldn't pull latest chapter for %s from host. \
-	# 				Try hitting \'Update\' later" % (WARNING_BOLD, strong(series_entry.abbr)),
-	# 				"warning")
-	# 		msg = "%s %s was successfully registered!" % (SUCCESS_BOLD, strong(series_entry.abbr))
-	# 		flash(msg, "success")
-	# 		return jsonify(status='ok')
-	# 	except CustomException as err:
-	# 		return jsonify(status='error', msg=str(err), severity=err.severity)
+	add_honorific_form =  AddHonorificForm()
+	if add_honorific_form.validate_on_submit():
+		try:
+			if utils.addHonorificToDatabase(add_honorific_form) is None:
+				err_msg = "%s Error adding honorific to database" % CRITICAL_BOLD
+				return jsonify(status='error', msg=err_msg, severity=CRITICAL)
+			flash("%s Honorific successfully registered!" % SUCCESS_BOLD, SUCCESS)
+			return jsonify(status='ok')
+		except CustomException as err:
+			return jsonify(status='error', msg=str(err), severity=err.severity)
+
+	data = json.dumps(add_honorific_form.errors, ensure_ascii=False)
+	return jsonify(data)
 
 
-	# data = json.dumps(register_novel_form.errors, ensure_ascii=False)
-	# return jsonify(data)
+# Background route to process Edit Honorific form
+@app.route("/dictionaries/honorifics/edit_entry/<hon_id>", methods=["POST"])
+def honorifics_edit_entry(hon_id):
+	edit_honorific_form = EditHonorificForm()
+	if edit_honorific_form.validate_on_submit():
+		try:
+			if utils.editHonorific(int(hon_id), edit_honorific_form) is None:
+				err_msg = "%s Encountered an unexpected issue" % CRITICAL_BOLD
+				return jsonify(status='error', msg=str(err_msg), severity=CRITICAL)
+			flash("%s Honorific successfully updated!" % SUCCESS_BOLD, SUCCESS)
+			return jsonify(status='ok')
+		except CustomException as err:
+			return jsonify(status='error', msg=str(err), severity=err.severity)
+
+	data = json.dumps(edit_honorific_form.errors, ensure_ascii=False)
+	return jsonify(data)
+
+
+# Background route to process Edit Honorific form
+@app.route("/dictionaries/honorifics/remove_entry/<hon_id>", methods=["POST"])
+def honorifics_remove_entry(hon_id):
+	hon_entry = HonorificsTable.query.filter_by(id=int(hon_id)).first()
+	if hon_entry is None:
+		err_msg = "%s This honorific entry does not exist in the database" % CRITICAL_BOLD
+		return jsonify(status='error', msg=str(err_msg), severity=CRITICAL)
+
+	db.session.delete(hon_entry)
+	db.session.commit()
+	flash("%s Honorific successfully deleted!" % SUCCESS_BOLD, SUCCESS)
+
+	return jsonify(status='ok')
 
 # Route for Tutorial page
 @app.route("/tutorial")

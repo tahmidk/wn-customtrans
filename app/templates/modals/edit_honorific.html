@@ -1,17 +1,18 @@
-{% macro add_honorific_modal(form) %}
-<div class="modal fade" id="add_honorific_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+{% macro edit_honorific_modal(form) %}
+<div class="modal fade" id="edit_honorific_modal_push" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg modal-notify modal-info" role="document">
     <!-- Modal Form Content-->
-    <form class="modal-content text-center modal_cust add_honorific_modal_cust" id="add_honorific_form" action="{{ url_for('honorifics_add_entry') }}">
+    <form class="modal-content text-center modal_cust edit_honorific_modal_cust" id="edit_honorific_form" action="{{ url_for('honorifics_edit_entry', hon_id='UNDEF') }}">
       <!--Modal Header-->
-      <div class="modal-header modal_header_cust light-green d-flex justify-content-center" id="add_honorific_header">
-        <p style="margin: 0.5rem 0"> Add Honorific </p>
+      <div class="modal-header modal_header_cust deep-purple darken-3 d-flex justify-content-center" id="edit_honorific_header">
+        <p style="margin: 0.5rem 0"> Edit Honorific </p>
       </div>
 
       <!--Modal Body-->
       <div class="modal-body modal_body_cust">
           {{ form.hidden_tag() }}
           <fieldset class="form-group" style="margin: 0">
+            {{ form.hon_id }}
             <div class="form-group form_group_cust">
               {{ form.lang.label(class="form-control-label label_cust") }}
               <div class="form_input_div md-form">
@@ -72,10 +73,10 @@
 
       <!--Modal Footer-->
       <div class="modal-footer flex">
-        <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="add_honorific_spinner">
+        <div class="spinner-border text-success mx-3 spinner_cust" role="status" id="edit_honorific_spinner">
           <span class="sr-only"></span>
         </div>
-        {{ form.submit(class="btn btn-success btn_cust", id="add_honorific_submit_btn") }}
+        {{ form.submit(class="btn btn-success btn_cust", id="edit_honorific_submit_btn") }}
         <button class="btn btn-outline-danger btn_cust modal_cancel_btn" data-dismiss="modal"> Cancel </button>
       </div>
 

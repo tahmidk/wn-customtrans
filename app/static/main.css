@@ -1321,7 +1321,7 @@ table.entry_info_table{
   color: #fff;
   font-size: 1.3rem;
   margin: 1rem 0 0.3rem;
-  padding: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
 }
 .jp_lang_div{
   background: var(--honorifics_jp_color);
@@ -1334,7 +1334,7 @@ table.entry_info_table{
   margin: 1px;
 }
 .honorific_entry_disabled{
-  filter: grayscale(1) contrast(0.6) brightness(0.5);
+  filter: grayscale(1) brightness(0.7);
 }
 .honorific_entry_jp:hover{
   outline: 1px dashed var(--honorifics_jp_color);
@@ -1385,4 +1385,28 @@ table.entry_info_table{
 }
 .honorific_entry_action_div{
   height: fit-content;
+}
+.honorifics_form_help{
+  display: inline;
+}
+.remove_honorific_modal_header_cust{
+  background: var(--danger);
+  color: #fff;
+  font-variant: all-petite-caps;
+  font-size: 1.5rem;
+}
+.remove_honorific_modal_body_cust{
+  font-size: 0.95rem;
+  padding: 2rem;
+  text-align: center;
+}
+.remove_honorific_modal_data_display{
+  width: fit-content;
+  margin: 1rem auto 0 auto;
+  padding: 5px 20px;
+  border: 1px solid;
+  font-size: 1.2rem;
+}
+.remove_honorific_modal_data_display span{
+  margin: 0 1rem;
 }

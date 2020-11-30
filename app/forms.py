@@ -16,6 +16,7 @@ from wtforms import SubmitField
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import SelectField
+from wtforms import HiddenField
 from wtforms import ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired
@@ -24,7 +25,9 @@ from wtforms.validators import Regexp
 
 # Internal imports
 from app.models import SeriesTable
+from app.models import HonorificsTable
 from app.models import HostTable
+from app.models import HonorificAffix
 from app.scripts.dictionary import COMMON_DICT_ABBR
 from app.scripts.custom_errors import mono
 from app.scripts.hostmanager import Language
@@ -67,30 +70,33 @@ class RegisterNovelForm(FlaskForm):
 
 	# Custom validator for title
 	def validate_title(self, title):
-		series_entry = SeriesTable.query.filter_by(title=title.data).first()
+		title_data = title.data.strip()
+		series_entry = SeriesTable.query.filter_by(title=title_data).first()
 		if series_entry is not None:
 			raise ValidationError("This title is already taken by another series")
 
 	# Custom validator for abbreviation
 	def validate_abbr(self, abbr):
-		if abbr.data == COMMON_DICT_ABBR:
-			raise ValidationError("The abbreviation \'%s\' is illegal" % abbr.data)
+		abbr_data = abbr.data.strip()
+		if abbr_data == COMMON_DICT_ABBR:
+			raise ValidationError("The abbreviation \'%s\' is illegal" % abbr_data)
 
 		# Validation: this abbreviation must not already be taken
-		series_entry = SeriesTable.query.filter_by(abbr=abbr.data).first()
+		series_entry = SeriesTable.query.filter_by(abbr=abbr_data).first()
 		if series_entry is not None:
-			raise ValidationError("The abbreviation \'%s\' is taken by another series" % abbr.data)
+			raise ValidationError("The abbreviation \'%s\' is taken by another series" % abbr_data)
 
 	# Custom validator for series code
 	def validate_series_code(self, series_code):
 		# Validation: the host-code combination must not already be in the database
+		series_code_data = series_code.data.strip()
 		host_entry = self.series_host.data
-		series_entry = SeriesTable.query.filter_by(code=str(series_code.data), host_id=host_entry.id).first()
+		series_entry = SeriesTable.query.filter_by(code=str(series_code_data), host_id=host_entry.id).first()
 		if series_entry is not None:
 			raise ValidationError("This host-code combination registered under %s" % series_entry.abbr)
 
 		# Validation: the url must exist
-		url = host_entry.host_url + series_code.data
+		url = host_entry.host_url + series_code_data
 		try:
 			urlopen(url)
 		# Page not found
@@ -142,14 +148,14 @@ class AddHonorificForm(FlaskForm):
 	# Field: hraw - The raw honorific entry in its native language
 	hraw_validators = [
 		DataRequired(),
-		Length(min=1, max=20)
+		Length(min=1, max=30)
 	]
 	hraw = StringField('Raw', validators=hraw_validators)
 
 	# Field: hraw - The raw honorific entry in its native language
 	htrans_validators = [
 		DataRequired(),
-		Length(min=1, max=50)
+		Length(min=1, max=30)
 	]
 	htrans = StringField('Translation', validators=htrans_validators)
 
@@ -161,8 +167,8 @@ class AddHonorificForm(FlaskForm):
 	affix_validators = [
 		DataRequired(),
 	]
-	affix = RadioField('Affix', validators=affix_validators, choices=[('1', 'Prefix'), ('2', 'Suffix')],
-		default='2')
+	affix = RadioField('Affix', validators=affix_validators, coerce=int, default=HonorificAffix.SUFFIX.value,
+		choices=[(HonorificAffix.PREFIX.value, 'Prefix'), (HonorificAffix.SUFFIX.value, 'Suffix')])
 
 	# Field: opt_with_dash - Option to append a dash character between subject and honorific
 	opt_with_dash = BooleanField("Append dash", default=True)
@@ -173,3 +179,61 @@ class AddHonorificForm(FlaskForm):
 
 	# Submit form
 	submit = SubmitField('Save')
+
+	# Custom validator for hraw
+	def validate_hraw(self, hraw):
+		hraw_data = hraw.data.strip()
+		honorifics_entry = HonorificsTable.query.filter_by(raw=hraw_data).first()
+		if honorifics_entry is not None:
+			raise ValidationError("%s is already registered" % hraw_data)
+
+class EditHonorificForm(FlaskForm):
+	'''
+		This form is used when displaying the "Edit Honorific" modal to the user
+		in the /honorifics route
+	'''
+	# The id of the honorific being edited
+	hon_id = HiddenField("Id")
+
+	# Field: hraw - The raw honorific entry in its native language
+	hraw_validators = [
+		DataRequired(),
+		Length(min=1, max=30)
+	]
+	hraw = StringField('Raw', validators=hraw_validators)
+
+	# Field: hraw - The raw honorific entry in its native language
+	htrans_validators = [
+		DataRequired(),
+		Length(min=1, max=30)
+	]
+	htrans = StringField('Translation', validators=htrans_validators)
+
+	# Field: lang - The native language of the raw honorific provided
+	lang_selection = sorted([(l.value, l.name) for l in Language])
+	lang = SelectField("Language", choices=lang_selection, coerce=int)
+
+	# Field: affix - Treat this honorific as a suffix or prefix?
+	affix_validators = [
+		DataRequired(),
+	]
+	affix = RadioField('Affix', validators=affix_validators, coerce=int,
+		choices=[(HonorificAffix.PREFIX.value, 'Prefix'), (HonorificAffix.SUFFIX.value, 'Suffix')])
+
+	# Field: opt_with_dash - Option to append a dash character between subject and honorific
+	opt_with_dash = BooleanField("Append dash")
+
+	# Field: opt_standalone - Option to indicate that this honorific can potentially be found
+	# w/out being attached to a subject
+	opt_standalone = BooleanField("Standalone")
+
+	# Submit form
+	submit = SubmitField('Save')
+
+	# Custom validator for hraw
+	def validate_hraw(self, hraw):
+		# Submission invalid if there's another HonorificTable entry w/ a diff id but same hraw
+		hraw_data = hraw.data.strip()
+		not_id = HonorificsTable.query.filter(HonorificsTable.id != int(self.hon_id.data))
+		if not_id.filter_by(raw=hraw_data).count() > 0:
+			raise ValidationError("%s is already registered" % hraw.data)
