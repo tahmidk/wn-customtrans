@@ -25,8 +25,9 @@ class HonorificAffix(Enum):
 
 # Database models
 class SeriesTable(db.Model):
-	code = db.Column(db.String(7), primary_key=True)
-	title = db.Column(db.String(80), nullable=False)
+	id = db.Column(db.Integer, primary_key=True)
+	code = db.Column(db.String(7), nullable=False)
+	title = db.Column(db.String(80), unique=True, nullable=False)
 	abbr = db.Column(db.String(15), unique=True, nullable=False)
 	current_ch = db.Column(db.Integer, nullable=False)
 	latest_ch = db.Column(db.Integer, nullable=False)

@@ -1,6 +1,7 @@
 {% macro series_entry(novel) %}
 	{% set resume_ch = [novel.current_ch, 1] | max %}
 	<div class="library_series_entry" id="series_{{novel.abbr}}"
+		data-id="{{novel.id}}"
 		data-title="{{novel.title}}"
 		data-abbr="{{novel.abbr}}"
 		data-current="{{novel.current_ch}}"

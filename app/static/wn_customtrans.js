@@ -39,7 +39,7 @@ function setupModalForm(btn_id, modal_id, form_id, flashpanel){
 		modal_spinner.css("display", "block");
 
 		// Make a post request to the route responsible for handling the form's backend
-		var url = $(form_id)[0].action;
+		var url = $(form_id).attr('action');
 		$.post(url, data=$(form_id).serialize(), function(data) {
 			modal_spinner.css("display", "none");
 			if (data.status == 'ok') {
@@ -336,13 +336,16 @@ function setupLibrary(){
 		var series_entry = $(event.relatedTarget).closest('.library_series_entry');
 		var title = series_entry.data('title');
 		var abbr = series_entry.data('abbr');
-		var code = series_entry.data('code');
+		var id = series_entry.data('id');
 
 		// Set the defaults for the form fields
-		$(edit_novel_modal)[0].querySelector('#title').defaultValue = title;
-		$(edit_novel_modal)[0].querySelector('#abbr').defaultValue = abbr;
-		// Customize the edit form's action to the specific series
-		$(edit_novel_form)[0].action = edit_novel_action_base + '/' + code;
+		$(`${edit_novel_modal} #title`).val(title);
+		$(`${edit_novel_modal} #abbr`).val(abbr);
+
+		// Customize the edit form's action and input id to that of the series entry that
+		// triggered this modal
+		$(`${edit_novel_form} input[name="series_id"]`).val(id)
+		$(edit_novel_form).attr('action', `${edit_novel_action_base}/${id}`);
 	});
 
 	// On show Remove Modal events
@@ -351,7 +354,7 @@ function setupLibrary(){
 		var code = series_entry.data('code');
 
 		// Customize the remove form's action to the specific series
-		$(remove_novel_form)[0].action = remove_novel_action_base + '/' + code;
+		$(remove_novel_form).attr('action', `${remove_novel_action_base}/${code}`);
 	});
 
 	// Update button event sets up an SSE and listens for update progress
@@ -382,10 +385,10 @@ function setupLibrary(){
 				var len_updated = progress_data['updated'].length;
 				var value = (len_updated / progress_data['num_series']) * 100;
 				var width_attr = "width: "+value+"%;";
-				$('#update_progress_bar')[0].setAttribute("style", width_attr);
+				$('#update_progress_bar').attr("style", width_attr);
 
 				var series_abbr = progress_data['updated'][len_updated-1][ABBR_INDEX];
-				$('#update_info_series')[0].removeAttribute("style");
+				$('#update_info_series').removeAttr("style");
 				$('#update_info_series').text(series_abbr);
 
 				// Close this connection when all entries have been updated
@@ -451,8 +454,7 @@ function setupTableOfContents(){
 	// Bookmark events
 	$('.toc_chapter_bookmark').click(function(event){
 		// Make a post request to the route responsible for handling the form's backend
-		var bookmark_btn = $(this)[0];
-		var url = bookmark_btn.getAttribute('action');
+		var url = $(this).attr('action');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				var ch_div = $('#'+data.target_ch)[0];
@@ -481,8 +483,7 @@ function setupTableOfContents(){
 
 	// Setcurrent events
 	$('.toc_chapter_setcurrent').click(function(event){
-		var setcurrent_btn = $(this)[0];
-		var url = setcurrent_btn.getAttribute('action');
+		var url = $(this).attr('action');
 		$.post(url, function(data) {
 			if(data.status == 'ok') {
 				var chapters = $('.toc_chapter').each(function(index){
@@ -533,8 +534,7 @@ function setupTableOfContents(){
 				"Fetching latest chapters... please wait a few seconds",
 				WARNING,
 				toc_flashpanel);
-			var update_btn = $(this)[0];
-			var url = update_btn.getAttribute('action');
+			var url = $(this).attr('action');
 			$.post(url, function(data) {
 				if(data.status == 'ok') {
 					update_series_btn_enabled = true;
@@ -566,8 +566,7 @@ function setupTableOfContents(){
 
 	if(!$(rmv_all_bkmk_btn)[0].hasAttribute('disabled')){
 		$(rmv_all_bkmk_btn).click(function() {
-			var rmv_all_bkmk_btn = $(this)[0];
-			var url = rmv_all_bkmk_btn.getAttribute('action');
+			var url = $(this).attr('action');
 			$.post(url, function(data){
 				if(data.status == 'ok') {
 					location.reload();

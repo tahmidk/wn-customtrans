@@ -146,11 +146,11 @@ def library_update():
 
 
 # Background route to process edit novel form
-@app.route("/library/edit_novel/<series_code>", methods=["POST"])
-def library_edit_novel(series_code):
+@app.route("/library/edit_novel/<series_id>", methods=["POST"])
+def library_edit_novel(series_id):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
-		series_entry = SeriesTable.query.filter_by(code=series_code).first()
+		series_entry = SeriesTable.query.filter_by(id=int(series_id)).first()
 		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 		host_manager = hostmanager.createManager(host_entry.host_type)

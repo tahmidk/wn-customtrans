@@ -48,7 +48,7 @@ class RegisterNovelForm(FlaskForm):
 	# Field: abbr - The user's personal abbreviation for this novel
 	abbr_validators = [
 		DataRequired(),
-		Length(min=1, max=15),
+		Length(min=1, max=20),
 		Regexp(r'^[^\W_]*$', message="Cannot contain spaces or special characters")
 	]
 	abbr = StringField('Abbreviation', validators=abbr_validators)
@@ -111,6 +111,7 @@ class EditNovelForm(FlaskForm):
 		This form is used when displaying the "Edit Novel" modal to the user
 		in the /libraries route
 	'''
+	series_id = HiddenField("Series Id")
 
 	# Field: title - The user's title for the novel to register
 	title_validators = [
@@ -122,13 +123,32 @@ class EditNovelForm(FlaskForm):
 	# Field: abbr - The user's personal abbreviation for this novel
 	abbr_validators = [
 		DataRequired(),
-		Length(min=1, max=15),
+		Length(min=1, max=20),
 		Regexp(r'^[\w]+$', message="Cannot contain spaces or special characters")
 	]
 	abbr = StringField('Abbreviation', validators=abbr_validators)
 
 	# Submit form
 	submit = SubmitField('Save')
+
+	# Custom validator for title
+	def validate_title(self, title):
+		# Submission invalid if there's another SeriesTable entry w/ a diff id but same title
+		title_data = title.data.strip()
+		not_id = SeriesTable.query.filter(SeriesTable.id != int(self.series_id.data))
+		if not_id.filter_by(title=title_data).count() > 0:
+			raise ValidationError("%s is already registered" % title_data)
+
+	# Custom validator for abbreviation
+	def validate_abbr(self, abbr):
+		abbr_data = abbr.data.strip()
+		if abbr_data == COMMON_DICT_ABBR:
+			raise ValidationError("The abbreviation \'%s\' is illegal" % abbr_data)
+
+		# Validation: this abbreviation must not already be taken
+		not_id = SeriesTable.query.filter(SeriesTable.id != int(self.series_id.data))
+		if not_id.filter_by(abbr=abbr_data).count() > 0:
+			raise ValidationError("The abbreviation \'%s\' is taken by another series" % abbr_data)
 
 class RemoveNovelForm(FlaskForm):
 	'''
@@ -236,4 +256,4 @@ class EditHonorificForm(FlaskForm):
 		hraw_data = hraw.data.strip()
 		not_id = HonorificsTable.query.filter(HonorificsTable.id != int(self.hon_id.data))
 		if not_id.filter_by(raw=hraw_data).count() > 0:
-			raise ValidationError("%s is already registered" % hraw.data)
+			raise ValidationError("%s is already registered" % hraw_data)
