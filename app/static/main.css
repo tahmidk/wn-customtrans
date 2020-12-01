@@ -48,6 +48,7 @@ html{
   /* Dictionary edit palette */
   --dictionary_edit_color_primary: #ff702c;
   --dictionary_edit_day_night_toggle_btn_color: #572a80;
+  --dictionary_edit_codemirror_hl_color: #e4e4e4;
   --dictionary_edit_codemirror_bg_color: white;
   --dictionary_edit_codemirror_text_color: black;
   --dictionary_edit_codemirror_gutter_color: #f7f7f7;
@@ -69,6 +70,7 @@ html[data-theme='dark']{
 
   /* Dictionary editor dark palette */
   --dictionary_edit_day_night_toggle_btn_color: #bea140;
+  --dictionary_edit_codemirror_hl_color: #2d2d2d;
   --dictionary_edit_codemirror_bg_color: #202020;
   --dictionary_edit_codemirror_text_color: white;
   --dictionary_edit_codemirror_gutter_color: #292929;
@@ -1221,8 +1223,14 @@ table.entry_info_table{
   color: var(--dictionary_edit_codemirror_text_color);
 }
 .CodeMirror-gutters{
-  background: var(--dictionary_edit_codemirror_gutter_color) !important;
-  border: none !important;
+  background: var(--dictionary_edit_codemirror_gutter_color);
+  border: none;
+}
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid var(--dictionary_edit_codemirror_text_color);
+}
+.CodeMirror-selected{
+  background: var(--dictionary_edit_codemirror_hl_color) !important;
 }
 .fullscreen .CodeMirror{
   height: 100% !important;
