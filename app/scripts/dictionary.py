@@ -92,6 +92,9 @@ def createDictFile(dict_fname, series_title, series_abbr, series_link):
 		Return:			None
 		------------------------------------------------------------------
 	"""
+	if not os.path.exists(app.config['DICTIONARIES_PATH']):
+		os.makedirs(app.config['DICTIONARIES_PATH'])
+
 	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
 	try:
 		with io.open(dict_path, mode='w', encoding='utf8') as dict_file:
