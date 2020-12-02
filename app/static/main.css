@@ -12,8 +12,8 @@ html{
   /* Main page palette */
   --library_color_primary: #d83939;
   --dictionary_color_primary: #f58e38;
-  --tutorial_color_primary: #9fde44;
-  --settings_color_primary: #31daff;
+  --tutorial_color_primary: #98ce4b;
+  --settings_color_primary: #648dab;
 
   /* Library palette */
   --update_library_button_color: #ffc545;
@@ -180,7 +180,6 @@ ion-icon .icon-inner{
   padding: 0.75em 0;
   box-sizing: border-box;
   box-shadow: 0 0 0 0.5rem black;
-  border-radius: 0.5rem;
   text-align: center;
   text-decoration: none !important;
   border: none !important;
@@ -197,12 +196,15 @@ ion-icon .icon-inner{
 }
 .menu_button_big{
   font-size: 8rem;
+  width: 30rem;
 }
 .menu_button_wide{
   font-size: 4rem;
+  width: 30rem;
 }
 .menu_button_small{
   font-size: 4rem;
+  width: 14rem;
 }
 .btn_cust{
   font-variant: all-small-caps;
@@ -437,8 +439,8 @@ ion-icon .icon-inner{
 
 /* Stylings for the site logo */
 .customtrans_logo_div{
-  height: 20vh;
-  margin-bottom: 5vh;
+  height: 20rem;
+  margin-bottom: 5rem;
 
   /* Make it unselectable */
   user-select: none;
@@ -457,9 +459,9 @@ ion-icon .icon-inner{
 .menu_div{
   display: flex;
   height: fit-content;
-  width: 70rem;
-  padding: 0.4vw;
-  margin: 2.5vh auto;
+  width: fit-content;
+  padding: 0.4rem;
+  margin: 2.5rem auto;
 
   /* Make it unselectable */
   user-select: none;
@@ -506,7 +508,7 @@ ion-icon .icon-inner{
   /*color: var(--tutorial_color_primary);*/
 }
 #menu_tutorial:hover {
-  filter: brightness(1.03);
+  filter: brightness(1.1);
 }
 #menu_settings{
   color: white;
@@ -515,7 +517,7 @@ ion-icon .icon-inner{
   /*color: var(--settings_color_primary);*/
 }
 #menu_settings:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.2);
 }
 
 
