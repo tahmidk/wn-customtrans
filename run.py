@@ -62,5 +62,13 @@ def initializeDatabase():
 
 # By running
 if __name__ == '__main__':
-	initializeDatabase()
+	db_path = os.path.join("app", app.config['SQLALCHEMY_DATABASE_NAME'])
+	if not os.path.isfile(db_path):
+		db.create_all()
+		initializeDatabase()
+	elif os.stat(db_path).st_size == 0:
+		os.remove(db_path)
+		db.create_all()
+		initializeDatabase()
+
 	app.run()

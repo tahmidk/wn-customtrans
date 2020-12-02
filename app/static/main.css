@@ -12,8 +12,8 @@ html{
   /* Main page palette */
   --library_color_primary: #d83939;
   --dictionary_color_primary: #f58e38;
-  --tutorial_color_primary: #9fde44;
-  --settings_color_primary: #31daff;
+  --tutorial_color_primary: #98ce4b;
+  --settings_color_primary: #648dab;
 
   /* Library palette */
   --update_library_button_color: #ffc545;
@@ -47,6 +47,11 @@ html{
 
   /* Dictionary edit palette */
   --dictionary_edit_color_primary: #ff702c;
+  --dictionary_edit_day_night_toggle_btn_color: #572a80;
+  --dictionary_edit_codemirror_hl_color: #e4e4e4;
+  --dictionary_edit_codemirror_bg_color: white;
+  --dictionary_edit_codemirror_text_color: black;
+  --dictionary_edit_codemirror_gutter_color: #f7f7f7;
 
   /* Honorifics palette */
   --honorifics_color_primary: #880e4f;
@@ -55,11 +60,20 @@ html{
 }
 html[data-theme='dark']{
   --html_background_color: #181818;
+
+  /* Chapter dark palette */
   --chapter_maintxt_color: #d0d0d0;
   --chapter_subtxt_color: #505050;
   --chapter_day_night_toggle_btn_color: #bea140;
   --chapter_scroll_bar_color: white;
   --chapter_word_color: #ffd000;
+
+  /* Dictionary editor dark palette */
+  --dictionary_edit_day_night_toggle_btn_color: #bea140;
+  --dictionary_edit_codemirror_hl_color: #2d2d2d;
+  --dictionary_edit_codemirror_bg_color: #202020;
+  --dictionary_edit_codemirror_text_color: white;
+  --dictionary_edit_codemirror_gutter_color: #292929;
 }
 html.transition,
 html.transition *,
@@ -166,7 +180,6 @@ ion-icon .icon-inner{
   padding: 0.75em 0;
   box-sizing: border-box;
   box-shadow: 0 0 0 0.5rem black;
-  border-radius: 0.5rem;
   text-align: center;
   text-decoration: none !important;
   border: none !important;
@@ -183,12 +196,15 @@ ion-icon .icon-inner{
 }
 .menu_button_big{
   font-size: 8rem;
+  width: 30rem;
 }
 .menu_button_wide{
   font-size: 4rem;
+  width: 30rem;
 }
 .menu_button_small{
   font-size: 4rem;
+  width: 14rem;
 }
 .btn_cust{
   font-variant: all-small-caps;
@@ -423,8 +439,8 @@ ion-icon .icon-inner{
 
 /* Stylings for the site logo */
 .customtrans_logo_div{
-  height: 20vh;
-  margin-bottom: 5vh;
+  height: 20rem;
+  margin-bottom: 5rem;
 
   /* Make it unselectable */
   user-select: none;
@@ -443,9 +459,9 @@ ion-icon .icon-inner{
 .menu_div{
   display: flex;
   height: fit-content;
-  width: 70rem;
-  padding: 0.4vw;
-  margin: 2.5vh auto;
+  width: fit-content;
+  padding: 0.4rem;
+  margin: 2.5rem auto;
 
   /* Make it unselectable */
   user-select: none;
@@ -492,7 +508,7 @@ ion-icon .icon-inner{
   /*color: var(--tutorial_color_primary);*/
 }
 #menu_tutorial:hover {
-  filter: brightness(1.03);
+  filter: brightness(1.1);
 }
 #menu_settings{
   color: white;
@@ -501,7 +517,7 @@ ion-icon .icon-inner{
   /*color: var(--settings_color_primary);*/
 }
 #menu_settings:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.2);
 }
 
 
@@ -1203,10 +1219,26 @@ table.entry_info_table{
   top: 0;
   left: 0;
   padding: 1rem;
-  background: white;
+}
+.CodeMirror-scroll{
+  background: var(--dictionary_edit_codemirror_bg_color);
+  color: var(--dictionary_edit_codemirror_text_color);
+}
+.CodeMirror-gutters{
+  background: var(--dictionary_edit_codemirror_gutter_color);
+  border: none;
+}
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid var(--dictionary_edit_codemirror_text_color);
+}
+.CodeMirror-selected{
+  background: var(--dictionary_edit_codemirror_hl_color) !important;
 }
 .fullscreen .CodeMirror{
   height: 100% !important;
+}
+#menu_dictionary_edit_day_night_toggle_btn{
+  background: var(--dictionary_edit_day_night_toggle_btn_color);
 }
 #dictionary_edit_icon{
   background: var(--dictionary_edit_color_primary);

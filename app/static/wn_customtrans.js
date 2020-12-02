@@ -599,8 +599,8 @@ function setupChapter(){
 
 	// Initialize the correct icon
 	var html = document.documentElement;
-	var day_night_toggle_class = "#day_night_toggle_btn";
-	$(day_night_toggle_class).each(function(){
+	var day_night_toggle = "#day_night_toggle_btn";
+	$(day_night_toggle).each(function(){
 		var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
 		var icon = $(this)[0].querySelector('ion-icon');
 		icon.setAttribute('name', icon_name);
@@ -628,7 +628,7 @@ function setupChapter(){
 	}
 
 	// Add functionality to toggle day and night UIs
-	$(day_night_toggle_class).click(function(){
+	$(day_night_toggle).click(function(){
 		html.classList.add('transition');
 		window.setTimeout(function(){
 			html.classList.remove('transition');
@@ -643,7 +643,7 @@ function setupChapter(){
 		}
 
 		// Change the toggle button
-		$(day_night_toggle_class).each(function(){
+		$(day_night_toggle).each(function(){
 			var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
 			var icon = $(this)[0].querySelector('ion-icon');
 			icon.setAttribute('name', icon_name);
@@ -769,6 +769,39 @@ function setupDictionaryEdit(){
 	const dictionary_edit_toastpanel = "#dictionary_edit_toastpanel";
 	var editor_dirty = false;
 
+	// Initialize the correct icon
+	var html = document.documentElement;
+	var day_night_toggle = "#menu_dictionary_edit_day_night_toggle_btn";
+	$(day_night_toggle).each(function(){
+		var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+		var icon = $(this)[0].querySelector('ion-icon');
+		icon.setAttribute('name', icon_name);
+	});
+
+	// Add functionality to toggle day and night UIs
+	$(day_night_toggle).click(function(){
+		html.classList.add('transition');
+		window.setTimeout(function(){
+			html.classList.remove('transition');
+		}, 1000);
+
+		// Toggle the theme
+		if(html.getAttribute('data-theme') == "light"){
+			html.setAttribute('data-theme', 'dark');
+		}
+		else{
+			html.setAttribute('data-theme', 'light');
+		}
+
+		// Change the toggle button
+		$(day_night_toggle).each(function(){
+			var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+			var icon = $(this)[0].querySelector('ion-icon');
+			icon.setAttribute('name', icon_name);
+		});
+
+	});
+
 	// Define a simple lexer for the dictionary syntax
 	CodeMirror.defineMode("dictionary_mode", function() {
 		return {
@@ -882,10 +915,12 @@ function setupDictionaryEdit(){
 	// Create the custom CodeMirror text area
 	var dict_editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
 		mode: "dictionary_mode",
+		keyMap: "sublime",
 		lineNumbers: true,
 		autoCloseBrackets: true,
-		indentWithTabs: false,
-		tabSize: 8
+		matchBrackets: true,
+		showCursorWhenSelecting: true,
+		tabSize: 2
 	});
 
 	// When user makes changes on the CodeMirror editor, determine if the editor is "dirty"
