@@ -371,9 +371,14 @@ function setupLibrary(){
 			update_btn_enabled = false;
 
 			// Show the progress bar
+			var body_padding_top = $('body').css('padding-top');
+			var update_bar_height = $(".library_update_progress_bar_display").css('height');
+			if(body_padding_top < update_bar_height){
+				$('body').css('padding-top', update_bar_height);
+			}
 			$('#update_progress_bar').attr("style", "width: 0;");
 			$('#update_info_series').attr("style", "display: none;");
-			$(".library_update_progress_bar_display").fadeIn()//.css("display","flex");
+			$(".library_update_progress_bar_display").fadeIn()
 
 			// Start SSE connection and listen for progress from server
 			var source = new EventSource("/library/update");
@@ -413,6 +418,7 @@ function setupLibrary(){
 					// Hide progress bar and re-enable this button
 					setTimeout(() => {
 						$(".library_update_progress_bar_display").fadeOut();
+						$('body').css('padding-top', body_padding_top);
 						update_btn_enabled = true;
 					}, 1000);
 					if(!update_error){
@@ -423,6 +429,7 @@ function setupLibrary(){
 								lib_flashpanel)
 						}, 1000);
 					}
+
 				}
 
 				// Display errors
