@@ -604,13 +604,21 @@ function setupChapter(){
 		document.querySelector('.chapter_scroll_notch').innerText = Math.round(percent_scrolled) + '%';
 	});
 
-	// Initialize the correct icon
-	var html = document.documentElement;
-	var day_night_toggle = "#day_night_toggle_btn";
-	$(day_night_toggle).each(function(){
-		var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-		var icon = $(this)[0].querySelector('ion-icon');
-		icon.setAttribute('name', icon_name);
+	// Bookmark button functionality
+	$(".chapter_bookmark_btn").click(function(){
+		var url = $(this).attr('action');
+		var bookmark_btn = $(this)
+		$.post(url, function(data) {
+			if(data.status != 'ok') {
+				createFlashMessage(
+					`${CRITICAL_BOLD} Encountered an error while bookmarking this chapters. Try again later`,
+					CRITICAL,
+					chapter_flashpanel);
+			}
+			else{
+				$(bookmark_btn).toggleClass("chapter_bookmark_btn_active");
+			}
+		});
 	});
 
 	// Add functionality of prev, toc, and next buttons
@@ -634,26 +642,31 @@ function setupChapter(){
 		});
 	}
 
+	// Initialize the correct icon
+	var day_night_toggle = "#day_night_toggle_btn";
+	$(day_night_toggle).each(function(){
+		var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+		$(this).find('ion-icon').attr('name', icon_name);
+	});
 	// Add functionality to toggle day and night UIs
 	$(day_night_toggle).click(function(){
-		html.classList.add('transition');
+		$('html').addClass('transition');
 		window.setTimeout(function(){
-			html.classList.remove('transition');
-		}, 2000);
+			$('html').removeClass('transition');
+		}, 1000);
 
 		// Toggle the theme
-		if(html.getAttribute('data-theme') == "light"){
-			html.setAttribute('data-theme', 'dark');
+		if($('html').attr('data-theme') == "light"){
+			$('html').attr('data-theme', "dark");
 		}
 		else{
-			html.setAttribute('data-theme', 'light');
+			$('html').attr('data-theme', "light");
 		}
 
 		// Change the toggle button
 		$(day_night_toggle).each(function(){
-			var icon_name = (html.getAttribute('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-			var icon = $(this)[0].querySelector('ion-icon');
-			icon.setAttribute('name', icon_name);
+			var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+			$(this).find('ion-icon').attr('name', icon_name);
 		});
 
 	});
@@ -923,7 +936,6 @@ function setupDictionaryEdit(){
 	var dict_editor = CodeMirror.fromTextArea($('#dictionary_editor')[0], {
 		mode: "dictionary_mode",
 		keyMap: "sublime",
-		lineNumbers: true,
 		autoCloseBrackets: true,
 		matchBrackets: true,
 		showCursorWhenSelecting: true,
@@ -1011,6 +1023,76 @@ function setupDictionaryEdit(){
 
 	$('#menu_dictionary_edit_fullscreen_btn').click(function(){
 		$('.dictionary_edit_body').toggleClass('fullscreen');
+	});
+
+	/* Editor utilbelt button functions */
+	$(".dictionary_edit_utility_btn").click(function(){
+		var cm = $(".CodeMirror")[0].CodeMirror;
+		var doc = cm.getDoc();
+		var cursor = doc.getCursor();
+		const line = doc.getLine(cursor.line);
+
+		switch($(this).attr('id')) {
+			case "util_new_line":{
+				// Insert new line
+				doc.replaceRange("\n", {
+					line: cursor.line
+				});
+				break;
+			}
+			case "util_del_line":{
+				// Insert new line
+				cm.execCommand("deleteLine");
+				break;
+			}
+			case "util_new_def":{
+				// Insert new definition
+				const insert_text = " -->   // ";
+				if (line.length === 0) {
+					doc.replaceRange(insert_text, {
+						line: cursor.line
+					});
+				} else {
+					doc.replaceRange(`\n${insert_text}`, {
+						line: cursor.line
+					});
+				}
+				break;
+			}
+			case "util_new_name":{
+				const insert_text = "@name{ , }   // ";
+				if (line.length === 0) {
+					doc.replaceRange(insert_text, {
+						line: cursor.line
+					});
+				} else {
+					doc.replaceRange(`\n${insert_text}`, {
+						line: cursor.line
+					});
+				}
+				break;
+			}
+			case "util_insrt_name_div":{
+				cm.setSelection(cursor, cursor);
+				cm.replaceSelection("|");
+				break;
+			}
+			case "util_insrt_comm_div":{
+				const insert_text = "//=============================[  ]==================================";
+				if (line.length === 0) {
+					doc.replaceRange(insert_text, {
+						line: cursor.line
+					});
+				} else {
+					doc.replaceRange(`\n${insert_text}`, {
+						line: cursor.line
+					});
+				}
+				break;
+			}
+			default:
+				// No Op
+		}
 	});
 }
 

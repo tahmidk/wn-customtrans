@@ -47,7 +47,7 @@ from app.scripts.custom_errors import *
 # This is the route for the main page
 @app.route("/")
 def index():
-	return render_template('index.html',
+	return render_template("index.html",
 		title='CustomTrans')
 
 # Custom error handlers
@@ -57,7 +57,7 @@ def error_404(error):
 		exist'''
 	desc = '''Perhaps you followed a bad link. Or maybe this is a series
 		sepcific page for a series that\'s no longer in your Library?'''
-	return render_template('misc/error_page.html',
+	return render_template("misc/error_page.html",
 		title='Error 404',
 		err_img=url_for('static', filename="error_404_img.gif"),
 		err_code=404,
@@ -70,7 +70,7 @@ def error_500(error):
 	hdr = '''<strong>Whoops!</strong> Server error. Yeah this one\'s on me...'''
 	desc = '''Looks like something caused the server side to error out. It's
 		not a you-problem though, it's a me-problem. Accept this sliding dogeza!'''
-	return render_template('misc/error_page.html',
+	return render_template("misc/error_page.html",
 		title='Error 500',
 		err_img=url_for('static', filename="error_500_img.gif"),
 		err_code=500,
@@ -93,7 +93,7 @@ def library():
 		entry.__dict__["lang"] = lang = Language.to_string(host_entry.host_lang)
 		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
 		entry.__dict__["dict_fname"] = dict_entry.fname
-	return render_template('library.html',
+	return render_template("library.html",
 		title="Library",
 		back_href=url_for('index'),
 		series=series,
@@ -236,7 +236,7 @@ def library_series_toc(series_code):
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
 	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
-	return render_template('series_toc.html',
+	return render_template("series_toc.html",
 		title=series_entry.abbr,
 		back_href=url_for('library'),
 		series=series_entry,
@@ -257,9 +257,8 @@ def library_series_update(series_code):
 
 
 # Route for removing a specific bookmark
-@app.route("/library/<series_code>/bookmark/<ch>", methods=["POST"])
+@app.route("/library/<series_code>/bookmark/<int:ch>", methods=["POST"])
 def library_series_toc_bookmark(series_code, ch):
-	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
 	if ch > series_entry.latest_ch:
 		# Can't set a current chapter if it's greater than the latest chapter
@@ -276,9 +275,8 @@ def library_series_toc_bookmark(series_code, ch):
 
 
 # Route for manual reseting of the current chapter for a given series
-@app.route("/library/<series_code>/setcurrent/<ch>", methods=["POST"])
+@app.route("/library/<series_code>/setcurrent/<int:ch>", methods=["POST"])
 def library_series_toc_setcurrent(series_code, ch):
-	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
 	if ch > series_entry.latest_ch:
 		# Can't set a current chapter if it's greater than the latest chapter
@@ -303,9 +301,8 @@ def library_series_toc_bookmark_all(series_code):
 
 
 # Route for a specific translated chapter 'ch' of 'series'
-@app.route("/library/<series_code>/<ch>")
+@app.route("/library/<series_code>/<int:ch>")
 def library_series_chapter(series_code, ch):
-	ch = int(ch)
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
@@ -318,6 +315,7 @@ def library_series_chapter(series_code, ch):
 		dummy_text = u"ダミー"
 	elif host_entry.host_lang == hostmanager.Language.CN:
 		dummy_text = u"假"
+	lang_code = hostmanager.Language.get_lang_code(host_entry.host_lang)
 
 	try:
 		chapter_data = utils.customTrans(series_entry, ch)
@@ -325,20 +323,24 @@ def library_series_chapter(series_code, ch):
 		flash(str(err), CRITICAL)
 		return render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
+			lang_code=lang_code,
 			back_href=back_href,
 			default_theme="dark",
 			series=series_entry,
 			ch=ch,
+			bookmarked=False,
 			dummy_text=dummy_text,
 			series_url=host_mgr.generateSeriesUrl(series_entry.code),
 			chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch))
 
 	return render_template("chapter.html",
 		title="%s %d" % (series_entry.abbr, ch),
+		lang_code=lang_code,
 		back_href=back_href,
 		default_theme="dark",
 		series=series_entry,
 		ch=ch,
+		bookmarked=(ch in series_entry.bookmarks),
 		dummy_text=dummy_text,
 		series_url=host_mgr.generateSeriesUrl(series_entry.code),
 		chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch),
@@ -648,7 +650,7 @@ def honorifics_remove_entry(hon_id):
 # Route for Tutorial page
 @app.route("/tutorial")
 def tutorial():
-	return render_template('tutorial.html',
+	return render_template("tutorial.html",
 		title="Tutorial")
 
 

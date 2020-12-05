@@ -4,7 +4,8 @@
 
 
 {% extends 'general_layout.html' %}
-{% block theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{% block html_theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{% block html_lang %}{{lang_code}}{% endblock %}
 {%- block metavars -%}
 	{{ define_metavar('ch', ch) }}
 	{{ define_metavar('latest_ch', series.latest_ch) }}
@@ -27,10 +28,17 @@
 
 	<!-- The chapter title and number -->
 	<div class="section_body">
+		<!-- The container that displays current chapter over latest chapter -->
 		<div class="series_progress">
 			<sup>{{ch}}</sup>&frasl;<sub>{{series.latest_ch}}</sub>
 		</div>
 
+		{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch) %}
+		<div class="chapter_bookmark_btn {{'chapter_bookmark_btn_active' if bookmarked}}" action="{{bookmark_url}}" title="Toggle bookmark">
+			<ion-icon name="bookmark"></ion-icon>
+		</div>
+
+		<!-- Chapter title and chapter number location -->
 		<div class="header_div">
 			<div class="chapter_series_title_div">
 				<a class="no_decoration" href="{{series_url}}" target="_blank">{{series.title}}</a>
