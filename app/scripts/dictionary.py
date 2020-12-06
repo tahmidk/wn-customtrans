@@ -334,7 +334,6 @@ def processDictFile(dict_fname, series_lang):
 			return (False, reason)
 
 		dict_list.append((r, (t, c)))
-		print("%s --> %s (%s)" % (r, t, c))
 		return (True, "")
 
 	try:
