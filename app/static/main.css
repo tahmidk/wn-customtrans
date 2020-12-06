@@ -63,7 +63,7 @@ html[data-theme='dark']{
 
   /* Chapter dark palette */
   --chapter_maintxt_color: #d0d0d0;
-  --chapter_subtxt_color: #505050;
+  --chapter_subtxt_color: #6f6f6f;
   --chapter_day_night_toggle_btn_color: #bea140;
   --chapter_scroll_bar_color: white;
   --chapter_word_color: #ffd000;
@@ -75,23 +75,18 @@ html[data-theme='dark']{
   --dictionary_edit_codemirror_text_color: white;
   --dictionary_edit_codemirror_gutter_color: #292929;
 }
-html.transition,
-html.transition *,
-html.transition *:before,
-html.transition *:after {
-  transition: all 300ms !important;
-  transition-delay: 0 !important;
-}
 
 body{
   margin:0;
-  padding:0;
+  padding-top: 5rem;
+  padding-bottom: 10rem;
   font-family:sans-serif;
   background: unset;
 }
 a{
   text-decoration: none !important;
   color: inherit;
+  transition: none;
 }
 a:link, a:visited{
   text-decoration: none !important;
@@ -109,13 +104,16 @@ section{
   width: fit-content;
   min-width: 75rem;
   height: auto;
-  margin: 5em auto 10em auto;
+  margin: auto;
   color: #555;
   box-sizing: border-box;
 
   font-family: 'Montserrat', sans-serif;
   font-size: 1.2rem;
   text-align: justify;
+}
+.section_body{
+  margin-top: 5rem;
 }
 /* Make some ugly webkit components disappear */
 input[type=number]::-webkit-inner-spin-button,
@@ -164,6 +162,7 @@ ion-icon .icon-inner{
   padding: 0.4em 0.2em;
   font-variant: petite-caps;
   font-size: 2em;
+  text-align: center;
 }
 .banner_icon{
   width: fit-content;
@@ -272,6 +271,7 @@ ion-icon .icon-inner{
 }
 .flash_msg_div{
   font-size: 1rem;
+  word-break: break-all;
 
   /* Make it unselectable */
   user-select: none;
@@ -439,7 +439,9 @@ ion-icon .icon-inner{
 
 /* Stylings for the site logo */
 .customtrans_logo_div{
-  height: 20rem;
+  width: fit-content;
+  height: 15rem;
+  margin: auto;
   margin-bottom: 5rem;
 
   /* Make it unselectable */
@@ -450,9 +452,7 @@ ion-icon .icon-inner{
   -o-user-select: none;
 }
 .customtrans_logo{
-  width: 100%;
   height: 100%;
-  object-fit: contain;
 }
 
 /* Main Page menu button stylings */
@@ -529,7 +529,7 @@ ion-icon .icon-inner{
 #library_icon{
   background: var(--library_color_primary);
 }
-#library_title{
+#library_banner{
   color: var(--library_color_primary);
 }
 /* Library superpanel stuff */
@@ -547,6 +547,7 @@ ion-icon .icon-inner{
   left: 0;
   top: 0;
   width: 100%;
+  height: 5rem;
   background: white;
   box-sizing: border-box;
 
@@ -558,12 +559,16 @@ ion-icon .icon-inner{
   -o-user-select: none;
 }
 .library_update_progress_bar_label{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   display: flex;
   width: fit-content;
   font-size: 1.3rem;
   font-variant: all-petite-caps;
   color: #c1891a;
-  margin: 1.5rem auto;
 }
 #library_update_spinner{
   width: 1.3rem;
@@ -587,6 +592,8 @@ ion-icon .icon-inner{
   border: 1px solid currentColor;
 }
 .library_update_progress_bar_container{
+  position: absolute;
+  bottom: 0;
   width: -webkit-fill-available;
   height: fit-content;
   margin: auto;
@@ -615,7 +622,6 @@ ion-icon .icon-inner{
   flex-direction: column;
   right: -0.5em;
   top: 0.5em;
-  width: 20%;
 }
 .minibanner{
   padding: 0.2em 1em;
@@ -655,7 +661,7 @@ table.entry_info_table{
 }
 .entry_details{
   margin: 1rem 0;
-  line-height: 2rem;
+  line-height: 1.5rem;
   font-size: 1rem;
 }
 .entry_action_bar{
@@ -769,7 +775,6 @@ table.entry_info_table{
 /*---------------------[ Table of Contents Stylings ]-----------------------*/
 .section_toc{
   padding: 10rem 3rem;
-  width: 75rem;
 }
 
 .toc_header{
@@ -788,6 +793,7 @@ table.entry_info_table{
 }
 .toc_series_title_div{
   color: #8e2525;
+  max-width: 75rem;
   font-variant: petite-caps;
   font-size: 3rem;
   text-align: center;
@@ -890,7 +896,6 @@ table.entry_info_table{
 /*---------------------[ Chapter Stylings ]-----------------------*/
 .section_chapter{
   padding: 10rem 3rem;
-  width: 120rem;
   max-width: 120rem;
 }
 .chapter_toolbelt{
@@ -913,14 +918,37 @@ table.entry_info_table{
   filter: brightness(1.3);
 }
 .series_progress{
+  position: unset;
   width: fit-content;
   color: var(--chapter_maintxt_color);
+  margin: 2rem auto;
+  padding: 0.5rem 1rem;
+  font-size: 1.3rem;
+  border: 1px solid var(--chapter_maintxt_color);
+}
+.chapter_bookmark_btn{
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
-  font-size: 1.3rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--chapter_maintxt_color);
+  width: 3rem;
+  height: 3rem;
+  background: #292929;
+  color: #565656;
+  cursor: pointer;
+  border: 1px solid var(--toc_bookmarked_highlight)
+}
+.chapter_bookmark_btn_active{
+  color: var(--toc_bookmarked_highlight);
+}
+.chapter_bookmark_btn:hover{
+  filter: brightness(1.2);
+}
+.chapter_bookmark_btn ion-icon{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.25rem;
 }
 .content_title_div{
   border-top: 1px solid #9a9a9a;
@@ -960,18 +988,23 @@ table.entry_info_table{
   padding: 2rem 0;
 }
 .content_line_div{
+  display: flex;
+  flex-direction: column;
   width: 100%;
   margin: 4rem 0;
 }
-.content_line{
+.content_line_div p{
   width: fit-content;
+  display: inline-block;
+  word-break: break-word;
+}
+.content_line{
   font-size: 1.5rem;
   margin: 0.5rem 0;
   color: var(--chapter_maintxt_color);
 }
 .content_raw{
-  width: fit-content;
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--chapter_subtxt_color);
 }
 .chapter_image_div{
@@ -989,7 +1022,6 @@ table.entry_info_table{
   font-variant: petite-caps;
   font-weight: bolder;
   color: var(--chapter_word_color) !important;
-  transition: 0.2s;
 }
 
 /* Chapter popover customizations */
@@ -1067,7 +1099,7 @@ table.entry_info_table{
 #dictionary_icon{
   background: var(--dictionary_color_primary);
 }
-#dictionary_title{
+#dictionary_banner{
   color: var(--dictionary_color_primary);
 }
 .dict_header{
@@ -1213,12 +1245,19 @@ table.entry_info_table{
 }
 .fullscreen #dictionary_edit_mainpanel{
   position: fixed;
+  background: var(--html_background_color);
   width: 100%;
   max-width: 2048px;
   height: 100%;
   top: 0;
   left: 0;
   padding: 1rem;
+}
+.CodeMirror{
+  font-size: 1.5rem;
+}
+.fullscreen .CodeMirror{
+  height: 100% !important;
 }
 .CodeMirror-scroll{
   background: var(--dictionary_edit_codemirror_bg_color);
@@ -1234,16 +1273,13 @@ table.entry_info_table{
 .CodeMirror-selected{
   background: var(--dictionary_edit_codemirror_hl_color) !important;
 }
-.fullscreen .CodeMirror{
-  height: 100% !important;
-}
 #menu_dictionary_edit_day_night_toggle_btn{
   background: var(--dictionary_edit_day_night_toggle_btn_color);
 }
 #dictionary_edit_icon{
   background: var(--dictionary_edit_color_primary);
 }
-#dictionary_edit_title{
+#dictionary_edit_banner{
   color: var(--dictionary_edit_color_primary);
 }
 .dictionary_edit_toolbelt{
@@ -1263,16 +1299,34 @@ table.entry_info_table{
 .dictionary_edit_toolbelt_btn ion-icon{
   margin: 0 0.2rem -0.2rem 0;
 }
-.dictionary_edit_abbr_tag{
-  position: absolute;
-  width: fit-content;
-  right: 0;
-  bottom: 0;
-  padding: 0.5rem 2rem;
+.dictionary_edit_utilbelt{
+  display: flex;
+  font-family: Lucida Console, Courier, monospace;
+  font-variant: all-petite-caps;
+  font-size: 1.1rem;
+  text-align: center;
   color: white;
-  font-size: 1.2rem;
-  font-family: monospace;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.dictionary_edit_utility_btn{
+  /* Spread 6 menu buttons evenly */
+  width: calc(100% / 6);
+  padding: 0.3rem 0;
+  cursor: pointer;
+  border-left: 1px solid;
   background: var(--dictionary_edit_color_primary);
+}
+.dictionary_edit_utility_btn:first-child{
+  border-left: none;
+}
+.dictionary_edit_utility_btn:hover{
+  filter: brightness(1.2);
 }
 #dictionary_edit_mainpanel .CodeMirror{
   height: fit-content;
@@ -1310,6 +1364,7 @@ table.entry_info_table{
 
 .toastpanel{
   position: fixed;
+  z-index: 2;
   display: flex;
   flex-direction: column-reverse;
   bottom: 0;
@@ -1366,7 +1421,7 @@ table.entry_info_table{
 #honorifics_icon{
   background: var(--honorifics_color_primary);
 }
-#honorifics_title{
+#honorifics_banner{
   color: var(--honorifics_color_primary);
 }
 #menu_honorifics_searchbar input:focus{
@@ -1444,6 +1499,10 @@ table.entry_info_table{
 .honorifics_form_help{
   display: inline;
 }
+.honorific_modal_options_div{
+  width: 10rem;
+  text-align: left;
+}
 .remove_honorific_modal_header_cust{
   background: var(--danger);
   color: #fff;
@@ -1464,4 +1523,223 @@ table.entry_info_table{
 }
 .remove_honorific_modal_data_display span{
   margin: 0 1rem;
+}
+
+
+/* Media Queries - Viewport Correction CSS */
+@media only screen and (max-width: 2480px){
+  /* Responsive Chapter */
+  .section_chapter{
+    max-width: 75rem;
+  }
+}
+@media only screen and (max-width: 1920px){
+  /* Responsive Chapter */
+  .chapter_sidebar{
+    display: none;
+  }
+}
+@media only screen and (max-width: 1280px){
+  section{
+    min-width: unset;
+  }
+
+  /* Responsive main menu*/
+  .section_index{
+    min-width: unset;
+  }
+  .menu_div{
+    flex-direction: column;
+  }
+  .menu_button_big{
+    font-size: 6rem;
+    width: 22rem;
+  }
+  .menu_button_wide{
+    font-size: 3rem;
+    width: 22rem;
+  }
+  .menu_button_small{
+    font-size: 3rem;
+    width: 10rem;
+  }
+
+  /* Responsive Dictionary */
+  .section_dictionary{
+    min-width: 50rem;
+  }
+  .dictionary_entry_filename{
+    display: none;
+  }
+  .dictionary_entry_abbr{
+    width: -webkit-fill-available;
+  }
+  .dictionary_entry_body{
+    width: unset;
+    padding-left: unset;
+  }
+  .dictionary_entry_abbr{
+    border-right: none;
+  }
+  .dictionary_entry_action_bar{
+    visibility: visible;
+    opacity: 1;
+  }
+  #menu_dictionary_honorifics_btn{
+    display: none;
+  }
+
+  /* Responsive Dictionary Edit */
+  #dictionary_edit_title{
+    font-size: 2rem;
+  }
+  .fullscreen #dictionary_edit_mainpanel, #dictionary_edit_mainpanel{
+    padding-right: 3rem;
+  }
+
+  /* Responsive TOC */
+  #jump_to_curr_btn span{
+    display: none;
+  }
+  #update_series_btn span{
+    display: none;
+  }
+  #series_dictionary_btn span{
+    display: none;
+  }
+
+  /* Responsive Chapter */
+  .chapter_bookmark_btn{
+    left: 3rem;
+  }
+  .section_chapter .super_navpanel{
+    right: 3rem;
+  }
+
+  /* Responsive Honorifics */
+  .section_honorifics{
+    min-width: 50rem;
+  }
+  .honorific_modal_options_div{
+    width: 15rem;
+  }
+}
+@media only screen and (max-width: 864px){
+  section{
+    width: auto;
+    min-width: unset;
+  }
+  body{
+    padding-top: 2rem;
+  }
+
+  .section_body{
+    margin-top: 10rem;
+  }
+  .banner{
+    width: 15rem;
+    margin: 3rem auto;
+    display: block;
+    border-bottom: 1px dashed currentColor;
+  }
+  .banner_icon{
+    margin: auto;
+  }
+  .banner_title{
+    width: fit-content;
+    margin: 0.5rem auto;
+    padding: 0;
+  }
+  .customtrans_logo_div{
+    height: 10rem;
+  }
+
+  /* Responsive Library */
+  .entry_minibanner{
+    position: initial;
+    width: fit-content;
+    margin: 0.5rem auto;
+  }
+  .minibanner{
+    text-align: center;
+  }
+  .entry_action_bar{
+    bottom: unset;
+    top: 1rem;
+  }
+  .entry_title{
+    width: fit-content;
+    margin: auto;
+    font-size: 2rem;
+    text-align: center;
+  }
+  .series_entry_btn{
+    font-size: 1.0rem;
+  }
+  .library_update_progress_bar_label{
+    font-size: 1rem;
+  }
+  .entry_action_button{
+    padding: 0 0.2rem;
+  }
+  #update_info_series{
+    padding: 0.2rem 2rem;
+  }
+
+  /* Responsive Dictionary */
+  .section_dictionary{
+    min-width: unset;
+  }
+  #dictionary_edit_mainpanel .CodeMirror{
+    height: 500px;
+  }
+
+  /* Responsive TOC */
+  .section_toc{
+    padding: 2rem;
+  }
+  .toc_series_abbr_div{
+    font-size: 1.5rem;
+    margin: 2rem auto;
+  }
+  .toc_series_title_div{
+    font-size: 3rem;
+    line-height: 3.2rem;
+  }
+  .section_toc .superpanel_menu_btn{
+    padding: 0.8rem 2rem;
+    font-size: 1.5rem;
+  }
+  .section_toc .superpanel_menu_btn span{
+    display: none;
+  }
+  .toc_chapter{
+    font-size: 2rem;
+  }
+
+  /* Responsive Chapter */
+  .section_chapter .section_body {
+    margin-top: 1rem;
+  }
+  .chapter_toolbelt{
+    width: unset;
+  }
+
+  /*Responsive Honorific*/
+  .section_honorifics{
+    min-width: unset;
+  }
+}
+
+@media only screen and (max-width: 640px){
+  html, html[data-theme='dark']{
+    font-size: 0.7rem;
+  }
+
+}
+
+@media only screen and (max-width: 460px){
+  html, html[data-theme='dark']{
+    font-size: 0.6rem;
+  }
 }

@@ -51,26 +51,35 @@ class Host(Enum):
 
 # Language enumeration
 class Language(Enum):
-    JP = 1
-    CN = 2
+	JP = 1
+	CN = 2
 
-    @staticmethod
-    def to_string(lang):
-    	if lang == Language.JP:
-    		return "Language.JP"
-    	elif lang == Language.CN:
-    		return "Language.CN"
-    	else:
-    		raise ValueError
+	@staticmethod
+	def to_string(lang):
+		if lang == Language.JP:
+			return "Language.JP"
+		elif lang == Language.CN:
+			return "Language.CN"
+		else:
+			raise ValueError
 
-    @staticmethod
-    def to_enum(label):
-    	if label in ('Language.JP', 1):
-    		return Language.JP
-    	elif label in ('Language.CN', 2):
-    		return Language.CN
-    	else:
-    		raise ValueError
+	@staticmethod
+	def to_enum(label):
+		if label in ('Language.JP', 1):
+			return Language.JP
+		elif label in ('Language.CN', 2):
+			return Language.CN
+		else:
+			raise ValueError
+
+	@staticmethod
+	def get_lang_code(lang):
+		if lang == Language.JP:
+			return "ja"
+		elif lang == Language.CN:
+			return "zh"
+		else:
+			raise ValueError
 
 
 
@@ -203,11 +212,7 @@ class HostManager(ABC):
 		------------------------------------------------------------------
 	"""
 	def generateGoogleTranslateLink(self, line):
-		if self.host_lang == Language.JP:
-			lang_code = "ja"
-		elif self.host_lang == Language.CN:
-			lang_code = "zh-CN"
-
+		lang_code = Language.get_lang_code(self.host_lang)
 		line = line.replace("\"", "\'")
 		link = "https://translate.google.com/?hl=en&tab=TT&authuser=0#view=home&op=translate&sl=%s&tl=en&text=%s" \
 			% (lang_code, line)

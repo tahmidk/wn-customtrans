@@ -4,7 +4,8 @@
 
 
 {% extends 'general_layout.html' %}
-{% block theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{% block html_theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{% block html_lang %}{{lang_code}}{% endblock %}
 {%- block metavars -%}
 	{{ define_metavar('ch', ch) }}
 	{{ define_metavar('latest_ch', series.latest_ch) }}
@@ -26,69 +27,78 @@
 	{% endif%}
 
 	<!-- The chapter title and number -->
-	<div class="header_div">
-		<div class="chapter_series_title_div">
-			<a class="no_decoration" href="{{series_url}}" target="_blank">{{series.title}}</a>
+	<div class="section_body">
+		<!-- The container that displays current chapter over latest chapter -->
+		<div class="series_progress">
+			<sup>{{ch}}</sup>&frasl;<sub>{{series.latest_ch}}</sub>
 		</div>
-		<div style="width: 60%; margin: auto;">
-			<hr style="border-top: 1px solid var(--chapter_maintxt_color)">
+
+		{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch) %}
+		<div class="chapter_bookmark_btn {{'chapter_bookmark_btn_active' if bookmarked}}" action="{{bookmark_url}}" title="Toggle bookmark">
+			<ion-icon name="bookmark"></ion-icon>
 		</div>
-		<div class="chapter_chapter_div">
-			<a class="no_decoration" href="{{chapter_url}}" target="_blank">Chapter {{ch}}</a>
-		</div>
-	</div>
 
-	<div class="series_progress">
-		<sup>{{ch}}</sup>&frasl;<sub>{{series.latest_ch}}</sub>
-	</div>
-
-	<!-- Top toolbelt -->
-	<div class="chapter_toolbelt" id="chapter_toolbelt_north">
-		{{ render_toolbelt() }}
-	</div>
-
-	<!-- Flashpanel -->
-	<div class="flashpanel" id="chapter_flashpanel">
-		<!-- Flashed messages -->
-		{% with messages = get_flashed_messages(with_categories=true) %}
-			{{ flash_alert(messages) }}
-		{% endwith %}
-	</div>
-
-	<div class="content">
-		{% if chapter_data is defined %}
-			<p class="dummy" id="d0">{{dummy_text}}</p>
-			<div class="content_title_div content_section">
-				{{ line_entry(chapter_data.title) }}
+		<!-- Chapter title and chapter number location -->
+		<div class="header_div">
+			<div class="chapter_series_title_div">
+				<a class="no_decoration" href="{{series_url}}" target="_blank">{{series.title}}</a>
 			</div>
-			<p class="dummy" id="d1">{{dummy_text}}</p>
-			{% if chapter_data.prescript|length > 0 %}
-				<div class="content_prescript content_section">
-				{% for data in chapter_data.prescript %}
-					{{ line_entry(data) }}
-				{% endfor %}
-				</div>
-			{% endif %}
-			{% if chapter_data.main|length > 0 %}
-				<div class="content_main content_section">
-				{% for data in chapter_data.main %}
-					{{ line_entry(data) }}
-				{% endfor %}
-				</div>
-			{% endif %}
-			{% if chapter_data.postscript|length > 0 %}
-				<div class="content_afterword content_section">
-				{% for data in chapter_data.postscript %}
-					{{ line_entry(data) }}
-				{% endfor %}
-				</div>
-			{% endif %}
-		{% endif %}
-	</div>
+			<div style="width: 60%; margin: auto;">
+				<hr style="border-top: 1px solid var(--chapter_maintxt_color)">
+			</div>
+			<div class="chapter_chapter_div">
+				<a class="no_decoration" href="{{chapter_url}}" target="_blank">Chapter {{ch}}</a>
+			</div>
+		</div>
 
-	<!-- Bottom toolbelt -->
-	<div class="chapter_toolbelt" id="chapter_toolbelt_south">
-		{{ render_toolbelt() }}
+		<!-- Top toolbelt -->
+		<div class="chapter_toolbelt" id="chapter_toolbelt_north">
+			{{ render_toolbelt() }}
+		</div>
+
+		<!-- Flashpanel -->
+		<div class="flashpanel" id="chapter_flashpanel">
+			<!-- Flashed messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{{ flash_alert(messages) }}
+			{% endwith %}
+		</div>
+
+		<div class="content">
+			{% if chapter_data is defined %}
+				<p class="dummy" id="d0">{{dummy_text}}</p>
+				<div class="content_title_div content_section">
+					{{ line_entry(chapter_data.title) }}
+				</div>
+				<p class="dummy" id="d1">{{dummy_text}}</p>
+				{% if chapter_data.prescript|length > 0 %}
+					<div class="content_prescript content_section">
+					{% for data in chapter_data.prescript %}
+						{{ line_entry(data) }}
+					{% endfor %}
+					</div>
+				{% endif %}
+				{% if chapter_data.main|length > 0 %}
+					<div class="content_main content_section">
+					{% for data in chapter_data.main %}
+						{{ line_entry(data) }}
+					{% endfor %}
+					</div>
+				{% endif %}
+				{% if chapter_data.postscript|length > 0 %}
+					<div class="content_afterword content_section">
+					{% for data in chapter_data.postscript %}
+						{{ line_entry(data) }}
+					{% endfor %}
+					</div>
+				{% endif %}
+			{% endif %}
+		</div>
+
+		<!-- Bottom toolbelt -->
+		<div class="chapter_toolbelt" id="chapter_toolbelt_south">
+			{{ render_toolbelt() }}
+		</div>
 	</div>
 
 	<!-- Fade outs on smaller screens-->

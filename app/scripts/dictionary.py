@@ -277,7 +277,6 @@ def sanitizeDictEntry(entry):
 	(raw, (translation, comment)) = entry
 	raw = html.escape(raw)
 	translation = html.escape(translation)
-	comment = html.escape(comment) if comment is not None else None
 	return (raw, (translation, comment))
 
 def processDictFile(dict_fname, series_lang):
@@ -302,79 +301,88 @@ def processDictFile(dict_fname, series_lang):
 		raise DictFileEmptyOnProcessException(dict_fname)
 
 	# Helper function to flash misformatted lines
-	def flashMisformattedLine(line, linenum):
+	def flashMisformattedLine(line, linenum, reason):
 		line = strong("\"%s\"" % line)
 		location = mono("[%s:%d]" % (dict_fname, linenum))
 		line_0 = line if len(line) < 40 else "%s...\"" % line[:36]
-		flash("%s Misformatted line %s at location %s" % (WARNING_BOLD, line_0, location), "warning")
+		flash("%s Ignored misformatted line %s at %s... %s" %
+			(WARNING_BOLD, line_0, location, reason), "warning")
+
+	# Helper function to validate name tags
+	def processNameTag(r, t, c):
+		# Validity check: the raw component should be one-to-one with the translation component
+		if len(r) != len(t):
+			reason = "Misbalanced name tag (left:%d, right:%d)" % (len(r), len(t))
+			return (False, reason)
+
+		# Validity check: No empty strings in the components
+		if '' in r or '' in t:
+			reason = "Cannot have empty entries within a name tag"
+			return (False, reason)
+
+		# Generate and append name variants to the dict
+		variants = generateNameVariants(r, t, c, series_lang)
+		if variants is not None:
+			dict_list.extend(variants)
+		return (True, "")
+
+	# Helper function to validate singular definitions
+	def processDefinition(r, t, c):
+		# Validity check: Neither raw nor translation components are empty strings
+		if len(r) == 0 or len(t) == 0:
+			reason = "Cannot have empty entries within a definition"
+			return (False, reason)
+
+		dict_list.append((r, (t, c)))
+		return (True, "")
 
 	try:
 		with io.open(dict_path, mode='r', encoding='utf8') as dict_file:
-			name_pattern = re.compile(r"\s*@name\{(.+), (.+)\}\s*(?:\/\/(.*))?")
+			name_pattern = re.compile(r"\s*@name\{(.+),(.+)\}\s*(\/\/.*)?")
+			defn_pattern = re.compile(r"([^\-\-\>]*)-->([^\/\/]*)(\/\/.*)?")
 			dict_contents = dict_file.readlines()
 			for index in range(0, len(dict_contents)):
+				reason = None
 				line = dict_contents[index]
 				line = line.strip()
 				# Double quotations in the google translate anchor mess up the link
 				line = line.replace("\"", "\'")
 
 				# Skip comment lines and unformatted/misformatted lines
-				name_match = name_pattern.match(line)
 				if line[0:2] == "//" or len(line) == 0 or line.isspace():
 					continue
-				elif name_match is not None:
+
+				# Match an @name line
+				name_match = name_pattern.match(line)
+				if name_match is not None:
 					# Process name tagged lines: '@name{name_raw, name_trans}',
 					#  '@name{first_name_raw|last_name_raw, first_name_trans|last_name_trans}', etc...
-					raw_component = name_match[1].strip().split(DICT_NAME_DIVIDER)
-					trans_component = name_match[2].strip().split(DICT_NAME_DIVIDER)
-					comment = name_match[3].strip()[:COMMENT_MAX_LEN] if name_match[3] is not None else None
+					(r, t, c) = (name_match[1], name_match[2], name_match[3])
+					raw_component = r.strip().split(DICT_NAME_DIVIDER)
+					trans_component = t.strip().split(DICT_NAME_DIVIDER)
+					# Start comment from index 2 to ignore the '//'
+					comment = c[2:COMMENT_MAX_LEN+2].strip() if c is not None else None
 
-					# Validity check: the raw component should be one-to-one with the translation component
-					if len(raw_component) != len(trans_component):
-						# Line is a misbalanced name tag
-						flashMisformattedLine(line, index+1)
+					(valid_name, reason) = processNameTag(raw_component, trans_component, comment)
+					if valid_name:
 						continue
 
-					# Validity check: No empty strings in the components
-					if '' in raw_component or '' in trans_component:
-						flashMisformattedLine(line, index+1)
+				# Match a regular definition
+				defn_match = defn_pattern.match(line)
+				if defn_match is not None:
+					(r, t, c) = (defn_match[1], defn_match[2], defn_match[3])
+					raw_component = r.strip()
+					trans_component = t.strip()
+					# Start comment from index 2 to ignore the '//'
+					comment = c[2:COMMENT_MAX_LEN+2].strip() if c is not None else None
+
+					(valid_def, reason) = processDefinition(raw_component, trans_component, comment)
+					if valid_def:
 						continue
 
-					# Generate and append name variants to the dict
-					variants = generateNameVariants(raw_component, trans_component, comment, series_lang)
-					if variants is not None:
-						dict_list.extend(variants)
-				else:
-					# Process single definition lines: 'X_raw --> X_trans // comment'
-					if DICT_DEF_DIVIDER not in line:
-						# This line is either misformatted or not a definition, skip
-						flashMisformattedLine(line, index+1)
-						continue
-
-					divider_split = [entry.strip() for entry in line.split(DICT_DEF_DIVIDER)]
-					if len(divider_split) != 2:
-						# Misformatted definition along divider, skip
-						flashMisformattedLine(line, index+1)
-						continue
-
-					raw_component = divider_split[0]
-					trans_component = divider_split[1]
-					if len(raw_component) == 0 or len(trans_component) == 0:
-						# Empty definition on either side of the definition divider, skip
-						flashMisformattedLine(line, index+1)
-						continue
-
-					# Split the translation component via // to seperate translation from comment
-					trans_comment_split = [entry.strip() for entry in trans_component.split("//")]
-
-					raw = raw_component
-					translation = trans_comment_split[0]
-					comment = None
-					if len(trans_comment_split) > 1 and len(trans_comment_split[1]) > 0:
-						# Non empty comment detected
-						comment = trans_comment_split[1][:COMMENT_MAX_LEN]
-
-					dict_list.append( (raw, (translation, comment)) )
+				# All else fails: misformatted line
+				reason = "Unrecognized syntactical construct" if (reason is None) else reason
+				flashMisformattedLine(line, index+1, reason)
 	except Exception as err:
 		raise DictFileReadException(dict_fname)
 
