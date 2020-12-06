@@ -64,9 +64,6 @@
 	<script type="text/javascript" src="{{ url_for('static', filename='wn_customtrans.js') }}"></script>
 	<!-- Custom Javascript (per page basis) -->
 	<script type="text/javascript">
-		{% block script_area %}
-		{% endblock %}
-
 		// CSRF protection per page
 		$.ajaxSetup({
 			beforeSend: function(xhr, settings) {
@@ -75,6 +72,9 @@
 				}
 			}
 		});
+
+		{% block script_area %}
+		{% endblock %}
 	</script>
 </body>
 </html>

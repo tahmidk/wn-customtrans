@@ -299,10 +299,6 @@ function tp_replace_placeholders(line_num, word_num)
 	$(line_elem).addClass('notranslate');
 	removeFontTags(line_elem);
 
-	if(line_num == 56){
-		var a =1;
-	}
-
 	// Remove rogue articles (the + a) often preceding dictionary words
 	var remove_articles_regex = new RegExp("(the|a)(\\s*)$", 'gi');
 	$(line_elem).find('.placeholder').each(function(){

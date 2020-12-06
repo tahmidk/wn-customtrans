@@ -16,16 +16,17 @@ class BaseConfig(object):
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'dicts')
 
 	# Security
+	SESSION_COOKIE_SECURE = True
 	SECRET_KEY = 'e0d41ebf1910b2ba'
 	SQLALCHEMY_DATABASE_NAME = 'database_wnct.db'
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
-	SESSION_COOKIE_SECURE = True
 	# Dictionary file upload constraints
 	ALLOWED_DICT_EXTENSIONS = ['DICT', 'TXT']
 	MAX_DICT_FILESIZE = 2 * 1024 * 1024
 
 # Config used in production
 class ProductionConfig(BaseConfig):
+	SESSION_COOKIE_SECURE = False
 	CONFIG_NAME = "production"
 
 # Config used in development
@@ -35,9 +36,9 @@ class DevelopmentConfig(BaseConfig):
 
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'dev', 'dicts')
 
+	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_dev.db'
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
-	SESSION_COOKIE_SECURE = False
 
 # Config used in
 class TestingConfig(BaseConfig):
@@ -46,6 +47,6 @@ class TestingConfig(BaseConfig):
 
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'test', 'dicts')
 
+	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_test.db'
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
-	SESSION_COOKIE_SECURE = False
