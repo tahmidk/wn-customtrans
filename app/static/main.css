@@ -75,13 +75,6 @@ html[data-theme='dark']{
   --dictionary_edit_codemirror_text_color: white;
   --dictionary_edit_codemirror_gutter_color: #292929;
 }
-html.transition,
-html.transition *,
-html.transition *:before,
-html.transition *:after {
-  transition: all 300ms !important;
-  transition-delay: 0 !important;
-}
 
 body{
   margin:0;
@@ -93,6 +86,7 @@ body{
 a{
   text-decoration: none !important;
   color: inherit;
+  transition: none;
 }
 a:link, a:visited{
   text-decoration: none !important;
@@ -277,6 +271,7 @@ ion-icon .icon-inner{
 }
 .flash_msg_div{
   font-size: 1rem;
+  word-break: break-all;
 
   /* Make it unselectable */
   user-select: none;
@@ -798,6 +793,7 @@ table.entry_info_table{
 }
 .toc_series_title_div{
   color: #8e2525;
+  max-width: 75rem;
   font-variant: petite-caps;
   font-size: 3rem;
   text-align: center;
@@ -1026,7 +1022,6 @@ table.entry_info_table{
   font-variant: petite-caps;
   font-weight: bolder;
   color: var(--chapter_word_color) !important;
-  transition: 0.2s;
 }
 
 /* Chapter popover customizations */
@@ -1597,6 +1592,9 @@ table.entry_info_table{
   /* Responsive Dictionary Edit */
   #dictionary_edit_title{
     font-size: 2rem;
+  }
+  .fullscreen #dictionary_edit_mainpanel, #dictionary_edit_mainpanel{
+    padding-right: 3rem;
   }
 
   /* Responsive TOC */
