@@ -207,15 +207,7 @@ function handleUploadDict(input){
  * 		root - the root JQuery object to mutate
  */
 function removeFontTags(root){
-	// Remove all immediate children <font> tags
-	$(root).find('> font').each(function(){
-		_removeFontTags($(this));
-	});
-
-	// Remove <font> tags from inline .placeholder <spans>s
-	$(root).find('.placeholder > font').each(function(){
-		_removeFontTags($(this));
-	});
+	$(root).find('font').contents().unwrap();
 
 	// Finally normalize the elements (combine individual text nodes into one text node)
 	$(root).find('.placeholder').each(function(){
@@ -245,15 +237,6 @@ function removeFontTags(root){
 	$(root).contents().filter(function(){
 		return (this.nodeType == Node.TEXT_NODE);
 	}).wrap("<span></span>");
-}
-// A recursive helper function
-function _removeFontTags(element){
-	$(element).find('> font').each(function(){
-		_removeFontTags($(this));
-	});
-
-	//$(element).replaceWith($(element).text());
-	$(element).contents().unwrap();
 }
 
 /*===================================================================*/
@@ -330,22 +313,22 @@ function tagged_placeholders(){
 			var dummy_curr_id = parseInt(this.id.substring(1));
 			checkpoint[dummy_curr_id] = true;
 
-			// If D and D-1 are both triggered, then the line between them, L=D-1
+			// If D-1 and D are both triggered, then the line between them, L=D
 			// should be completely translated and ready to postprocess
 			var dummy_prev_id = dummy_curr_id - 1;
-			if(dummy_prev_id > 0 && checkpoint[dummy_prev_id]){
+			if(dummy_prev_id >= 0 && checkpoint[dummy_prev_id]){
 				if(!line_processed[dummy_prev_id]){
-					word_num = tp_replace_placeholders(dummy_prev_id, word_num);
+					word_num = tp_replace_placeholders(dummy_curr_id, word_num);
 					line_processed[dummy_prev_id] = true;
 				}
 			}
 
-			// If D and D+1 are both triggered, then the line between them, L=D
+			// If D and D+1 are both triggered, then the line between them, L=D+1
 			// should be completely translated and ready to postprocess
 			var dummy_next_id = dummy_curr_id + 1;
 			if(dummy_next_id < checkpoint.length && checkpoint[dummy_next_id]){
 				if(!line_processed[dummy_curr_id]){
-					word_num = tp_replace_placeholders(dummy_curr_id, word_num);
+					word_num = tp_replace_placeholders(dummy_next_id, word_num);
 					line_processed[dummy_curr_id] = true;
 				}
 			}

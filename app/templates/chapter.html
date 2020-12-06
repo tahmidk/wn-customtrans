@@ -67,10 +67,11 @@
 		<div class="content">
 			{% if chapter_data is defined %}
 				<p class="dummy" id="d0">{{dummy_text}}</p>
+				<!-- Chapter title -->
 				<div class="content_title_div content_section">
 					{{ line_entry(chapter_data.title) }}
 				</div>
-				<p class="dummy" id="d1">{{dummy_text}}</p>
+				<!-- Chapter prescript -->
 				{% if chapter_data.prescript|length > 0 %}
 					<div class="content_prescript content_section">
 					{% for data in chapter_data.prescript %}
@@ -78,6 +79,7 @@
 					{% endfor %}
 					</div>
 				{% endif %}
+				<!-- Chapter main content -->
 				{% if chapter_data.main|length > 0 %}
 					<div class="content_main content_section">
 					{% for data in chapter_data.main %}
@@ -85,6 +87,7 @@
 					{% endfor %}
 					</div>
 				{% endif %}
+				<!-- Chapter postscript -->
 				{% if chapter_data.postscript|length > 0 %}
 					<div class="content_afterword content_section">
 					{% for data in chapter_data.postscript %}
