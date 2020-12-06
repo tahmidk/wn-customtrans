@@ -1693,6 +1693,9 @@ table.entry_info_table{
   #dictionary_edit_mainpanel .CodeMirror{
     height: 500px;
   }
+  .CodeMirror-scroll{
+    width: 100%;
+  }
 
   /* Responsive TOC */
   .section_toc{

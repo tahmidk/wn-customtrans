@@ -5,6 +5,7 @@
 
 {% extends 'general_layout.html' %}
 {% block html_theme %}{{default_theme if default_theme is defined}}{% endblock %}
+{% block hdr_theme %}#262829{% endblock %}
 {% block html_lang %}{{lang_code}}{% endblock %}
 {%- block metavars -%}
 	{{ define_metavar('ch', ch) }}
