@@ -52,6 +52,13 @@ html{
   --dictionary_edit_codemirror_bg_color: white;
   --dictionary_edit_codemirror_text_color: black;
   --dictionary_edit_codemirror_gutter_color: #f7f7f7;
+  /* Lexer colors */
+  --dictionary_edit_nametag_color : #ff0071;
+  --dictionary_edit_nameargs_color : white;
+  --dictionary_edit_namesplit_color : #3cc500;
+  --dictionary_edit_divider_color : #ff7a00;
+  --dictionary_edit_comment_color: #adadad;
+  --dictionary_edit_meta_color : #9b74ff;
 
   /* Honorifics palette */
   --honorifics_color_primary: #880e4f;
@@ -74,6 +81,7 @@ html[data-theme='dark']{
   --dictionary_edit_codemirror_bg_color: #202020;
   --dictionary_edit_codemirror_text_color: white;
   --dictionary_edit_codemirror_gutter_color: #292929;
+  --dictionary_edit_comment_color: #474747;
 }
 
 body{
@@ -1037,8 +1045,9 @@ table.entry_info_table{
 /* Side progress indicator */
 .chapter_sidebar{
   position: fixed;
-  left: 10rem;
-  top: 30vh;
+  /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 */
+  left: calc((100vw - 75rem) / 4);
+  top: calc(50% - 20vh);
   width: 3rem;
   height: 40vh;
 }
@@ -1073,7 +1082,8 @@ table.entry_info_table{
 }
 .chapter_scroll_notch{
   position: absolute;
-  top: 19vh;
+  top: calc(50% - 1rem);
+  height: 2rem;
   width: 100%;
   color: var(--chapter_maintxt_color);
   background: var(--html_background_color);
@@ -1334,12 +1344,12 @@ table.entry_info_table{
   border-top: 5px solid var(--dictionary_edit_color_primary);
 }
 /* Lexer token styles */
-.cm-dict-nametag   { color: #ff0071; font-weight: bold; }
-.cm-dict-nameargs  { color: #fff; }
-.cm-dict-namesplit { color: #3cc500; }
-.cm-dict-divider   { color: #ff7a00; }
-.cm-dict-comment   { color: #adadad; }
-.cm-dict-meta      { color: #9b74ff; }
+.cm-dict-nametag   { color: var(--dictionary_edit_nametag_color); font-weight: bold; }
+.cm-dict-nameargs  { color: var(--dictionary_edit_nameargs_color); }
+.cm-dict-namesplit { color: var(--dictionary_edit_namesplit_color); }
+.cm-dict-divider   { color: var(--dictionary_edit_divider_color); }
+.cm-dict-comment   { color: var(--dictionary_edit_comment_color); }
+.cm-dict-meta      { color: var(--dictionary_edit_meta_color); }
 .dict-error{
   margin: -1px 0 !important;
   border: 1px solid red;
@@ -1533,7 +1543,7 @@ table.entry_info_table{
     max-width: 75rem;
   }
 }
-@media only screen and (max-width: 1920px){
+@media only screen and (max-width: 1440px){
   /* Responsive Chapter */
   .chapter_sidebar{
     display: none;

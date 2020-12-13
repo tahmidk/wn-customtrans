@@ -683,11 +683,10 @@ function setupChapter(){
 	}
 
 	// Initialize the correct icon
-	var day_night_toggle = "#day_night_toggle_btn";
-	$(day_night_toggle).each(function(){
-		var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-		$(this).find('ion-icon').attr('name', icon_name);
-	});
+	var day_night_toggle = $('.chapter_toolbelt').find('#day_night_toggle_btn');
+	var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+	$(day_night_toggle).find('ion-icon').attr('name', icon_name);
+
 	// Add functionality to toggle day and night UIs
 	$(day_night_toggle).click(function(){
 		// Toggle the theme
@@ -699,11 +698,8 @@ function setupChapter(){
 		}
 
 		// Change the toggle button
-		$(day_night_toggle).each(function(){
-			var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-			$(this).find('ion-icon').attr('name', icon_name);
-		});
-
+		var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
+		$(day_night_toggle).find('ion-icon').attr('name', icon_name);
 	});
 }
 

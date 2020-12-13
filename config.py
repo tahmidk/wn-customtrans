@@ -15,6 +15,9 @@ class BaseConfig(object):
 	SEED_DATA_PATH = os.path.join(os.getcwd(), 'seed_data')
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'dicts')
 
+	# Remove CSRF token life-time restriction
+	WTF_CSRF_TIME_LIMIT = None
+
 	# Security
 	SESSION_COOKIE_SECURE = True
 	SECRET_KEY = 'e0d41ebf1910b2ba'
