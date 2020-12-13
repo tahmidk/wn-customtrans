@@ -532,6 +532,7 @@ def dictionaries_edit(dict_fname):
 	return render_template("dictionary_edit.html",
 		title="Edit %s" % series_abbr,
 		back_href=url_for('dictionaries'),
+		default_theme="dark",
 		series_abbr=series_abbr,
 		dict_fname=dict_fname,
 		dict_content=dict_content)
