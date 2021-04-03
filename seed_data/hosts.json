@@ -1,11 +1,11 @@
 {
     "hosts":[
         {
-            "host_type": "Host.Syosetu",
-            "host_name": "Syosetu",
-            "host_lang": "Language.JP",
-            "host_url": "https://ncode.syosetu.com/",
-            "host_search_engine": "https://yomou.syosetu.com/search.php"
+            "host_type": 			"Host.Syosetu",
+            "host_name": 			"Syosetu",
+            "host_lang": 			"Language.JP",
+            "host_url": 			"https://ncode.syosetu.com/",
+            "host_search_engine": 	"https://yomou.syosetu.com/search.php"
         }
     ]
 }

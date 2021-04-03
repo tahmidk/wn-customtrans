@@ -6,8 +6,7 @@
 #=======================================================================
 
 # Python Imports
-from urllib.request import urlopen
-from urllib.error import HTTPError
+import requests
 
 # Flask imports
 from flask_wtf import FlaskForm
@@ -98,10 +97,17 @@ class RegisterNovelForm(FlaskForm):
 		# Validation: the url must exist
 		url = host_entry.host_url + series_code_data
 		try:
-			urlopen(url)
-		# Page not found
-		except HTTPError as e:
-			raise ValidationError("%s does not exist" % mono(url))
+			cookies = { 'over18': 'yes' }
+			headers = { 'User-Agent' : 'Mozilla/5.0' }
+			response = requests.get(url,
+				cookies=cookies,
+				headers=headers,
+				verify=False)
+
+			if not response.status_code == 200:
+				if response.status_code == 404:
+					raise ValidationError("%s does not exist" % mono(url))
+				raise Exception
 		# Some error has occurred
 		except Exception as e:
 			raise ValidationError("No response from %s. Try again later" % mono(url))
