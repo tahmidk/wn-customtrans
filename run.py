@@ -8,7 +8,7 @@
 # Python imports
 import io
 import os
-import argparse
+import argparse as argp
 
 # Internal imports
 from flask import url_for
@@ -34,10 +34,9 @@ def initializeDatabase():
 	"""
 	# HostTable can't be empty on execution of the flask app
 	if len(HostTable.query.all()) == 0:
-		print("No hosts found in the database... Seeding hosts from disk")
-		utils.seedHosts(
-			os.path.join(app.config['SEED_DATA_PATH'], "hosts.json"),
-			mode='overwrite')
+		hosts_path = os.path.join(app.config['SEED_DATA_PATH'], "hosts.json")
+		print("No hosts found in the database... Seeding hosts from disk: \'%s\'" % hosts_path)
+		utils.seedHosts(hosts_path, mode='overwrite')
 
 	# DictionaryTable should minimally have the common dictionary registered
 	if DictionaryTable.query.filter_by(fname=dictionary.COMMON_DICT_FNAME).first() is None:
@@ -62,6 +61,11 @@ def initializeDatabase():
 
 # By running
 if __name__ == '__main__':
+	parser = argp.ArgumentParser()
+	parser.add_argument('--reinit_hosts', required=False, action="store_true",
+		help="Drops and reinitializes the host table from seed_data/hosts.json")
+	args = parser.parse_args()
+
 	db_path = os.path.join("app", app.config['SQLALCHEMY_DATABASE_NAME'])
 	if not os.path.isfile(db_path):
 		db.create_all()
@@ -70,5 +74,11 @@ if __name__ == '__main__':
 		os.remove(db_path)
 		db.create_all()
 		initializeDatabase()
+
+	# Special admin level argument to update database
+	if args.reinit_hosts:
+		hosts_path = os.path.join(app.config['SEED_DATA_PATH'], "hosts.json")
+		print("Dropping and reinitializing hosts table from: \'%s\'" % hosts_path)
+		utils.seedHosts(hosts_path, mode='overwrite')
 
 	app.run()

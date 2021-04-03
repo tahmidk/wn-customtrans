@@ -8,13 +8,9 @@
 # Python imports
 import os
 import io
-import ssl
 import re
 import json
-
-from urllib.request import Request
-from urllib.request import urlopen
-from urllib.error import HTTPError
+import requests
 
 # Flask imports
 from flask import url_for
@@ -44,20 +40,19 @@ def fetchHtml(url, lang):
 		------------------------------------------------------------------
 	"""
 	try:
-		headers = { 'User-Agent' : 'Mozilla/5.0' }
-		request = Request(url, None, headers)
-		response = urlopen(request, context=ssl._create_unverified_context())
+		cookies = { 'over18': 'yes' }
+		headers = { 'User-Agent': 'Mozilla/5.0' }
+		response = requests.get(url,
+			cookies=cookies,
+			headers=headers,
+			verify=False)
+
+		if not response.status_code == 200:
+			raise Exception
 	except:
 		raise HtmlFetchException(url)
 
-	# Read and decode the response according to series language
-	source = response.read()
-	if lang == Language.JP:
-		data = source.decode('utf8')
-	elif lang == Language.CN:
-		data = source.decode('gbk')
-
-	return data
+	return response.text
 
 def getLatestChapter(series_code, host_entry):
 	"""-------------------------------------------------------------------
