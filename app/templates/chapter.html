@@ -164,8 +164,12 @@
 {% macro render_toolbelt() %}
 	<div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 100%;">
 		{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
+		{% set series_dict_url = url_for('dictionaries_edit', dict_fname=dict_fname) %}
 		<a role="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter" {{'disabled' if ch == 1}}>
 			<ion-icon name="return-up-back-outline"></ion-icon>
+		</a>
+		<a role="button" class="btn chapter_toolbelt_btn chapter_dict_btn" id="ch_dict_btn" title="Chapter Dictionary" href="{{series_dict_url}}">
+			<ion-icon name="reader-outline"></ion-icon>
 		</a>
 		<a role="button" class="btn special-color-dark chapter_toolbelt_btn chapter_toc_btn" id="toc_btn" title="Table of Contents"
 			href="{{series_toc_url}}">

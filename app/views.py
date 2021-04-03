@@ -306,7 +306,8 @@ def library_series_chapter(series_code, ch):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
-
+	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+	dict_fname = dict_entry.fname
 	back_href = url_for('library_series_toc', series_code=series_code)
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
@@ -329,6 +330,7 @@ def library_series_chapter(series_code, ch):
 			series=series_entry,
 			ch=ch,
 			bookmarked=False,
+			dict_fname=dict_fname,
 			dummy_text=dummy_text,
 			series_url=host_mgr.generateSeriesUrl(series_entry.code),
 			chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch))
@@ -341,6 +343,7 @@ def library_series_chapter(series_code, ch):
 		series=series_entry,
 		ch=ch,
 		bookmarked=(ch in series_entry.bookmarks),
+		dict_fname=dict_fname,
 		dummy_text=dummy_text,
 		series_url=host_mgr.generateSeriesUrl(series_entry.code),
 		chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch),
