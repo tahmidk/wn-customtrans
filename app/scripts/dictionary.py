@@ -102,14 +102,12 @@ def createDictFile(dict_fname, series_title, series_abbr, series_link):
 			dict_file.write("// series_abbr  :  %s\n" % series_abbr)
 			dict_file.write("// series_link  :  %s\n" % series_link)
 			dict_file.write("\n\n//=============================[ Names ]==================================")
-			dict_file.write(u'\n@name{{ナルト{0}うずまき, Naruto{0}Uzumaki}}\t\t// Main character of a popular manga'.format(DICT_NAME_DIVIDER))
 			dict_file.write("\n\n//=============================[ Places ]=================================")
 			dict_file.write("\n\n//=============================[ Skills ]=================================")
 			dict_file.write("\n\n//============================[ Monsters ]================================")
 			dict_file.write("\n\n//===========================[ Terminology ]==============================")
-			dict_file.write(u'\n九尾の狐 %s Nine Tailed Fox' % DICT_DEF_DIVIDER)
 			dict_file.write("\n\n//==============================[ Misc ]==================================")
-			dict_file.write("\n\n// END OF FILE")
+			dict_file.write("%s// END OF FILE" % ('\n'*15))
 	except Exception as err:
 		# OS error creating the file
 		raise DictFileCreationException(dict_fname)

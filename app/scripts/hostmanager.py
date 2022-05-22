@@ -12,6 +12,10 @@ from abc import ABC, abstractmethod		# Pythonic abstract inheritance
 from enum import Enum					# Pythonic enumerators
 import bs4 as soup 						# Python HTML query tool
 import re 								# Regex for personalized parsing HTML
+import requests 						# HTTP request library
+
+# Internal imports
+from app import app
 
 
 # Describes the section where a line or image should appear
@@ -19,22 +23,19 @@ class LType(Enum):
 	TITLE 	 	= 0	# Line is the chapter title
 	PRESCRIPT 	= 1 # Lines just before the story content
 	MAIN  	 	= 2 # Main content text
-	POSTSCRIPT 	= 3 #Right after the story content, author's afterword
+	POSTSCRIPT 	= 3 # Right after the story content, author's afterword
 
 # Enum for the hosts
 class Host(Enum):
-	Syosetu = 0
-	Biquyun = 1
-	Shu69 	= 2
+	Syosetu  = 0
+	Kakuyomu = 1
 
 	@staticmethod
 	def to_string(host):
 		if host == Host.Syosetu:
 			return "Host.Syosetu"
-		elif host == Host.Biquyun:
-			return "Host.Biquyun"
-		elif host == Host.Shu69:
-			return "Host.Shu69"
+		if host == Host.Kakuyomu:
+			return "Host.Kakuyomu"
 		else:
 			raise ValueError
 
@@ -42,10 +43,8 @@ class Host(Enum):
 	def to_enum(label):
 		if label in ('Host.Syosetu', 0):
 			return Host.Syosetu
-		elif label in ('Host.Biquyun', 1):
-			return Host.Biquyun
-		elif label in ('Host.Shu69', 2):
-			return Host.Shu69
+		if label in ('Host.Kakuyomu', 1):
+			return Host.Kakuyomu
 		else:
 			raise ValueError
 
@@ -95,10 +94,8 @@ def createManager(host):
 	"""
 	if host == Host.Syosetu:
 		return SyosetuManager()
-	elif host == Host.Biquyun:
-		return BiquyunManager()
-	elif host == Host.Shu69:
-		return Shu69Manager()
+	elif host == Host.Kakuyomu:
+		return KakuyomuManager()
 
 	return None
 
@@ -141,13 +138,13 @@ class HostManager(ABC):
 	"""
 	def generateLineData(self, ltype, line):
 		data = {
-			"type": "text",
-			"seq": self.__seqnum,
-			"line_id": self.__linenum,
-			"ltype": ltype,
-			"text":	line,
-			"subtext": self.generateRomanization(line),
-			"gt_link": self.generateGoogleTranslateLink(line)
+			"type": 	"text",
+			"seq": 		self.__seqnum,
+			"line_id": 	self.__linenum,
+			"ltype": 	ltype,
+			"text":		line,
+			"subtext": 	self.generateRomanization(line),
+			"gt_link": 	self.generateGoogleTranslateLink(line)
 		}
 		self.__seqnum += 1
 		self.__linenum += 1
@@ -165,11 +162,11 @@ class HostManager(ABC):
 	"""
 	def generateImgData(self, ltype, img):
 		data = {
-			"type": "image",
-			"seq": self.__seqnum,
-			"img_id": self.__imgnum,
-			"ltype": ltype,
-			"img_src": img['src']
+			"type":		"image",
+			"seq":		self.__seqnum,
+			"img_id":	self.__imgnum,
+			"ltype":	ltype,
+			"img_src":	img['src']
 		}
 		self.__seqnum += 1
 		self.__imgnum += 1
@@ -186,7 +183,7 @@ class HostManager(ABC):
 		------------------------------------------------------------------
 	"""
 	def generateRomanization(self, text):
-		# We only romanize Japanese
+		# Romanization only applies to Japanese
 		if self.host_lang == Language.JP:
 			romanizer = pkk.kakasi()
 			romanizer.setMode("H","a") 			# Enable Hiragana to ascii
@@ -227,8 +224,8 @@ class HostManager(ABC):
 		Return:			The url to access chapter ch of the given series
 		-------------------------------------------------------------------
 	"""
-	@abstractmethod
-	def generateSeriesUrl(self, series_code): pass
+	def generateSeriesUrl(self, series_code):
+		return f"{self.domain}/{series_code}"
 
 	"""-------------------------------------------------------------------
 		Function:		[generateChapterUrl]
@@ -241,8 +238,8 @@ class HostManager(ABC):
 		Return:			The url to access chapter ch of the given series
 		-------------------------------------------------------------------
 	"""
-	@abstractmethod
-	def generateChapterUrl(self, series_code, ch): pass
+	def generateChapterUrl(self, series_code, ch):
+		return f"{self.generateSeriesUrl(series_code)}/{str(ch)}"
 
 	"""-------------------------------------------------------------------
 		Function:		[parseContent]
@@ -272,9 +269,8 @@ class HostManager(ABC):
 						chapter code of the (i+1)th chapter of this series
 		-------------------------------------------------------------------
 	"""
-	@abstractmethod
-	def parsePageTableFromWeb(self, html): pass
-
+	def parsePageTableFromWeb(self, html):
+		return range(1, self.getLatestChapter(html)+1)
 
 	"""-------------------------------------------------------------------
 		Function:		[getLatestChapter]
@@ -299,9 +295,7 @@ class SyosetuManager(HostManager):
 	def __init__(self):
 		# Page table not needed for Syosetu domain
 		super(SyosetuManager, self).__init__(
-			"https://ncode.syosetu.com/",
-			Host.Syosetu,
-			Language.JP)
+			"https://ncode.syosetu.com", Host.Syosetu, Language.JP)
 
 	def parseChapterContent(self, html):
 		super(SyosetuManager, self).parseChapterContent(html)
@@ -320,10 +314,7 @@ class SyosetuManager(HostManager):
 						for img in images:
 							content.append(self.generateImgData(ltype, img))
 					else:
-						# Skip breaks and blanks
 						line = p.getText().strip()
-						if re.fullmatch(r'\s*<br\s*/>\s*', line) or re.fullmatch(r'\s*', line):
-							continue
 						content.append(self.generateLineData(ltype, line))
 
 		# Handle the title
@@ -342,124 +333,83 @@ class SyosetuManager(HostManager):
 
 		return content
 
-	# Syosetu domain has chapter codes corresponding to the chapter number
-	#   https://ncode.syosetu.com/<ncode>/1 = Chapter 1
-	#   https://ncode.syosetu.com/<ncode>/2 = Chapter 2
-	#   ...
-	# So page table is trivial
-	def parsePageTableFromWeb(self, html):
-		return range(1, self.getLatestChapter(html)+1)
-
-	def generateSeriesUrl(self, series_code):
-		return self.domain + series_code + "/"
-
-	def generateChapterUrl(self, series_code, ch):
-		return self.generateSeriesUrl(series_code) + str(ch)
-
 	def getLatestChapter(self, html):
-		pattern = re.compile(r"<dl class=\"novel_sublist2\">")
-		latest = len(pattern.findall(html))
+		html_soup = soup.BeautifulSoup(html, 'lxml')
+		latest = len(html_soup.select(".novel_sublist2"))
 		return latest
 
 
 
 #==========================================================================
-#	[BiquyunManager]
+#	[KakuyomuManager]
 #	HostManager specialized for parsing and processing html chapters taken
-# 	from the https://www.biquyun.com/ domain
+# 	from the https://kakuyomu.jp domain
 #==========================================================================
-class BiquyunManager(HostManager):
+class KakuyomuManager(HostManager):
 	def __init__(self):
-		# Page table needed for Biquyun domain
-		super(BiquyunManager, self).__init__(
-			"https://www.biquyun.com/",
-			Host.Biquyun,
-			Language.CN)
-
-	def parseTitle(self, html):
-		title = re.findall(r'<div class="bookname">\r\n\t\t\t\t\t<h1>(.*?)\
-			</h1>', html)
-		return title[0]
+		# Page table not needed for Kakuyomu domain
+		super(KakuyomuManager, self).__init__(
+			"https://kakuyomu.jp", Host.Kakuyomu, Language.JP)
 
 	def parseChapterContent(self, html):
-		super(BiquyunManager, self).parseChapterContent(html)
+		super(KakuyomuManager, self).parseChapterContent(html)
 
 		content = []
-
-		# Parse lines and make them readable before adding them to content
-		lines = re.findall(r'&nbsp;&nbsp;&nbsp;&nbsp;(.*?)<', html)
-		for line in lines:
-			content.append((LType.MAIN, line))
-			content.append((LType.MAIN, u'\n'))
-
-		return content
-
-	# Erratic chapter codes, so page table needed
-	def parsePageTableFromWeb(self, html):
-		# Note: this parsing scheme may be outdated for the Biquyun domain
-		page_table = re.findall(r'<a href="/.*?/(.*?)\.html">', html)
-		return page_table
-
-	def generateSeriesUrl(self, series_code):
-		return self.domain + series_code + "/"
-
-	def generateChapterUrl(self, series_code, ch):
-		return self.generateSeriesUrl(series_code) + parsePageTableFromWeb()[ch-1]
-
-	def getLatestChapter(self, html):
-		return len(self.parsePageTableFromWeb(html))
-
-
-
-#==========================================================================
-#	[Shu69Manager]
-#	HostManager specialized for parsing and processing html chapters taken
-# 	from the https://www.69shu.org/book/ domain
-#==========================================================================
-class Shu69Manager(HostManager):
-	def __init__(self):
-		# Page table needed for Biquyun domain
-		super(Shu69Manager, self).__init__(
-			"https://www.69shu.org/book/",
-			Host.Shu69,
-			Language.CN)
-
-	def parseChapterContent(self, html):
-		super(Shu69Manager, self).parseChapterContent(html)
-
-		content = []
-
+		# Filter out <ruby> tags that mess up translation
+		html = re.sub(r'<ruby>(.*?)<rb>(.*?)</rb>(.*?)</ruby>', r'\2', html)
 		html_soup = soup.BeautifulSoup(html, 'lxml')
-		title_div = html_soup.find('div', {'class': 'h1title'})
-		title = title_div.h1.string if title_div.h1 is not None else "NOTITLE"
 
+		# Handle the title
+		title = html_soup.select_one("p.widget-episodeTitle").text
+		content.append(self.generateLineData(LType.TITLE, title))
 
-		# Parse lines and make them readable before adding them to content
-		lines = re.findall(r'&nbsp;&nbsp;&nbsp;&nbsp;(.*?)<', html)
-		for line in lines:
-			content.append((LType.MAIN, line))
-			content.append((LType.MAIN, u'\n'))
+		# Fetch the main section content
+		main = html_soup.select_one("div.widget-episodeBody")
+		if main is not None:
+			for p in main.find_all('p', recursive=False):
+				line = p.getText().strip()
+				content.append(self.generateLineData(LType.MAIN, line))
 
 		return content
 
 	# Erratic chapter codes, so page table needed
-	def parsePageTableFromWeb(self, html):
+	def parsePageTableFromWeb(self, series_code):
+		# Fetch the HTML of the table of contents
+		print(app.config['PAGE_TABLES_PATH'])
+		url = self.generateSeriesUrl(series_code)
+		try:
+			cookies = { 'over18': 'yes' }
+			headers = { 'User-Agent': 'Mozilla/5.0' }
+			response = requests.get(url,
+				cookies=cookies,
+				headers=headers,
+				verify=False)
+
+			if not response.status_code == 200:
+				raise Exception
+
+			toc_html = response.text
+		except:
+			raise HtmlFetchException(url)
+
+		# Generate the page table
 		page_table = []
-
-		html_soup = soup.BeautifulSoup(html, 'lxml')
-		ch_list = html_soup.find('ul', {'class': 'chapterlist'})
-		for ch_elem in ch_list.find_all('li', {'class': ''}):
-			if ch_elem.a is not None:
-				ch_html = ch_elem.a.get('href')
-				page_table.append(ch_html)
+		html_soup = soup.BeautifulSoup(toc_html, 'lxml')
+		for ch in html_soup.select('a.widget-toc-episode-episodeTitle'):
+			ch_link = ch.get('href')
+			ch_code_match = re.search(r"episodes\/(\d+)", ch_link)
+			page_table.append(ch_code_match.group(1) if ch_code_match else "")
 
 		return page_table
 
 	def generateSeriesUrl(self, series_code):
-		return self.domain + series_code + "/"
+		return f"{self.domain}/works/{series_code}"
 
 	def generateChapterUrl(self, series_code, ch):
-		return self.generateSeriesUrl(series_code) + parsePageTableFromWeb()[ch-1]
+		chapter_code = self.parsePageTableFromWeb(series_code)[ch-1]
+		return f"{self.generateSeriesUrl(series_code)}/episodes/{chapter_code}"
 
 	def getLatestChapter(self, html):
-		return len(self.parsePageTableFromWeb(html))
+		html_soup = soup.BeautifulSoup(html, 'lxml')
+		latest = len(html_soup.select(".widget-toc-episode"))
+		return latest

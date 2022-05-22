@@ -14,6 +14,7 @@ class BaseConfig(object):
 	# Important paths
 	SEED_DATA_PATH = os.path.join(os.getcwd(), 'seed_data')
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'dicts')
+	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'pages')
 
 	# Remove CSRF token life-time restriction
 	WTF_CSRF_TIME_LIMIT = None
@@ -38,6 +39,7 @@ class DevelopmentConfig(BaseConfig):
 	DEBUG = True
 
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'dev', 'dicts')
+	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'dev', 'pages')
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_dev.db'
@@ -49,6 +51,7 @@ class TestingConfig(BaseConfig):
 	TESTING = True
 
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'test', 'dicts')
+	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'test', 'pages')
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_test.db'

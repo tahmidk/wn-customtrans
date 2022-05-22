@@ -6,6 +6,13 @@
             "host_lang": 			"Language.JP",
             "host_url": 			"https://ncode.syosetu.com/",
             "host_search_engine": 	"https://yomou.syosetu.com/search.php"
+        },
+        {
+            "host_type": 			"Host.Kakuyomu",
+            "host_name": 			"Kakuyomu",
+            "host_lang": 			"Language.JP",
+            "host_url": 			"https://kakuyomu.jp",
+            "host_search_engine": 	"https://kakuyomu.jp/search"
         }
     ]
 }

@@ -29,7 +29,9 @@ from app.models import HostTable
 from app.models import HonorificAffix
 from app.scripts.dictionary import COMMON_DICT_ABBR
 from app.scripts.custom_errors import mono
-from app.scripts.hostmanager import Language
+
+import app.scripts.hostmanager as hostmgr
+
 
 class RegisterNovelForm(FlaskForm):
 	'''
@@ -92,10 +94,11 @@ class RegisterNovelForm(FlaskForm):
 		host_entry = self.series_host.data
 		series_entry = SeriesTable.query.filter_by(code=str(series_code_data), host_id=host_entry.id).first()
 		if series_entry is not None:
-			raise ValidationError("This host-code combination registered under %s" % series_entry.abbr)
+			raise ValidationError("This host-code combination already registered as %s" % series_entry.abbr)
 
 		# Validation: the url must exist
-		url = host_entry.host_url + series_code_data
+		host_manager = hostmgr.createManager(host_entry.host_type)
+		url = host_manager.generateSeriesUrl(str(series_code_data))
 		try:
 			cookies = { 'over18': 'yes' }
 			headers = { 'User-Agent' : 'Mozilla/5.0' }
@@ -110,7 +113,7 @@ class RegisterNovelForm(FlaskForm):
 				raise Exception
 		# Some error has occurred
 		except Exception as e:
-			raise ValidationError("No response from %s. Try again later" % mono(url))
+			raise ValidationError("No response from %s" % mono(url))
 
 class EditNovelForm(FlaskForm):
 	'''
@@ -186,7 +189,7 @@ class AddHonorificForm(FlaskForm):
 	htrans = StringField('Translation', validators=htrans_validators)
 
 	# Field: lang - The native language of the raw honorific provided
-	lang_selection = sorted([(l.value, l.name) for l in Language])
+	lang_selection = sorted([(l.value, l.name) for l in hostmgr.Language])
 	lang = SelectField("Language", choices=lang_selection, coerce=int, default=lang_selection[0])
 
 	# Field: affix - Treat this honorific as a suffix or prefix?
@@ -236,7 +239,7 @@ class EditHonorificForm(FlaskForm):
 	htrans = StringField('Translation', validators=htrans_validators)
 
 	# Field: lang - The native language of the raw honorific provided
-	lang_selection = sorted([(l.value, l.name) for l in Language])
+	lang_selection = sorted([(l.value, l.name) for l in hostmgr.Language])
 	lang = SelectField("Language", choices=lang_selection, coerce=int)
 
 	# Field: affix - Treat this honorific as a suffix or prefix?
