@@ -484,8 +484,26 @@ function setupLibrary(){
 		});
 	}
 
+	// When Register Novel Modal's host selection changes, change series code 
+	$("#series_host").change(function(){
+		const opt = $(this).val();
+		var placeholder = "";
+		switch(opt){
+			case '1':{
+				placeholder = "https://ncode.syosetu.com/{series_code}";
+				break;
+			}
+			case '2':{
+				placeholder = "https://kakuyomu.jp/works/{series_code}";
+				break;
+			}
+		}
+		$("#series_code").attr('placeholder', placeholder);
+	});
+
 	// Setup the register novel modal
 	setupModalForm(reg_novel_submit, reg_novel_modal, reg_novel_form, lib_flashpanel);
+
 
 	// Setup the edit novel modal
 	setupModalForm(edit_novel_submit, edit_novel_modal, edit_novel_form, lib_flashpanel);

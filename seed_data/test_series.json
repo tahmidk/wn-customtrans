@@ -1,5 +1,14 @@
 {
     "series":[
+    	{
+    		"code": "1177354054897633138",
+			"title": "Futsal Club",
+			"abbr": "Futsal",
+			"current": 1,
+			"latest": 962,
+			"bookmarks": [],
+			"host": "Host.Kakuyomu"
+    	},
 		{
 			"code": "n7031bs",
 			"title": "Konjiki no Wordmaster",

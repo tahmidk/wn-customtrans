@@ -651,6 +651,7 @@ def honorifics_remove_entry(hon_id):
 
 	return jsonify(status='ok')
 
+
 # Route for Tutorial page
 @app.route("/tutorial")
 def tutorial():

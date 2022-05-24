@@ -28,14 +28,13 @@ from app.scripts.dictionary import *
 
 
 
-def fetchHtml(url, lang):
+def fetchHtml(url):
 	"""-------------------------------------------------------------------
 		Function:		[fetchHtml]
 		Description:	Tries to prompt a response url and return the received
 						HTML content as a UTF-8 decoded string
 		Input:
 		  [url]			The url to make the request to
-		  [lang]		The page's language (Language Enum)
 		Return: 		The HTML content of the given website address
 		------------------------------------------------------------------
 	"""
@@ -64,10 +63,10 @@ def getLatestChapter(series_code, host_entry):
 		Return:			Latest chapter number
 		------------------------------------------------------------------
 	"""
-	source_url = host_entry.host_url + series_code
-	source_html = fetchHtml(source_url, host_entry.host_lang)
-	html_parser = createManager(host_entry.host_type)
-	res = html_parser.getLatestChapter(source_html)
+	host_manager = createManager(host_entry.host_type)
+	source_url = host_manager.generateSeriesUrl(series_code)
+	source_html = fetchHtml(source_url)
+	res = host_manager.getLatestChapter(source_html)
 
 	return res
 
@@ -126,8 +125,12 @@ def registerSeriesToDatabase(reg_form):
 	db.session.add(dict_entry)
 	db.session.commit()
 
+	dict_dir = app.config['DICTIONARIES_PATH']
+	if not os.path.exists(dict_dir):
+		os.makedirs(dict_dir)
+
 	# Check the physical file,
-	dict_path = os.path.join(app.config['DICTIONARIES_PATH'], dict_fname)
+	dict_path = os.path.join(dict_dir, dict_fname)
 	if not os.path.exists(dict_path):
 		# First traverse the dict files to see if there is a dict file with the same host-code combination
 		# This implies the user has registered and removed this series before with the preserve dictionary
@@ -290,7 +293,7 @@ def customTrans(series_entry, ch):
 	# First fetch the html
 	host_manager = createManager(host_entry.host_type)
 	chapter_url = host_manager.generateChapterUrl(series_entry.code, ch)
-	chapter_html = fetchHtml(chapter_url, host_entry.host_lang)
+	chapter_html = fetchHtml(chapter_url)
 
 	# Parse out relevant content from the website source code
 	chapter_content = host_manager.parseChapterContent(chapter_html)

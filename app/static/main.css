@@ -34,8 +34,8 @@ html{
   --toc_bookmarked_highlight: #ffc946;
 
   /* Chapter palette */
-  --chapter_maintxt_color: #828282;
-  --chapter_subtxt_color: #adadad;
+  --chapter_maintxt_color: #242424;
+  --chapter_subtxt_color: #b7b7b7;
   --chapter_day_night_toggle_btn_color: #572a80;
   --chapter_scroll_bar_color: #181818;
   --chapter_word_color: #007eff;
@@ -65,6 +65,8 @@ html{
   --honorifics_jp_color: #ce225b;
   --honorifics_cn_color: #226fce;
 }
+
+/* Themes */
 html[data-theme='dark']{
   --html_background_color: #181818;
 
@@ -742,14 +744,18 @@ table.entry_info_table{
 }
 #host_search_engine_btn{
   display: flex;
-  width: 20rem;
-  height: 2rem;
-  margin: auto 1rem;
+  width: 11rem;
+  height: 2.5rem;
+  margin: auto 0.5rem;
   padding: 0.2rem 1rem;
   color: white;
   background: #1ab196;
   font-size: 1.6rem;
   border-radius: 2rem;
+}
+#host_search_engine_btn ion-icon{
+  transform: scale(0.9);
+  margin: auto 0;
 }
 
 /*----------------------[ Edit Novel Modal stylings ]----------------------*/
@@ -1002,7 +1008,7 @@ table.entry_info_table{
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 4rem 0;
+  margin: 0.5rem 0;
 }
 .content_line_div p{
   width: fit-content;
@@ -1048,8 +1054,8 @@ table.entry_info_table{
 /* Side progress indicator */
 .chapter_sidebar{
   position: fixed;
-  /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 */
-  left: calc((100vw - 75rem) / 4);
+  /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 / 2 */
+  left: calc((100vw - 120rem) / 4);
   top: calc(50% - 20vh);
   width: 3rem;
   height: 40vh;
@@ -1544,6 +1550,11 @@ table.entry_info_table{
   /* Responsive Chapter */
   .section_chapter{
     max-width: 75rem;
+  }
+
+  .chapter_sidebar{
+    /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 / 2 */
+    left: calc((100vw - 75rem) / 4);
   }
 }
 @media only screen and (max-width: 1440px){
