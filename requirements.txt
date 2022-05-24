@@ -7,7 +7,7 @@ Flask-WTF==0.14.3
 itsdangerous==1.1.0
 Jinja2==2.11.3
 klepto==0.1.9
-lxml==4.6.3
+lxml==4.6.5
 MarkupSafe==1.1.1
 pox==0.2.8
 pykakasi==2.0.1
