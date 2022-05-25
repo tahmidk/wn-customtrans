@@ -8,6 +8,8 @@
 from flask import Flask
 from flask_wtf.csrf import CsrfProtect
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 
 # Initialize and configure Flask app
 app = Flask(__name__)
@@ -30,6 +32,7 @@ app.add_url_rule('/user/default/<path:filename>', endpoint='user',
 
 # Create database instance connected to webapp
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Secure web app forms against CSRF
 csrf = CsrfProtect(app)

@@ -17,3 +17,10 @@ $ python run.py
 
 #Accessing Development Server Webapp
 In Chrome: http://localhost:5000/
+
+#Handling database migration
+Sometimes, an update to this web app is accompanied by a change in the SQLAlchemy database schema. This section describes what to do on the release Web Server (RPi) to smoothly migrate the existing database from old version to the current. The following commands takes place in the root of the project: wn-customtrans/
+
+$ flask db init
+$ flask db migrate -m "Migration description"
+$ flask db upgrade
