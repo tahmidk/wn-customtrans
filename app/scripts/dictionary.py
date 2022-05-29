@@ -403,7 +403,7 @@ def initSeriesDict(series_abbr):
 	abbr = series_entry.abbr
 	code = series_entry.code
 
-	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+	dict_entry = series_entry.dictionary
 	dict_fname = dict_entry.fname
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()

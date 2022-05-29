@@ -7,12 +7,14 @@
 #=======================================================================
 
 # Python imports
-import pykakasi as pkk 					# Python Japanese romanization api
-from abc import ABC, abstractmethod		# Pythonic abstract inheritance
-from enum import Enum					# Pythonic enumerators
-import bs4 as soup 						# Python HTML query tool
 import re 								# Regex for personalized parsing HTML
 import requests 						# HTTP request library
+import pykakasi as pkk 					# Python Japanese romanization api
+import bs4 as soup 						# Python HTML query tool
+import datetime as dt 					# Date time format for chapter timestamps
+
+from abc import ABC, abstractmethod		# Pythonic abstract inheritance
+from enum import Enum					# Pythonic enumerators
 
 # Internal imports
 from app import app
@@ -143,6 +145,7 @@ class HostManager(ABC):
 			"line_id": 	self.__linenum,
 			"ltype": 	ltype,
 			"text":		line,
+			"raw": 		line,
 			"subtext": 	self.generateRomanization(line),
 			"gt_link": 	self.generateGoogleTranslateLink(line)
 		}
@@ -238,7 +241,7 @@ class HostManager(ABC):
 		Return:			The url to access chapter ch of the given series
 		-------------------------------------------------------------------
 	"""
-	def generateChapterUrl(self, series_code, ch):
+	def generateChapterUrl(self, series_code, ch, page_table=None):
 		return f"{self.generateSeriesUrl(series_code)}/{str(ch)}"
 
 	"""-------------------------------------------------------------------
@@ -270,7 +273,7 @@ class HostManager(ABC):
 		-------------------------------------------------------------------
 	"""
 	def parsePageTableFromWeb(self, html):
-		return range(1, self.getLatestChapter(html)+1)
+		return [ch+1 for ch in range(self.getLatestChapter(html))]
 
 	"""-------------------------------------------------------------------
 		Function:		[getLatestChapter]
@@ -282,8 +285,21 @@ class HostManager(ABC):
 		-------------------------------------------------------------------
 	"""
 	@abstractmethod
-	def getLatestChapter(self, html): pass
+	def getLatestChapter(self, html):
+		pass
 
+	"""-------------------------------------------------------------------
+		Function:		[getVolumesData]
+		Description:	Retrieves all volume/chapter information for the given series
+		Input:
+		  [html]		The base table of contents html for a given series
+		Return:			A list constisting of all volumes data fit for a database
+						entry under VolumeTable
+		-------------------------------------------------------------------
+	"""
+	@abstractmethod
+	def getVolumesData(self, html):
+		pass
 
 
 #==========================================================================
@@ -337,6 +353,48 @@ class SyosetuManager(HostManager):
 		html_soup = soup.BeautifulSoup(html, 'lxml')
 		latest = len(html_soup.select(".novel_sublist2"))
 		return latest
+
+	def getVolumesData(self, html):
+		volumes = list()
+		html_soup = soup.BeautifulSoup(html, 'lxml')
+
+		volume = dict()
+		chapter_index = 1
+		volume_index = 0
+		volume["num"] = volume_index
+		volume["title"] = "Volume %d" % volume_index
+		volume["chapters"] = list()
+
+		toc_container = html_soup.find('div', {'class': 'index_box'})
+		for child_elem in toc_container.find_all(recursive=False):
+			# Check if this element is a volume header
+			if child_elem.has_attr('class') and "chapter_title" in child_elem["class"]:
+				# Close off the current volume (if it's not empty) and start a new volume
+				if len(volume["chapters"]) > 0:
+					volumes.append(volume)
+
+				volume = dict()
+				volume_index += 1
+				volume["num"] = volume_index
+				volume["title"] = child_elem.text
+				volume["chapters"] = list()
+			else:
+				# Otherwise, this element is a chapter div
+				chapter_title_elem = child_elem.find('dd', {'class': 'subtitle'})
+				chapter_title = chapter_title_elem.find('a').text
+				date_posted_elem = child_elem.find('dt', {'class': 'long_update'})
+				date_posted = date_posted_elem.text[1:17]
+				volume["chapters"].append({
+					"number": chapter_index,
+					"title": chapter_title,
+					"date_posted": dt.datetime.strptime(date_posted, "%Y/%m/%d %H:%M"),
+				})
+				chapter_index += 1
+
+		if len(volume["chapters"]) > 0:
+			volumes.append(volume)
+
+		return volumes
 
 
 
@@ -405,11 +463,53 @@ class KakuyomuManager(HostManager):
 	def generateSeriesUrl(self, series_code):
 		return f"{self.domain}/works/{series_code}"
 
-	def generateChapterUrl(self, series_code, ch):
-		chapter_code = self.parsePageTableFromWeb(series_code)[ch-1]
-		return f"{self.generateSeriesUrl(series_code)}/episodes/{chapter_code}"
+	def generateChapterUrl(self, series_code, ch, page_table=None):
+		chapter = page_table[ch-1] if page_table != None else ch
+		return f"{self.generateSeriesUrl(series_code)}/episodes/{chapter}"
 
 	def getLatestChapter(self, html):
 		html_soup = soup.BeautifulSoup(html, 'lxml')
 		latest = len(html_soup.select(".widget-toc-episode"))
 		return latest
+
+	def getVolumesData(self, html):
+		volumes = list()
+		html_soup = soup.BeautifulSoup(html, 'lxml')
+
+		volume = dict()
+		chapter_index = 1
+		volume_index = 0
+		volume["num"] = volume_index
+		volume["title"] = "Volume %d" % volume_index
+		volume["chapters"] = list()
+
+		toc_container = html_soup.find('ol', {'class': 'widget-toc-items'})
+		for child_elem in toc_container.find_all(recursive=False):
+			# Check if this element is a volume header
+			if child_elem.has_attr('class') and "widget-toc-chapter" in child_elem["class"]:
+				# Close off the current volume (if it's not empty) and start a new volume
+				if len(volume["chapters"]) > 0:
+					volumes.append(volume)
+
+				volume = dict()
+				volume_index += 1
+				volume["num"] = volume_index
+				volume["title"] = child_elem.select_one("span").text
+				volume["chapters"] = list()
+			else:
+				# Otherwise, this element is a chapter div
+				chapter_title_elem = child_elem.find('span', {'class': 'widget-toc-episode-titleLabel'})
+				chapter_title = chapter_title_elem.text
+				date_posted_elem = child_elem.find('time', {'class': 'widget-toc-episode-datePublished'})
+				date_posted = date_posted_elem.get("datetime")
+				volume["chapters"].append({
+					"number": chapter_index,
+					"title": chapter_title,
+					"date_posted": dt.datetime.strptime(date_posted, "%Y-%m-%dT%H:%M:%SZ")
+				})
+				chapter_index += 1
+
+		if len(volume["chapters"]) > 0:
+			volumes.append(volume)
+
+		return volumes

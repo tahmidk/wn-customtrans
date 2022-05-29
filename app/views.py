@@ -56,7 +56,7 @@ def error_404(error):
 	hdr = '''<strong>Ummm...</strong> The page you requested does not
 		exist'''
 	desc = '''Perhaps you followed a bad link. Or maybe this is a series
-		sepcific page for a series that\'s no longer in your Library?'''
+		specific page for a series that\'s no longer in your Library?'''
 	return render_template("misc/error_page.html",
 		title='Error 404',
 		err_img=url_for('static', filename="error_404_img.gif"),
@@ -85,18 +85,18 @@ def library():
 	remove_novel_form = RemoveNovelForm()
 
 	# Fetch series from database
-	series = SeriesTable.query.order_by(SeriesTable.title).all();
+	series_entries = SeriesTable.query.order_by(SeriesTable.title).all();
 	# Add additional host info
-	for entry in series:
+	for entry in series_entries:
 		host_entry = HostTable.query.filter_by(id=entry.host_id).first()
 		entry.__dict__["host"] = host_entry.host_name
 		entry.__dict__["lang"] = lang = Language.to_string(host_entry.host_lang)
-		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
+		dict_entry = entry.dictionary
 		entry.__dict__["dict_fname"] = dict_entry.fname
 	return render_template("library.html",
 		title="Library",
 		back_href=url_for('index'),
-		series=series,
+		series=series_entries,
 		reg_form=register_novel_form,
 		edit_form=edit_novel_form,
 		rmv_form=remove_novel_form)
@@ -151,7 +151,7 @@ def library_edit_novel(series_id):
 	edit_novel_form = EditNovelForm()
 	if edit_novel_form.validate_on_submit():
 		series_entry = SeriesTable.query.filter_by(id=series_id).first()
-		dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+		dict_entry = series_entry.dictionary
 		host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 		host_manager = hostmanager.createManager(host_entry.host_type)
 
@@ -167,20 +167,14 @@ def library_edit_novel(series_id):
 
 		# First check if the dicitonary file exists, create it if necessary
 		if not os.path.exists(dict_path_old):
-			dictionary.createDictFile(fname_new,
-				new_title,
-				new_abbr,
-				host_manager.generateSeriesUrl(series_entry.code))
+			dictionary.createDictFile(fname_new, new_title, new_abbr, series_entry.url)
 		# It exists so reprocess it
 		else:
 			# Rename the associated dict according to new abbreviation
 			dictionary.renameDictFile(dict_entry.fname, fname_new)
 			# If the dict exists but is empty, repopulate it with the dictionary skeleton text
 			if os.path.getsize(dict_path_new) == 0:
-				dictionary.createDictFile(fname_new,
-					new_title,
-					new_abbr,
-					host_manager.generateSeriesUrl(series_entry.code))
+				dictionary.createDictFile(fname_new, new_title, new_abbr, series_entry.url)
 			# Otherwise, just update the meta
 			else:
 				dictionary.updateDictMetaHeader(fname_new, new_title, new_abbr)
@@ -206,7 +200,7 @@ def library_remove_novel(series_id):
 		series_entry = SeriesTable.query.filter_by(id=series_id).first()
 		series_abbr = series_entry.abbr
 		if not remove_novel_form.opt_keep_dict.data:
-			dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+			dict_entry = series_entry.dictionary
 			# Remove physical dict file
 			dictionary.removeDictFile(dict_entry.fname)
 			# Remove dict from database
@@ -235,13 +229,12 @@ def library_series_toc(series_code):
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
-	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+	dict_entry = series_entry.dictionary
 	return render_template("series_toc.html",
 		title=series_entry.abbr,
 		back_href=url_for('library'),
 		series=series_entry,
-		dict_fname=dict_entry.fname,
-		series_url=host_mgr.generateSeriesUrl(series_entry.code))
+		dict_fname=dict_entry.fname)
 
 
 # Route for updating a specific 'series'
@@ -264,12 +257,13 @@ def library_series_toc_bookmark(series_code, ch):
 		# Can't set a current chapter if it's greater than the latest chapter
 		return jsonify(status='illegal_chapter_abort', target_ch=ch)
 
-	if ch in series_entry.bookmarks:
-		series_entry.bookmarks.remove(ch)
+	chapter_entry = utils.getChapterDbEntry(series_entry.id, ch)
+	if chapter_entry.bookmarked:
+		chapter_entry.bookmarked = False
 		db.session.commit()
 		return jsonify(status='ok', action='rmv_bookmark', target_ch=ch)
 
-	series_entry.bookmarks.append(ch)
+	chapter_entry.bookmarked = True
 	db.session.commit()
 	return jsonify(status='ok', action='add_bookmark', target_ch=ch)
 
@@ -295,7 +289,9 @@ def library_series_toc_setcurrent(series_code, ch):
 @app.route("/library/<series_code>/bookmark/*", methods=["POST"])
 def library_series_toc_bookmark_all(series_code):
 	series_entry = SeriesTable.query.filter_by(code=series_code).first();
-	series_entry.bookmarks = []
+	for volume in series_entry.volumes:
+		for chapter in volume:
+			chapter.bookmarked = False
 	db.session.commit()
 	return jsonify(status='ok')
 
@@ -303,10 +299,15 @@ def library_series_toc_bookmark_all(series_code):
 # Route for a specific translated chapter 'ch' of 'series'
 @app.route("/library/<series_code>/<int:ch>")
 def library_series_chapter(series_code, ch):
+	# Get Series entry
 	series_entry = SeriesTable.query.filter_by(code=series_code).first()
 	if series_entry is None or ch < 1 or ch > series_entry.latest_ch:
 		abort(404)
-	dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+
+	# Get Chapter entry
+	chapter_entry = utils.getChapterDbEntry(series_entry.id, ch)
+
+	dict_entry = series_entry.dictionary
 	dict_fname = dict_entry.fname
 	back_href = url_for('library_series_toc', series_code=series_code)
 
@@ -318,37 +319,32 @@ def library_series_chapter(series_code, ch):
 		dummy_text = u"假"
 	lang_code = hostmanager.Language.get_lang_code(host_entry.host_lang)
 
+
 	try:
 		chapter_data = utils.customTrans(series_entry, ch)
-	except CustomException as err:
-		flash(str(err), CRITICAL)
-		return render_template("chapter.html",
+		chapter_render = render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			lang_code=lang_code,
 			back_href=back_href,
 			default_theme="dark",
 			series=series_entry,
-			ch=ch,
-			bookmarked=False,
+			chapter=chapter_entry,
 			dict_fname=dict_fname,
 			dummy_text=dummy_text,
-			series_url=host_mgr.generateSeriesUrl(series_entry.code),
-			chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch))
+			chapter_data=chapter_data)
+	except CustomException as err:
+		flash(str(err), CRITICAL)
+		chapter_render = render_template("chapter.html",
+			title="%s %d" % (series_entry.abbr, ch),
+			lang_code=lang_code,
+			back_href=back_href,
+			default_theme="dark",
+			series=series_entry,
+			chapter=chapter_entry,
+			dict_fname=dict_fname,
+			dummy_text=dummy_text)
 
-	return render_template("chapter.html",
-		title="%s %d" % (series_entry.abbr, ch),
-		lang_code=lang_code,
-		back_href=back_href,
-		default_theme="dark",
-		series=series_entry,
-		ch=ch,
-		bookmarked=(ch in series_entry.bookmarks),
-		dict_fname=dict_fname,
-		dummy_text=dummy_text,
-		series_url=host_mgr.generateSeriesUrl(series_entry.code),
-		chapter_url=host_mgr.generateChapterUrl(series_entry.code, ch),
-		chapter_data=chapter_data)
-
+	return chapter_render
 
 # Route for Dictionaries view
 @app.route("/dictionaries")
@@ -356,7 +352,7 @@ def dictionaries():
 	series = SeriesTable.query.all()
 	dictionaries = []
 	for entry in series:
-		dict_entry = DictionaryTable.query.filter_by(id=entry.dict_id).first()
+		dict_entry = entry.dictionary
 		dictionaries.append({
 			"id": dict_entry.id,
 			"abbr": entry.abbr,
@@ -390,7 +386,7 @@ def dictionaries_toggle_entry(dict_abbr):
 			series_entry = SeriesTable.query.filter_by(abbr=dict_abbr).first()
 			if series_entry is None:
 				raise SeriesEntryDNEException(dict_abbr)
-			dict_entry = DictionaryTable.query.filter_by(id=series_entry.dict_id).first()
+			dict_entry = series_entry.dictionary
 	except CustomException as err:
 		return jsonify(status='series_nf', msg=str(err), severity=err.severity)
 
@@ -507,7 +503,7 @@ def dictionaries_edit(dict_fname):
 
 		series_title = series_entry.title
 		series_abbr = series_entry.abbr
-		series_url = host_manager.generateSeriesUrl(series_code)
+		series_url = series_entry.url
 	elif dict_fname == dictionary.COMMON_DICT_FNAME:
 		series_title = dictionary.COMMON_DICT_TITLE
 		series_abbr = dictionary.COMMON_DICT_ABBR

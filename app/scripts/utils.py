@@ -70,6 +70,77 @@ def getLatestChapter(series_code, host_entry):
 
 	return res
 
+def generateSeriesVolumes(series_entry):
+	"""-------------------------------------------------------------------
+		Function:		[generateSeriesVolumes]
+		Description:	Generates volumes entries for the given series
+		Input:
+		  [series_code]	The identifying series code
+		  [host_entry] 	The HostTable entry associated with this series
+		Return:			None
+		------------------------------------------------------------------
+	"""
+	host_manager = createManager(series_entry.host.host_type)
+	source_url = host_manager.generateSeriesUrl(series_entry.code)
+	source_html = fetchHtml(source_url)
+	volumes = host_manager.getVolumesData(source_html)
+	# Add volumes
+	for volume in volumes:
+		volume_entry = VolumeTable(
+			number=volume["num"],
+			title=volume["title"],
+			series=series_entry
+		)
+		db.session.add(volume_entry)
+		db.session.commit()
+
+		# Add chapters
+		for ch in volume["chapters"]:
+			chapter_url = host_manager.generateChapterUrl(series_entry.code, ch["number"], series_entry.page_table)
+			chapter_entry = ChapterTable(
+				number=ch["number"],
+				title=ch["title"],
+				date_posted=ch["date_posted"],
+				url=chapter_url,
+				volume=volume_entry
+			)
+			db.session.add(chapter_entry)
+		db.session.commit()
+
+def getChapterDbEntry(series_id, ch):
+	"""-------------------------------------------------------------------
+		Function:		[getChapterDbEntry]
+		Description:	Fetches the database entry corresponding to chapter ch
+						of the given series
+		Input:
+		  [series_id]	The series_id of the Series associated with the chapter
+		  [ch] 			The chapter to fetch
+		Return:			ChapterTable database entry
+		------------------------------------------------------------------
+	"""
+	chapter_entry = ChapterTable.query \
+						.filter(ChapterTable.number == ch) \
+						.join(ChapterTable.volume) \
+						.join(VolumeTable.series) \
+						.filter(SeriesTable.id == series_id).first()
+	return chapter_entry
+
+def getAllSeriesChapterDbEntries(series_id):
+	"""-------------------------------------------------------------------
+		Function:		[getAllSeriesChapterDbEntries]
+		Description:	Fetches the database entry corresponding to chapter ch
+						of the given series
+		Input:
+		  [series_id]	The series_id to fetch all chapters for
+		Return:			list of all ChapterTable database entries attached to given series
+		------------------------------------------------------------------
+	"""
+	chapter_entries = ChapterTable.query \
+						.join(ChapterTable.volume) \
+						.join(VolumeTable.series) \
+						.filter(SeriesTable.id == series_id).first()
+	return chapter_entries
+
 def getFileExtension(filename):
 	"""-------------------------------------------------------------------
 		Function:		[getFileExtension]
@@ -97,11 +168,14 @@ def registerSeriesToDatabase(reg_form):
 		------------------------------------------------------------------
 	"""
 	# Rip relevant information
+	host_entry = reg_form.series_host.data
+	host_manager = createManager(host_entry.host_type)
+
 	series_title = reg_form.title.data.strip()
 	series_abbr = reg_form.abbr.data.strip()
 	series_code = reg_form.series_code.data.strip()
+	series_url = host_manager.generateSeriesUrl(series_code)
 
-	host_entry = reg_form.series_host.data
 	dict_fname = generateDictFilename(series_abbr, host_entry.host_name, series_code)
 	dict_entry = None
 
@@ -119,9 +193,7 @@ def registerSeriesToDatabase(reg_form):
 
 	# If an existing dictionary is not found, make a new entry
 	if dict_entry is None:
-		dict_entry = DictionaryTable(
-			fname=dict_fname,
-		)
+		dict_entry = DictionaryTable(fname=dict_fname)
 	db.session.add(dict_entry)
 	db.session.commit()
 
@@ -150,27 +222,31 @@ def registerSeriesToDatabase(reg_form):
 
 		# Dict with this host+code combination wasn't found, create a new one from scratch
 		if not dict_initialized:
-			host_manager = createManager(host_entry.host_type)
-			createDictFile(dict_fname, series_title, series_abbr, host_manager.generateSeriesUrl(series_code))
+			createDictFile(dict_fname, series_title, series_abbr, series_url)
 
 	# If the dict exists but is empty, repopulate it with the dictionary skeleton text
 	if os.path.getsize(dict_path) == 0:
-		host_manager = createManager(host_entry.host_type)
-		createDictFile(dict_fname, series_title, series_abbr, host_manager.generateSeriesUrl(series_code))
+		createDictFile(dict_fname, series_title, series_abbr, series_url)
 
-	# Finally build the table for the series
+	# Build the table for the series
+	page_table = host_manager.parsePageTableFromWeb(series_code)
+	latest_chapter = getLatestChapter(series_code, host_entry)
 	series_entry = SeriesTable(
 		code=series_code,
 		title=series_title,
 		abbr=series_abbr,
 		current_ch=0,
-		latest_ch=getLatestChapter(series_code, host_entry),
-		bookmarks=[],
-		dict_id=dict_entry.id,
-		host_id=host_entry.id,
+		latest_ch=latest_chapter,
+		page_table=page_table,
+		url=series_url,
+		dictionary=dict_entry,
+		host=host_entry
 	)
 	db.session.add(series_entry)
 	db.session.commit()
+
+	# Generate all series volumes
+	generateSeriesVolumes(series_entry)
 
 	return series_entry
 
@@ -179,17 +255,27 @@ def updateSeries(series_entry):
 		Function:		[updateSeries]
 		Description:	Updates a specific series
 		Input:
-		  [reg_form] 	The Flask novel registration form to process
+		  [series_entry] The series to update
 		Return:			Number of chapter updates on success
 		------------------------------------------------------------------
 	"""
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
-	latest = getLatestChapter(series_entry.code, host_entry)
-	ret = latest - series_entry.latest_ch;
-	series_entry.latest_ch = latest
-	db.session.commit()
+	old_latest = series_entry.latest_ch
+	new_latest = getLatestChapter(series_entry.code, host_entry)
+	num_new_chapters = new_latest - old_latest
 
-	return ret
+	if num_new_chapters > 0:
+		host_manager = createManager(host_entry.host_type)
+		series_entry.latest_ch = new_latest
+		series_entry.page_table = host_manager.parsePageTableFromWeb(series_entry.code)
+		for volume_entry in series_entry.volumes:
+			db.session.delete(volume_entry)
+		db.session.commit()
+
+		# Re-generate volumes
+		generateSeriesVolumes(series_entry)
+
+	return num_new_chapters
 
 def applyDictionaryToContent(content, series_dict):
 	"""-------------------------------------------------------------------
@@ -292,8 +378,8 @@ def customTrans(series_entry, ch):
 
 	# First fetch the html
 	host_manager = createManager(host_entry.host_type)
-	chapter_url = host_manager.generateChapterUrl(series_entry.code, ch)
-	chapter_html = fetchHtml(chapter_url)
+	chapter_entry = getChapterDbEntry(series_entry.id, ch)
+	chapter_html = fetchHtml(chapter_entry.url)
 
 	# Parse out relevant content from the website source code
 	chapter_content = host_manager.parseChapterContent(chapter_html)
@@ -336,9 +422,7 @@ def seedSeries(series_json_path, mode='append'):
 			DictionaryTable.__table__])
 
 		# Add back the common dictionary
-		dict_entry = DictionaryTable(
-			fname="common_dict.dict",
-		)
+		dict_entry = DictionaryTable(fname="common_dict.dict")
 		db.session.add(dict_entry)
 		db.session.commit()
 
@@ -350,24 +434,38 @@ def seedSeries(series_json_path, mode='append'):
 			host_entry = HostTable.query.filter_by(host_type=Host.to_enum(entry['host'])).first();
 			# Submit dictionary to database
 			dict_fname = generateDictFilename(entry['abbr'], host_entry.host_name, entry['code'])
-			dict_entry = DictionaryTable(
-				fname=dict_fname,
-			)
+			dict_entry = DictionaryTable(fname=dict_fname)
 			db.session.add(dict_entry)
 			db.session.commit()
 
 			# Create series entry in database
+			host_manager = createManager(host_entry.host_type)
+			page_table = host_manager.parsePageTableFromWeb(entry['code'])
+			series_url = host_manager.generateSeriesUrl(entry['code'])
 			series_entry = SeriesTable(
 				code=entry['code'],
 				title=entry['title'],
 				abbr=entry['abbr'],
 				current_ch=entry['current'],
 				latest_ch=entry['latest'],
-				bookmarks=entry['bookmarks'],
-				dict_id=dict_entry.id,
-				host_id=host_entry.id
+				page_table=page_table,
+				url=series_url,
+				dictionary=dict_entry,
+				host=host_entry
 			)
 			db.session.add(series_entry)
+			db.session.commit()
+
+			try:
+				# Generate series volumes data
+				generateSeriesVolumes(series_entry)
+				for volume in series_entry.volumes:
+					for chapter in volume:
+						if chapter.number in entry['bookmarks']:
+							chapter.bookmarked = True
+
+			except:
+				pass
 		db.session.commit()
 
 def seedHosts(hosts_json_path, mode='append'):

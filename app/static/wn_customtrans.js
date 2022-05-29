@@ -257,7 +257,7 @@ function tp_replace_placeholders(line_num, word_num)
 	}
 
 	// Replace each placeholder on this line
-	var line_elem = $(`.content_line#l${line_num}`);
+	var line_elem = $(`#l${line_num}`);
 	line_elem.find('.placeholder').each( function(){
 		if( $(this).html().toLowerCase().includes("placeholder") ){
 			var id = $(this).attr('id').substring(1);
@@ -484,7 +484,7 @@ function setupLibrary(){
 		});
 	}
 
-	// When Register Novel Modal's host selection changes, change series code 
+	// When Register Novel Modal's host selection changes, change series code
 	$("#series_host").change(function(){
 		const opt = $(this).val();
 		var placeholder = "";
@@ -649,6 +649,10 @@ function setupChapter(){
 	// Run the postprocessing algorithm
 	tagged_placeholders();
 
+	// Padding top = size of floating navbar + 10px so no content is hidden under the top navbar
+	$("body").css('padding-top', $("#navbar_top").outerHeight() + 20);
+    $(".section_chapter").css('transition', 'filter 0.3s');
+
 	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
 	$(window).scroll(function() {
 		var winTop = $(window).scrollTop();
@@ -656,11 +660,30 @@ function setupChapter(){
 		var winHeight = $(window).height();
 
 		var percent_scrolled = (winTop / (docHeight - winHeight))*100;
-		var display = (percent_scrolled < 0.01) ? 'none' : 'block';
-		$('.chapter_scroll_bar#bar').css('display', display);
-		$('.chapter_scroll_bar').css('height', percent_scrolled + '%');
-		document.querySelector('.chapter_scroll_notch').innerText = Math.round(percent_scrolled) + '%';
+		$('#progress_bar').css('width', percent_scrolled + '%');
+		//document.querySelector('.chapter_scroll_notch').innerText = Math.round(percent_scrolled) + '%';
 	});
+
+    // Chapter Navbar show-hide logic
+    const navbar_speed = 100;
+    $("body").click(function(e){
+        if(e.target == this){
+            if($(".chapter_navbar").css('display') == 'none'){
+                $("#navbar_top").show("slide", { direction: 'up'}, navbar_speed);
+                $("#navbar_bottom").show("slide", { direction: 'down'}, navbar_speed);
+            }
+            else{
+                $("#navbar_top").hide("slide", { direction: 'up'}, navbar_speed);
+                $("#navbar_bottom").hide("slide", { direction: 'down'}, navbar_speed);
+            }
+        }
+    });
+
+    // Chapter Navbar to-top button
+    $("#chapter_to_top_btn").click(function(){
+        document.body.scrollTop = 0;            // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
 
 	// Bookmark button functionality
 	$(".chapter_bookmark_btn").click(function(){
@@ -675,30 +698,86 @@ function setupChapter(){
 			}
 			else{
 				$(bookmark_btn).toggleClass("chapter_bookmark_btn_active");
+                $(".chapter_sidebar_elem_icon_bookmark").toggle()
 			}
 		});
 	});
 
+	// Chapter Sidebar
+    const ch = parseInt($(`#mdata_ch`).data("value"));
+    const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
+	// Start the sidebar in hidden state with current chapter in view
+	$("#ch_"+ch).get(0).scrollIntoView({ block: 'center' });
+	$(".chapter_sidebar").hide();
+
+	// Chapter sidebar toggle button funcitonality
+	$("#chapter_sidebar_hide_btn").click(function(){
+        $(".section_chapter").css({
+            'filter':              '',
+            'pointer-events':      '',
+            'user-select':         '',
+            '-moz-user-select':    '',
+            '-khtml-user-select':  '',
+            '-webkit-user-select': '',
+            '-o-user-select':      ''
+        });
+		$(".chapter_sidebar").hide("slide", { direction: "right" }, 100);
+        $(".chapter_sidebar_backdrop").hide();
+	});
+	$("#chapter_sidebar_show_btn").click(function(){
+		$(".section_chapter").css({
+			'filter':              'opacity(0.2)',
+            'pointer-events':      'none',
+  			'user-select': 		   'none',
+  			'-moz-user-select':    'none',
+  			'-khtml-user-select':  'none',
+  			'-webkit-user-select': 'none',
+  			'-o-user-select': 	   'none'
+		});
+        $(".chapter_sidebar").show("slide", { direction: "right" }, 100);
+		$("#ch_"+ch).get(0).scrollIntoView({ block: 'center' });
+        $(".chapter_sidebar_backdrop").show();
+	});
+
+    $(".chapter_sidebar_backdrop").click(function(){
+        $("#chapter_sidebar_hide_btn").click();
+    });
+
+	// Chapter sidebar navigation buttions
+	$("#navbar_to_first").click(function() {
+	    $("#ch_1").get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+	$("#navbar_to_current").click(function() {
+	    $("#ch_"+ch).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+	$("#navbar_to_latest").click(function() {
+	    $("#ch_"+latest_ch).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+
+	// Chapter Navbar
 	// Add functionality of prev, toc, and next buttons
-	const ch = parseInt($(`#mdata_ch`).data("value"));
-	const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
 	const url = this.location.href;
-	if(!$(".chapter_prev_btn")[0].hasAttribute('disabled')){
-		$('.chapter_prev_btn').click(function() {
+	if(!$("#ch_prev_btn")[0].hasAttribute('disabled')){
+		$('#ch_prev_btn').click(function() {
 			var prev = ch - 1;
 			if(prev > 0){
 				location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
 			}
 		});
 	}
-	if(!$(".chapter_next_btn")[0].hasAttribute('disabled')){
-		$('.chapter_next_btn').click(function() {
+	if(!$("#ch_next_btn")[0].hasAttribute('disabled')){
+		$('#ch_next_btn').click(function() {
 			var next = ch + 1;
 			if(next <= latest_ch){
 				location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
 			}
 		});
 	}
+
+    // Line view button functionality
+    $("#ch_lineview_btn").click(function(){
+        $(".content_maintext_content").toggle();
+    })
 
 	// Initialize the correct icon
 	var day_night_toggle = $('.chapter_toolbelt').find('#day_night_toggle_btn');

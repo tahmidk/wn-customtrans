@@ -14,7 +14,6 @@ class BaseConfig(object):
 	# Important paths
 	SEED_DATA_PATH = os.path.join(os.getcwd(), 'seed_data')
 	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'dicts')
-	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'pages')
 
 	# Remove CSRF token life-time restriction
 	WTF_CSRF_TIME_LIMIT = None
