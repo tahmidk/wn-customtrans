@@ -257,7 +257,7 @@ function tp_replace_placeholders(line_num, word_num)
 	}
 
 	// Replace each placeholder on this line
-	var line_elem = $(`.content_line#l${line_num}`);
+	var line_elem = $(`#l${line_num}`);
 	line_elem.find('.placeholder').each( function(){
 		if( $(this).html().toLowerCase().includes("placeholder") ){
 			var id = $(this).attr('id').substring(1);
@@ -484,7 +484,7 @@ function setupLibrary(){
 		});
 	}
 
-	// When Register Novel Modal's host selection changes, change series code 
+	// When Register Novel Modal's host selection changes, change series code
 	$("#series_host").change(function(){
 		const opt = $(this).val();
 		var placeholder = "";
@@ -649,18 +649,39 @@ function setupChapter(){
 	// Run the postprocessing algorithm
 	tagged_placeholders();
 
-	// Credit to Codegrid for scroll indicator script: https://www.youtube.com/channel/UC7pVho4O31FyfQsZdXWejEw
+	// Padding top = size of floating navbar + 10px so no content is hidden under the top navbar
+	$("body").css('padding-top', $("#navbar_top").outerHeight() + 20);
+    $(".section_chapter").css('transition', 'filter 0.3s');
+
+    // Chapter progress bar
+    const documentStyle = document.documentElement.style;
 	$(window).scroll(function() {
+        var startTime = performance.now();
+
 		var winTop = $(window).scrollTop();
 		var docHeight = $(document).height();
 		var winHeight = $(window).height();
 
-		var percent_scrolled = (winTop / (docHeight - winHeight))*100;
-		var display = (percent_scrolled < 0.01) ? 'none' : 'block';
-		$('.chapter_scroll_bar#bar').css('display', display);
-		$('.chapter_scroll_bar').css('height', percent_scrolled + '%');
-		document.querySelector('.chapter_scroll_notch').innerText = Math.round(percent_scrolled) + '%';
+		var progress = (winTop / (docHeight - winHeight))*100;
+        documentStyle.setProperty('--chapter_progress_var', `${progress}%`);
+
+        var endTime = performance.now()
+        console.log(`Scroll event took ${endTime - startTime} ms`);
 	});
+
+    // Chapter Navbar show-hide logic
+    const navbar_speed = 100;
+    $("body").click(function(e){
+        if(e.target == this){
+            $("#navbar_top, #navbar_bottom").toggleClass("chapter_navbar_hidden");
+        }
+    });
+
+    // Chapter Navbar to-top button
+    $("#chapter_to_top_btn").click(function(){
+        document.body.scrollTop = 0;            // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
 
 	// Bookmark button functionality
 	$(".chapter_bookmark_btn").click(function(){
@@ -675,24 +696,72 @@ function setupChapter(){
 			}
 			else{
 				$(bookmark_btn).toggleClass("chapter_bookmark_btn_active");
+                $(".chapter_sidebar_elem_icon_bookmark").toggle()
 			}
 		});
 	});
 
+	// Chapter Sidebar
+    const ch = parseInt($(`#mdata_ch`).data("value"));
+    const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
+	// Start the sidebar in hidden state with current chapter in view
+	$("#ch_"+ch).get(0).scrollIntoView({ block: 'center' });
+
+	// Chapter sidebar toggle button funcitonality
+	$("#chapter_sidebar_hide_btn").click(function(){
+		$(".chapter_sidebar").toggleClass("chapter_sidebar_hidden");
+        $(".chapter_sidebar").one("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function() {
+            $(this).hide();
+        });
+
+        // Fade in the background
+        $(".section_chapter").toggleClass("section_chapter_faded");
+        // Hide backdrop div
+        $(".chapter_sidebar_backdrop").hide();
+        // Re-enable page scrolling
+        $("html").css("overflow", "unset");
+	});
+	$("#chapter_sidebar_show_btn").click(function(){
+        $(".chapter_sidebar").show().toggleClass("chapter_sidebar_hidden");
+
+        // Fade out the background
+        $(".section_chapter").toggleClass("section_chapter_faded");
+        // Scroll to current chapter in sidebar
+		$("#ch_"+ch).get(0).scrollIntoView({ block: 'center' });
+        // Show backdrop div
+        $(".chapter_sidebar_backdrop").show();
+        // Hook page to temporarily disable scrolling
+        $("html").css("overflow", "hidden");
+	});
+
+    $(".chapter_sidebar_backdrop").click(function(){
+        $("#chapter_sidebar_hide_btn").click();
+    });
+
+	// Chapter sidebar navigation buttions
+	$("#navbar_to_first").click(function() {
+	    $("#ch_1").get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+	$("#navbar_to_current").click(function() {
+	    $("#ch_"+ch).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+	$("#navbar_to_latest").click(function() {
+	    $("#ch_"+latest_ch).get(0).scrollIntoView({ behavior: 'smooth', block: 'center' });
+	});
+
+	// Chapter Navbar
 	// Add functionality of prev, toc, and next buttons
-	const ch = parseInt($(`#mdata_ch`).data("value"));
-	const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
 	const url = this.location.href;
-	if(!$(".chapter_prev_btn")[0].hasAttribute('disabled')){
-		$('.chapter_prev_btn').click(function() {
+	if(!$('#ch_prev_btn').attr('disabled')){
+		$('#ch_prev_btn').click(function(){
 			var prev = ch - 1;
 			if(prev > 0){
 				location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
 			}
 		});
 	}
-	if(!$(".chapter_next_btn")[0].hasAttribute('disabled')){
-		$('.chapter_next_btn').click(function() {
+	if(!$('#ch_next_btn, .chapter_next_chapter_section').attr('disabled')){
+		$('#ch_next_btn, .chapter_next_chapter_section').click(function(){
 			var next = ch + 1;
 			if(next <= latest_ch){
 				location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
@@ -700,25 +769,10 @@ function setupChapter(){
 		});
 	}
 
-	// Initialize the correct icon
-	var day_night_toggle = $('.chapter_toolbelt').find('#day_night_toggle_btn');
-	var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-	$(day_night_toggle).find('ion-icon').attr('name', icon_name);
-
-	// Add functionality to toggle day and night UIs
-	$(day_night_toggle).click(function(){
-		// Toggle the theme
-		if($('html').attr('data-theme') == "light"){
-			$('html').attr('data-theme', "dark");
-		}
-		else{
-			$('html').attr('data-theme', "light");
-		}
-
-		// Change the toggle button
-		var icon_name = ($('html').attr('data-theme') == "light") ? 'moon-outline' : 'sunny-outline';
-		$(day_night_toggle).find('ion-icon').attr('name', icon_name);
-	});
+    // Line view button functionality
+    $("#ch_lineview_btn").click(function(){
+        $(".content_maintext_content").toggle();
+    })
 }
 
 function setupDictionary(){

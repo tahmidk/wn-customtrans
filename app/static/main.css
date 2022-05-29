@@ -1,4 +1,8 @@
 /*---------------------------[ General Stylings ]-----------------------*/
+:root{
+  --chapter_progress_var: 0;
+}
+
 html{
   scroll-behavior: smooth;
   background: var(--html_background_color);
@@ -35,10 +39,15 @@ html{
 
   /* Chapter palette */
   --chapter_maintxt_color: #242424;
-  --chapter_subtxt_color: #b7b7b7;
+  --chapter_subtxt_color: #898989;
+  --chapter_contrast_color: white;
   --chapter_day_night_toggle_btn_color: #572a80;
-  --chapter_scroll_bar_color: #181818;
+  --chapter_progress_bar_color: #181818;
   --chapter_word_color: #007eff;
+  --chapter_sidebar_bg_color: rgba(245, 245, 245);
+  --chapter_sidebar_bg_color_alpha: rgba(245, 245, 245, 0);
+  --chapter_hover_color: #e3e3e3;
+  --chapter_navbar_bg_color: #e7e7e7;
 
   /* Dictionary palette */
   --dictionary_dlall_button_color: #09437b;
@@ -71,11 +80,16 @@ html[data-theme='dark']{
   --html_background_color: #181818;
 
   /* Chapter dark palette */
-  --chapter_maintxt_color: #d0d0d0;
+  --chapter_maintxt_color: #ebebeb;
   --chapter_subtxt_color: #6f6f6f;
+  --chapter_contrast_color: black;
   --chapter_day_night_toggle_btn_color: #bea140;
-  --chapter_scroll_bar_color: white;
+  --chapter_progress_bar_color: white;
   --chapter_word_color: #ffd000;
+  --chapter_sidebar_bg_color: rgba(34, 34, 34);
+  --chapter_sidebar_bg_color_alpha: rgba(34, 34, 34, 0);
+  --chapter_hover_color: #2c2c2c;
+  --chapter_navbar_bg_color: #1c1c1c;
 
   /* Dictionary editor dark palette */
   --dictionary_edit_day_night_toggle_btn_color: #bea140;
@@ -912,27 +926,34 @@ table.entry_info_table{
   padding: 10rem 3rem;
   max-width: 120rem;
 }
-.chapter_toolbelt{
-  width: 50%;
-  min-width: 30rem;
-  height: 4rem;
-  margin: 3rem auto;
+.section_chapter_faded{
+  filter: opacity(0.2);
+
+  pointer-events: none;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
 }
-#chapter_toolbelt_south{
-  margin-top: 5rem;
+/* The following logic is to make the body element clickable throughout the page.
+   Clicking the body is the trigger for showing/hiding the chapter navigation bar */
+.section_chapter,
+.section_chapter > *{
+  pointer-events: none;
 }
-.chapter_toolbelt_btn {
-  height: fit-content;
-  padding: 1rem;
-  color: white !important;
-  z-index: 0 !important;
-  box-shadow: none !important;
+.section_chapter .super_navpanel,
+.series_progress,
+.header_div,
+.flashpanel,
+.chapter_content,
+.chapter_next_chapter_section{
+  pointer-events: auto;
 }
-.chapter_toolbelt_btn:hover{
-  filter: brightness(1.3);
-}
-#ch_dict_btn{
-  background: var(--toc_dictionary_btn_color);
+
+.header_div{
+  margin: 0 auto 3rem auto;
+  width: fit-content;
 }
 .series_progress{
   position: unset;
@@ -942,30 +963,6 @@ table.entry_info_table{
   padding: 0.5rem 1rem;
   font-size: 1.3rem;
   border: 1px solid var(--chapter_maintxt_color);
-}
-.chapter_bookmark_btn{
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  width: 3rem;
-  height: 3rem;
-  background: #292929;
-  color: #565656;
-  cursor: pointer;
-  border: 1px solid var(--toc_bookmarked_highlight)
-}
-.chapter_bookmark_btn_active{
-  color: var(--toc_bookmarked_highlight);
-}
-.chapter_bookmark_btn:hover{
-  filter: brightness(1.2);
-}
-.chapter_bookmark_btn ion-icon{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.25rem;
 }
 .content_title_div{
   border-top: 1px solid #9a9a9a;
@@ -1004,28 +1001,68 @@ table.entry_info_table{
   border-bottom: 1px solid #9a9a9a;
   padding: 2rem 0;
 }
+.chapter_next_chapter_section{
+  width: 100%;
+  height: 300px;
+  display: flex;
+  transition: background 0.2s;
+
+  /* Make it unselectable */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.chapter_next_chapter_section:hover{
+  background: var(--chapter_hover_color);
+}
+.chapter_next_chapter_textdiv{
+  display: flex;
+  margin: auto;
+  flex-direction: column;
+  color: var(--chapter_maintxt_color);
+}
+.chapter_next_chapter_textdiv > *{
+  width: fit-content;
+  margin: 0.5rem auto;
+  font-size: 2rem;
+}
+.chapter_content{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.chapter_image{
+  max-width: 100%;
+}
 .content_line_div{
+  width: fit-content;
   display: flex;
   flex-direction: column;
+}
+.content_img_div{
   width: 100%;
-  margin: 0.5rem 0;
 }
 .content_line_div p{
   width: fit-content;
   display: inline-block;
   word-break: break-word;
+  margin-bottom: 0;
 }
-.content_line{
+.content_maintext{
   font-size: 1.5rem;
   margin: 0.5rem 0;
   color: var(--chapter_maintxt_color);
 }
-.content_raw{
+.content_subtext{
   font-size: 1.2rem;
   color: var(--chapter_subtxt_color);
 }
 .chapter_image_div{
-  width: 100%;
+  width: fit-content;
+  margin: 1rem auto;
+  padding: 10px;
+  border: solid 1px var(--chapter_maintxt_color);
 }
 #day_night_toggle_btn{
   color: white;
@@ -1051,63 +1088,313 @@ table.entry_info_table{
 .word_popover_body_cust{
 }
 
-/* Side progress indicator */
+/* Chapter sidebar */
 .chapter_sidebar{
   position: fixed;
-  /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 / 2 */
-  left: calc((100vw - 120rem) / 4);
-  top: calc(50% - 20vh);
-  width: 3rem;
-  height: 40vh;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100vh;
+  width: 25vw;
+  padding: 2rem;
+  z-index: 3;
+  box-shadow: rgb(0 0 0) 0px 0px 1rem 0px;
+  background: var(--chapter_sidebar_bg_color);
+  transition: transform 0.1s, opacity 0.1s;
 }
-.chapter_scroll_indicator{
-  position: absolute;
+.chapter_sidebar_hidden{
+  opacity: 0;
+  transform: translateX(100%);
+}
+.chapter_sidebar_backdrop{
+  display: none;
+  position: fixed;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
 }
-.chapter_scroll_bar{
+.chapter_sidebar_toolbelt_button{
+  float: right;
+}
+.chapter_sidebar_toolbelt_button ion-icon{
+  padding: 10px;
+  font-size: 2rem;
+  color: var(--chapter_maintxt_color);
+}
+.chapter_sidebar_toolbelt_button ion-icon:hover{
+  background: var(--chapter_maintxt_color);
+  color: var(--chapter_contrast_color);
+  transition: background 0.1s, color 0.1s;
+  cursor: pointer;
+}
+.chapter_sidebar_toc_title{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
+  color: var(--chapter_maintxt_color);
+}
+.chapter_sidebar_toc_title_abbr{
+  margin: 1rem auto;
+  padding: 0.5rem 2rem;
+  color: var(--chapter_contrast_color);
+  background: var(--chapter_maintxt_color);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-variant: all-petite-caps;
+
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.chapter_sidebar_toc_title_text{
+  margin: 0 auto 2rem;
+  padding: 0.5rem 10%;
+  font-size: 2.2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-variant: all-petite-caps;
+  text-align: center;
+  border: solid 1px var(--chapter_maintxt_color);
+}
+.chapter_sidebar_content{
+  position: relative;
+  flex-grow: 1;
+}
+.chapter_sidebar_content_list{
+  height: 70vh;
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
+  overflow-y: scroll;
+  list-style: none;
+}
+.chapter_sidebar_content_fade{
+  position: absolute;
+  width: 100%;
+  height: 4rem;
+  z-index: 3;
+  /* Allow chapter links covered under the fade div clickable*/
+  pointer-events: none;
+}
+#fadein.chapter_sidebar_content_fade{
+  top: 0;
+  background: linear-gradient(to bottom, var(--chapter_sidebar_bg_color) 0%, var(--chapter_sidebar_bg_color_alpha) 100%);
+}
+#fadeout.chapter_sidebar_content_fade{
+  bottom: 0;
+  background: linear-gradient(to top, var(--chapter_sidebar_bg_color) 0%, var(--chapter_sidebar_bg_color_alpha) 100%);
+}
+.chapter_sidebar_elem{
+  color: var(--chapter_maintxt_color);
+  padding: 2rem 1rem;
+  font-size: 1.2rem;
+  font-variant: petite-caps;
+}
+.chapter_sidebar_volume{
+  margin: 2rem 1rem 0;
+  padding-bottom: 1rem;
+  color: var(--chapter_maintxt_color);
+  font-variant: petite-caps;
+  border-bottom: solid 1px var(--chapter_maintxt_color);
+}
+.chapter_sidebar_volume_number{
+  font-size: 1.25rem;
+  color: var(--chapter_subtxt_color);
+}
+.chapter_sidebar_volume_title{
+  font-size: 2rem;
+  line-height: 2rem;
+}
+.chapter_sidebar_elem:hover{
+  background: var(--chapter_hover_color);
+}
+.chapter_sidebar_elem_bookmarked .chapter_sidebar_elem_header{
+  border-bottom: solid 1px var(--toc_bookmarked_highlight);
+}
+.chapter_sidebar_elem_current .chapter_sidebar_elem_header{
+  border-bottom: solid 1px var(--toc_current_chapter_highlight);
+}
+.chapter_sidebar_elem_header{
+  display: flex;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: solid 1px var(--chapter_subtxt_color);
+}
+.chapter_sidebar_elem_icon{
+  display: flex;
+  margin-right: 0.5rem;
+}
+.chapter_sidebar_elem_icon > div{
+  margin: 0 0.2rem;
+}
+.chapter_sidebar_elem_icon ion-icon{
+  width: 15px;
+}
+.chapter_sidebar_elem_chapter{
+  font-style: oblique;
+  flex: 1;
+}
+.chapter_sidebar_elem_timestamp{
+  color: var(--chapter_subtxt_color);
+  font-size: 1rem;
+  font-family: math;
+}
+.chapter_sidebar_elem_title{
+  color: var(--chapter_subtxt_color);
+  font-family: 'Montserrat', sans-serif;
+  font-variant: initial;
+  text-align: justify;
+}
+.chapter_sidebar_scroll_column{
+  position: relative;
+  width: 10px;
+  margin-left: 5px;
+}
+.chapter_sidebar_scrollbar{
+  position: absolute;
+  height: 100px;
+  width: 10px;
+  border-radius: 2rem;
+  background: var(--chapter_maintxt_color);
+}
+.chapter_sidebar_navbar{
+  display: flex;
+  width: 100%;
+  max-width: 30rem;
+  height: fit-content;
+  margin: 0 auto 1rem;
+}
+.chapter_sidebar_navbar_btn{
+  width: 100%;
+  height: fit-content;
+  padding: 0.5rem 0 0.3rem;
+  font-size: 1rem;
+}
+
+/* Chapter navbar */
+.chapter_navbar{
+  position: fixed;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  height: fit-content;
+  padding: 1rem;
+  z-index: 1;
+  opacity: 1;
+  background: var(--chapter_navbar_bg_color);
+  transition: transform 0.1s, opacity 0.1s;
+}
+.chapter_navbar_hidden{
+  opacity: 0;
+}
+.chapter_navbar_chapter_section{
+  width: fit-content;
+  margin: auto 0.5rem;
+  padding-right: 1.5rem;
+  font-size: 3rem;
+  font-family: fantasy;
+  font-style: italic;
+  color: var(--chapter_maintxt_color);
+}
+.chapter_navbar_title_section{
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-style: italic;
+}
+.chapter_navbar_title{
+  color: var(--chapter_maintxt_color);
+  font-size: 1.75rem;
+  font-family: 'Montserrat';
+  font-variant: petite-caps;
+}
+.chapter_navbar_chapter_title{
+  color: var(--chapter_subtxt_color);
+  font-family: 'Montserrat';
+}
+.chapter_navbar_button_section{
+  display: flex;
+}
+.chapter_navbar_button_section ion-icon{
+  padding: 10px;
+  font-size: 2rem;
+  color: var(--chapter_maintxt_color);
+}
+.chapter_navbar_button_section ion-icon:hover{
+  background: var(--chapter_maintxt_color);
+  color: var(--chapter_contrast_color);
+  transition: background 0.1s, color 0.1s;
+  cursor: pointer;
+}
+.chapter_navbar_button{
+  padding: 0.5rem;
+}
+#navbar_top{
+  top: 0;
+  border-bottom: solid 1px var(--chapter_maintxt_color);
+}
+#navbar_bottom{
+  bottom: 0;
+  border-top: solid 1px var(--chapter_maintxt_color);
+}
+.chapter_navbar_hidden#navbar_top{
+  transform: translateY(-100%);
+}
+.chapter_navbar_hidden#navbar_bottom{
+  transform: translateY(100%);
+}
+.chapter_navbar_progress_bar_container{
   position: absolute;
   top: 0;
-  right: 50%;
-  width: 1px;
-  height: 0%;
-  background: var(--chapter_scroll_bar_color);
-  box-shadow: 0 0 3px 0.1px var(--chapter_scroll_bar_color);
-
-  /* Make this unselectable */
-  user-select: none;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-}
-.chapter_scroll_bar#bar{
-  display: none;
-}
-.chapter_scroll_bar#bg{
-  height: 100% !important;
-  background: rgba(127, 127, 127, 0.4);
-  box-shadow: none;
-}
-.chapter_scroll_notch{
-  position: absolute;
-  top: calc(50% - 1rem);
-  height: 2rem;
+  left: 0;
   width: 100%;
-  color: var(--chapter_maintxt_color);
-  background: var(--html_background_color);
-  text-align: center;
-  line-height: 2rem;
-  font-family: 'Courier', sans-serif;
-  font-size: 1rem;
-  border: 1px solid var(--chapter_maintxt_color);
-
-  /* Make this unselectable */
-  user-select: none;
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
+  height: 5px;
+}
+#progress_bar{
+  position: relative;
+  width: var(--chapter_progress_var);
+  height: 100%;
+  z-index: 2;
+  background: var(--chapter_progress_bar_color);
+}
+.chapter_navbar_navigation{
+  margin: auto;
+}
+.chapter_navbar_navigation_btn{
+  width: 4rem;
+  height: fit-content;
+  padding: 1rem;
+  font-size: 1.1rem;
+  color: white !important;
+  box-shadow: none;
+  z-index: 0 ;
+}
+.chapter_navbar_navigation_btn:hover{
+  filter: brightness(1.1);
+}
+#ch_dict_btn{
+  background: var(--toc_dictionary_btn_color);
+}
+#ch_lineview_btn{
+  background: #AB47BC;
+}
+#ch_bkmk_btn{
+  background: #2c2c2c;
+  border: 1px solid var(--toc_bookmarked_highlight);
+}
+#ch_prev_btn,
+#ch_next_btn{
+  width: 7rem;
+}
+.chapter_bookmark_btn_active{
+  background: var(--toc_bookmarked_highlight) !important;
 }
 
 
@@ -1544,26 +1831,18 @@ table.entry_info_table{
   margin: 0 1rem;
 }
 
-
 /* Media Queries - Viewport Correction CSS */
 @media only screen and (max-width: 2480px){
   /* Responsive Chapter */
-  .section_chapter{
-    max-width: 75rem;
+  .chapter_sidebar{
+    width: 40vw;
   }
 
-  .chapter_sidebar{
-    /* Chapter sidebar's left position is half of margin-left size = (total view width - section_max_width) / 2 / 2 */
-    left: calc((100vw - 75rem) / 4);
-  }
-}
-@media only screen and (max-width: 1440px){
-  /* Responsive Chapter */
-  .chapter_sidebar{
-    display: none;
-  }
 }
 @media only screen and (max-width: 1280px){
+  html{
+    font-size: 0.8rem;
+  }
   section{
     min-width: unset;
   }
@@ -1633,11 +1912,11 @@ table.entry_info_table{
   }
 
   /* Responsive Chapter */
-  .chapter_bookmark_btn{
-    left: 3rem;
-  }
   .section_chapter .super_navpanel{
     right: 3rem;
+  }
+  .chapter_sidebar{
+    width: 50vw;
   }
 
   /* Responsive Honorifics */
@@ -1649,6 +1928,9 @@ table.entry_info_table{
   }
 }
 @media only screen and (max-width: 864px){
+  html{
+    font-size: 0.75rem;
+  }
   section{
     width: auto;
     min-width: unset;
@@ -1748,8 +2030,11 @@ table.entry_info_table{
   .section_chapter .section_body {
     margin-top: 1rem;
   }
-  .chapter_toolbelt{
-    width: unset;
+  .chapter_sidebar{
+    width: 75vw;
+  }
+  .chapter_navbar_navigation_btn{
+    width: fit-content;
   }
 
   /*Responsive Honorific*/
@@ -1758,11 +2043,57 @@ table.entry_info_table{
   }
 }
 
+
+@media only screen and (max-height: 640px){
+  /* Simplify side bar when not enough vertical space */
+  html{
+    font-size: 0.75rem;
+  }
+  .chapter_sidebar_toc_title{
+    flex-direction: row;
+  }
+  .chapter_sidebar_toc_title_abbr{
+    display: none;
+  }
+  .chapter_sidebar_toc_title_text{
+    padding: 0;
+    margin: 0 auto 0.5rem;
+    border: none;
+  }
+  .chapter_sidebar_content_list{
+    height: 50vh;
+  }
+  .chapter_sidebar_content_fade{
+    display: none;
+  }
+  .chapter_navbar_title{
+    font-size: 1.4rem;
+  }
+  .chapter_navbar_chapter_title{
+    font-size: 1.3rem;
+  }
+}
+
 @media only screen and (max-width: 640px){
   html, html[data-theme='dark']{
     font-size: 0.7rem;
   }
+  .chapter_navbar_navigation_btn{
+    width: fit-content !important;
+  }
 
+  .super_navpanel{
+    position: initial;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex: 1;
+  }
+  .super_navpanel > *{
+    padding: 0 !important;
+    border-radius: 0;
+    flex-grow: 1;
+  }
 }
 
 @media only screen and (max-width: 460px){

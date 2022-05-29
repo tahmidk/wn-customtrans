@@ -8,7 +8,7 @@
 {% block hdr_theme %}#262829{% endblock %}
 {% block html_lang %}{{lang_code}}{% endblock %}
 {%- block metavars -%}
-	{{ define_metavar('ch', ch) }}
+	{{ define_metavar('ch', chapter.number) }}
 	{{ define_metavar('latest_ch', series.latest_ch) }}
 	{% if chapter_data is defined %}
 		{% for definition in chapter_data.dictionary %}
@@ -20,7 +20,60 @@
 	{% endif %}
 {%- endblock -%}
 
+{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
+{% set series_dict_url = url_for('dictionaries_edit', dict_fname=dict_fname) %}
+{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=chapter.number) %}
+
 {% block content %}
+<!-- Chapter navbar -->
+<div class="chapter_navbar" id="navbar_top">
+	<div class="chapter_navbar_chapter_section notranslate">
+		{{chapter.number}}
+	</div>
+	<div class="chapter_navbar_title_section">
+		<div class="chapter_navbar_title notranslate" id="navbar_series_title">
+			{{series.title}}
+		</div>
+		<div class="chapter_navbar_chapter_title" id="navbar_chapter_title">
+			{{chapter.title}}
+		</div>
+	</div>
+	<div class="chapter_navbar_button_section">
+		<div class="chapter_navbar_button" id="chapter_to_top_btn" title="Scroll to top">
+			<ion-icon name="chevron-up-outline"></ion-icon>
+		</div>
+		<div class="chapter_navbar_button" id="chapter_sidebar_show_btn" title="Open sidemenu">
+			<ion-icon name="reorder-three-outline" style=""></ion-icon>
+		</div>
+	</div>
+</div>
+<div class="chapter_navbar" id="navbar_bottom">
+	<div class="chapter_navbar_progress_bar_container">
+		<div class="chapter_navbar_progress_bar" id="progress_bar"></div>
+	</div>
+	<div class="chapter_navbar_navigation">
+		<a role="button" class="btn btn-dark chapter_navbar_navigation_btn chapter_prev_btn" id="ch_prev_btn" title="Previous Chapter" {{'disabled' if chapter.number == 1}}>
+			<ion-icon name="return-up-back-outline"></ion-icon>
+		</a>
+		<a role="button" class="btn chapter_navbar_navigation_btn chapter_dict_btn" id="ch_dict_btn" title="Chapter Dictionary" href="{{series_dict_url}}">
+			<ion-icon name="reader"></ion-icon>
+		</a>
+		<a role="button" class="btn special-color-dark chapter_navbar_navigation_btn chapter_toc_btn" id="ch_toc_btn" title="Table of Contents" href="{{series_toc_url}}">
+			<ion-icon name="list-outline"></ion-icon>
+		</a>
+		<a role="button" class="btn chapter_navbar_navigation_btn chapter_lineview_btn" id="ch_lineview_btn" data-toggle="popover" tabindex="0" title="Toggle Line View">
+			<ion-icon name="language"></ion-icon>
+		</a>
+		<a role="button" class="btn chapter_navbar_navigation_btn chapter_bookmark_btn {{'chapter_bookmark_btn_active' if chapter.bookmarked}}" id="ch_bkmk_btn" action="{{bookmark_url}}" title="Toggle bookmark">
+			<ion-icon name="bookmark"></ion-icon>
+		</a>
+		<a role="button" class="btn btn-dark chapter_navbar_navigation_btn chapter_next_btn" id="ch_next_btn" title="Next Chapter" {{'disabled' if chapter.number == series.latest_ch}}>
+			<ion-icon name="return-up-forward-outline"></ion-icon>
+		</a>
+	</div>
+</div>
+
+<!-- Main content -->
 <section class="section_chapter">
 	<!-- Navigation bar -->
 	{% if back_href is defined %}
@@ -31,30 +84,20 @@
 	<div class="section_body">
 		<!-- The container that displays current chapter over latest chapter -->
 		<div class="series_progress">
-			<sup>{{ch}}</sup>&frasl;<sub>{{series.latest_ch}}</sub>
-		</div>
-
-		{% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=ch) %}
-		<div class="chapter_bookmark_btn {{'chapter_bookmark_btn_active' if bookmarked}}" action="{{bookmark_url}}" title="Toggle bookmark">
-			<ion-icon name="bookmark"></ion-icon>
+			<sup>{{chapter.number}}</sup>&frasl;<sub>{{series.latest_ch}}</sub>
 		</div>
 
 		<!-- Chapter title and chapter number location -->
 		<div class="header_div">
 			<div class="chapter_series_title_div">
-				<a class="no_decoration" href="{{series_url}}" target="_blank">{{series.title}}</a>
+				<a class="no_decoration" href="{{series.url}}" target="_blank">{{series.title}}</a>
 			</div>
 			<div style="width: 60%; margin: auto;">
 				<hr style="border-top: 1px solid var(--chapter_maintxt_color)">
 			</div>
 			<div class="chapter_chapter_div">
-				<a class="no_decoration" href="{{chapter_url}}" target="_blank">Chapter {{ch}}</a>
+				<a class="no_decoration" href="{{chapter.url}}" target="_blank">Chapter {{chapter.number}}</a>
 			</div>
-		</div>
-
-		<!-- Top toolbelt -->
-		<div class="chapter_toolbelt" id="chapter_toolbelt_north">
-			{{ render_toolbelt() }}
 		</div>
 
 		<!-- Flashpanel -->
@@ -99,22 +142,99 @@
 			{% endif %}
 		</div>
 
-		<!-- Bottom toolbelt -->
-		<div class="chapter_toolbelt" id="chapter_toolbelt_south">
-			{{ render_toolbelt() }}
-		</div>
+		<a class="chapter_next_chapter_section" {{'disabled' if chapter.number == series.latest_ch}}>
+			<div class="chapter_next_chapter_textdiv">
+				<div>
+					Next Chapter
+				</div>
+				<div>
+					<ion-icon name="arrow-down-outline"></ion-icon>
+				</div>
+			</div>
+		</a>
 	</div>
-
-	<!-- Fade outs on smaller screens-->
-	<div class="fade_div"> </div>
 </section>
 
-<!-- Scroll indicator -->
-<div class="chapter_sidebar">
-	<div class="chapter_scroll_indicator">
-		<div class="chapter_scroll_bar" id="bar"></div>
-		<div class="chapter_scroll_bar" id="bg"></div>
-		<div class="chapter_scroll_notch notranslate">0%</div>
+<!-- Chapter TOC sidebar -->
+<div class="chapter_sidebar_backdrop"></div>
+<div class="chapter_sidebar chapter_sidebar_hidden" style="display: none;">
+	<div class="chapter_sidebar_toolbelt" style="width: 100%">
+		<div class="chapter_sidebar_toolbelt_button" id="chapter_sidebar_hide_btn" title="Close Sidemenu">
+			<ion-icon name="reorder-three-outline"></ion-icon>
+		</div>
+	</div>
+	<div class="chapter_sidebar_toc_title">
+		<div class="chapter_sidebar_toc_title_abbr notranslate">
+			{{ series.abbr }}
+		</div>
+		<div class="chapter_sidebar_toc_title_text notranslate">
+			<a href="{{series_toc_url}}" title="Table of contents" >Table of Contents</a>
+		</div>
+	</div>
+	<div class="chapter_sidebar_navbar">
+		<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_first" title="Scroll to first chapter">
+			<ion-icon name="arrow-up"></ion-icon>
+		</div>
+		<div class="btn btn-success chapter_sidebar_navbar_btn" id="navbar_to_current" title="Scroll to current chapter">
+			<ion-icon name="chevron-down-circle"></ion-icon>
+		</div>
+		<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_latest" title="Scroll to latest chapter">
+			<ion-icon name="arrow-down"></ion-icon>
+		</div>
+	</div>
+	<div style="display: flex;">
+		<div class="chapter_sidebar_content">
+			<div class="chapter_sidebar_content_fade" id="fadein"></div>
+			<ol class="chapter_sidebar_content_list">
+				{% for volume in series.volumes %}
+					<li class="chapter_sidebar_volume">
+						<div class="chapter_sidebar_volume_number">
+							Volume {{volume.number}}
+						</div>
+						<div class="chapter_sidebar_volume_title">
+							{{volume.title}}
+						</div>
+					</li>
+					{% for ch in volume.chapters %}
+						{% set current = ch.number == chapter.number %}
+						{% set bookmarked = ch.bookmarked %}
+						<a href="{{url_for('library_series_chapter', series_code=series.code, ch=ch.number)}}">
+							<li class="chapter_sidebar_elem {{'chapter_sidebar_elem_current' if current}} {{'chapter_sidebar_elem_bookmarked' if bookmarked}}" id=ch_{{ch.number}}>
+								<div class="chapter_sidebar_elem_header">
+									<div class="chapter_sidebar_elem_icon">
+										{% if bookmarked or current%}
+										<div class="chapter_sidebar_elem_icon_current" style="{{'display: none' if not current}}">
+											<ion-icon name="chevron-down-circle" style="color: var(--toc_current_chapter_highlight)"></ion-icon>
+										</div>
+										<div class="chapter_sidebar_elem_icon_bookmark" style="{{'display: none' if not bookmarked}}">
+											<ion-icon name="bookmark" style="color: var(--toc_bookmarked_highlight)"></ion-icon>
+										</div>
+										{% else %}
+										<div class="chapter_sidebar_elem_icon_regular">
+											<ion-icon name="ellipse-outline"></ion-icon>
+										</div>
+										{% endif %}
+									</div>
+									<div class="chapter_sidebar_elem_chapter notranslate">
+										Chapter {{ch.number}}
+									</div>
+									<div class="chapter_sidebar_elem_timestamp notranslate">
+										05/10/2022
+									</div>
+								</div>
+								<div class="chapter_sidebar_elem_title">
+									{{ch.title}}
+								</div>
+							</li>
+						</a>
+					{% endfor %}
+				{% endfor %}
+			</ol>
+			<div class="chapter_sidebar_content_fade" id="fadeout"></div>
+		</div>
+		<div class="chapter_sidebar_scroll_column" style="display: none">
+			<div class="chapter_sidebar_scrollbar"></div>
+		</div>
 	</div>
 </div>
 
@@ -125,8 +245,8 @@
 		setupChapter();
 
 		// Mark this chapter as the current chapter if it's greater than what it currently is
-		if({{ch}} > {{series.current_ch}}){
-			var url = "{{url_for('library_series_toc_setcurrent', series_code=series.code, ch=ch)}}";
+		if({{chapter.number}} > {{series.current_ch}}){
+			var url = "{{url_for('library_series_toc_setcurrent', series_code=series.code, ch=chapter.number)}}";
 			$.post(url, function(data) {
 				if(data.status != 'ok') {
 					var msg = `An unexpected error occurred while trying to set this as the current chapter`;
@@ -139,52 +259,27 @@
 
 <!-- Creates a line entry in the content section of the chapter html -->
 {% macro line_entry(data) %}
-	<div class="chapter_content">
 	{% if data.type == "text" %}
-		<div class="content_line_div">
-			<p class="content_line" id="l{{data.line_id}}">
-				{{data.text|safe}}
-			</p>
-			<p class="content_raw notranslate" id="r{{data.line_id}}">
-				<a href="{{data.gt_link}}" class="no_decoration" target="_blank">
-					{{data.subtext}}
-				</a>
-			</p>
+	<div class="chapter_content content_line_div">
+		<div class="content_maintext" id="l{{data.line_id}}">
+			<p class="content_maintext_content content_maintext_trans"> {{data.text|safe}} </p>
+			<p class="content_maintext_content content_maintext_raw notranslate" style="display: none;"> {{data.raw}} </p>
 		</div>
-		<p class="dummy" id="d{{data.line_id}}">{{dummy_text}}</p>
+		<p class="content_subtext notranslate" id="r{{data.line_id}}">
+			<a href="{{data.gt_link}}" class="no_decoration" target="_blank">
+				{{data.subtext}}
+			</a>
+		</p>
+	</div>
+	<p class="dummy" id="d{{data.line_id}}">{{dummy_text}}</p>
 	{% elif data.type == "image" %}
-		<div class="chapter_image_div">
-			<img class="chapter_image" src="{{data.img_src}}" id="i{{data.img_id}}">
-		</div>
+	<div class="chapter_content chapter_image_div">
+		<img class="chapter_image" src="{{data.img_src}}" id="i{{data.img_id}}">
+	</div>
 	{% endif %}
-	</div>
 {% endmacro %}
 
-<!-- Macro to render the toolbelt -->
-{% macro render_toolbelt() %}
-	<div class="btn-group" role="group" aria-label="Basic example" style="width: 100%; height: 100%;">
-		{% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
-		{% set series_dict_url = url_for('dictionaries_edit', dict_fname=dict_fname) %}
-		<a role="button" class="btn btn-dark chapter_toolbelt_btn chapter_prev_btn" id="prev_btn" title="Previous Chapter" {{'disabled' if ch == 1}}>
-			<ion-icon name="return-up-back-outline"></ion-icon>
-		</a>
-		<a role="button" class="btn chapter_toolbelt_btn chapter_dict_btn" id="ch_dict_btn" title="Chapter Dictionary" href="{{series_dict_url}}">
-			<ion-icon name="reader-outline"></ion-icon>
-		</a>
-		<a role="button" class="btn special-color-dark chapter_toolbelt_btn chapter_toc_btn" id="toc_btn" title="Table of Contents"
-			href="{{series_toc_url}}">
-			<ion-icon name="library-outline"></ion-icon>
-		</a>
-		<button type="button" class="btn chapter_toolbelt_btn chapter_day_night_toggle_btn" id="day_night_toggle_btn" title="Day/Night Mode"
-			style="color: #fff">
-			<ion-icon name="moon-outline"></ion-icon>
-		</button>
-		<a role="button" class="btn btn-dark chapter_toolbelt_btn chapter_next_btn" id="next_btn" title="Next Chapter" {{'disabled' if ch == series.latest_ch}}>
-			<ion-icon name="return-up-forward-outline"></ion-icon>
-		</a>
-	</div>
-{% endmacro %}
-
+<!-- Creates a dictionary metadata element -->
 {% macro define_metavar_dict(id, trans, comment) %}
 	<meta id="mdata_definition_{{id}}" data-translation="{{trans}}" data-comment="{{comment}}">
 {% endmacro %}
