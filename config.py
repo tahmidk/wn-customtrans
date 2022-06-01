@@ -18,6 +18,12 @@ class BaseConfig(object):
 	# Remove CSRF token life-time restriction
 	WTF_CSRF_TIME_LIMIT = None
 
+	# Celery config using default redis server
+	CELERY_CONFIG={
+		'broker_url': 'redis://localhost:6379',
+	    'result_backend': 'redis://localhost:6379'
+	}
+
 	# Security
 	SESSION_COOKIE_SECURE = True
 	SECRET_KEY = 'e0d41ebf1910b2ba'

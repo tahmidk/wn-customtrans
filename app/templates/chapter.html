@@ -158,82 +158,84 @@
 <!-- Chapter TOC sidebar -->
 <div class="chapter_sidebar_backdrop"></div>
 <div class="chapter_sidebar chapter_sidebar_hidden" style="display: none;">
-	<div class="chapter_sidebar_toolbelt" style="width: 100%">
-		<div class="chapter_sidebar_toolbelt_button" id="chapter_sidebar_hide_btn" title="Close Sidemenu">
-			<ion-icon name="reorder-three-outline"></ion-icon>
+	<div class="chapter_sidebar_wrapper">
+		<div class="chapter_sidebar_toolbelt" style="width: 100%">
+			<div class="chapter_sidebar_toolbelt_button" id="chapter_sidebar_hide_btn" title="Close Sidemenu">
+				<ion-icon name="reorder-three-outline"></ion-icon>
+			</div>
 		</div>
-	</div>
-	<div class="chapter_sidebar_toc_title">
-		<div class="chapter_sidebar_toc_title_abbr notranslate">
-			{{ series.abbr }}
+		<div class="chapter_sidebar_toc_title">
+			<div class="chapter_sidebar_toc_title_abbr notranslate">
+				{{ series.abbr }}
+			</div>
+			<div class="chapter_sidebar_toc_title_text notranslate">
+				<a href="{{series_toc_url}}" title="Table of contents" >Table of Contents</a>
+			</div>
 		</div>
-		<div class="chapter_sidebar_toc_title_text notranslate">
-			<a href="{{series_toc_url}}" title="Table of contents" >Table of Contents</a>
+		<div class="chapter_sidebar_navbar">
+			<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_first" title="Scroll to first chapter">
+				<ion-icon name="arrow-up"></ion-icon>
+			</div>
+			<div class="btn btn-success chapter_sidebar_navbar_btn" id="navbar_to_current" title="Scroll to current chapter">
+				<ion-icon name="chevron-down-circle"></ion-icon>
+			</div>
+			<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_latest" title="Scroll to latest chapter">
+				<ion-icon name="arrow-down"></ion-icon>
+			</div>
 		</div>
-	</div>
-	<div class="chapter_sidebar_navbar">
-		<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_first" title="Scroll to first chapter">
-			<ion-icon name="arrow-up"></ion-icon>
-		</div>
-		<div class="btn btn-success chapter_sidebar_navbar_btn" id="navbar_to_current" title="Scroll to current chapter">
-			<ion-icon name="chevron-down-circle"></ion-icon>
-		</div>
-		<div class="btn btn-elegant chapter_sidebar_navbar_btn" id="navbar_to_latest" title="Scroll to latest chapter">
-			<ion-icon name="arrow-down"></ion-icon>
-		</div>
-	</div>
-	<div style="display: flex;">
-		<div class="chapter_sidebar_content">
-			<div class="chapter_sidebar_content_fade" id="fadein"></div>
-			<ol class="chapter_sidebar_content_list">
-				{% for volume in series.volumes %}
-					<li class="chapter_sidebar_volume">
-						<div class="chapter_sidebar_volume_number">
-							Volume {{volume.number}}
-						</div>
-						<div class="chapter_sidebar_volume_title">
-							{{volume.title}}
-						</div>
-					</li>
-					{% for ch in volume.chapters %}
-						{% set current = ch.number == chapter.number %}
-						{% set bookmarked = ch.bookmarked %}
-						<a href="{{url_for('library_series_chapter', series_code=series.code, ch=ch.number)}}">
-							<li class="chapter_sidebar_elem {{'chapter_sidebar_elem_current' if current}} {{'chapter_sidebar_elem_bookmarked' if bookmarked}}" id=ch_{{ch.number}}>
-								<div class="chapter_sidebar_elem_header">
-									<div class="chapter_sidebar_elem_icon">
-										{% if bookmarked or current%}
-										<div class="chapter_sidebar_elem_icon_current" style="{{'display: none' if not current}}">
-											<ion-icon name="chevron-down-circle" style="color: var(--toc_current_chapter_highlight)"></ion-icon>
+		<div class="chapter_sidebar_content_section">
+			<div class="chapter_sidebar_content">
+				<div class="chapter_sidebar_content_fade" id="fadein"></div>
+				<ol class="chapter_sidebar_content_list">
+					{% for volume in series.volumes %}
+						<li class="chapter_sidebar_volume">
+							<div class="chapter_sidebar_volume_number">
+								Volume {{volume.number}}
+							</div>
+							<div class="chapter_sidebar_volume_title">
+								{{volume.title}}
+							</div>
+						</li>
+						{% for ch in volume.chapters %}
+							{% set current = ch.number == chapter.number %}
+							{% set bookmarked = ch.bookmarked %}
+							<a href="{{url_for('library_series_chapter', series_code=series.code, ch=ch.number)}}">
+								<li class="chapter_sidebar_elem {{'chapter_sidebar_elem_current' if current}} {{'chapter_sidebar_elem_bookmarked' if bookmarked}}" id=ch_{{ch.number}}>
+									<div class="chapter_sidebar_elem_header">
+										<div class="chapter_sidebar_elem_icon">
+											{% if bookmarked or current%}
+											<div class="chapter_sidebar_elem_icon_current" style="{{'display: none' if not current}}">
+												<ion-icon name="chevron-down-circle" style="color: var(--toc_current_chapter_highlight)"></ion-icon>
+											</div>
+											<div class="chapter_sidebar_elem_icon_bookmark" style="{{'display: none' if not bookmarked}}">
+												<ion-icon name="bookmark" style="color: var(--toc_bookmarked_highlight)"></ion-icon>
+											</div>
+											{% else %}
+											<div class="chapter_sidebar_elem_icon_regular">
+												<ion-icon name="ellipse-outline"></ion-icon>
+											</div>
+											{% endif %}
 										</div>
-										<div class="chapter_sidebar_elem_icon_bookmark" style="{{'display: none' if not bookmarked}}">
-											<ion-icon name="bookmark" style="color: var(--toc_bookmarked_highlight)"></ion-icon>
+										<div class="chapter_sidebar_elem_chapter notranslate">
+											Chapter {{ch.number}}
 										</div>
-										{% else %}
-										<div class="chapter_sidebar_elem_icon_regular">
-											<ion-icon name="ellipse-outline"></ion-icon>
+										<div class="chapter_sidebar_elem_timestamp notranslate">
+											05/10/2022
 										</div>
-										{% endif %}
 									</div>
-									<div class="chapter_sidebar_elem_chapter notranslate">
-										Chapter {{ch.number}}
+									<div class="chapter_sidebar_elem_title">
+										{{ch.title}}
 									</div>
-									<div class="chapter_sidebar_elem_timestamp notranslate">
-										05/10/2022
-									</div>
-								</div>
-								<div class="chapter_sidebar_elem_title">
-									{{ch.title}}
-								</div>
-							</li>
-						</a>
+								</li>
+							</a>
+						{% endfor %}
 					{% endfor %}
-				{% endfor %}
-			</ol>
-			<div class="chapter_sidebar_content_fade" id="fadeout"></div>
-		</div>
-		<div class="chapter_sidebar_scroll_column" style="display: none">
-			<div class="chapter_sidebar_scrollbar"></div>
+				</ol>
+				<div class="chapter_sidebar_content_fade" id="fadeout"></div>
+			</div>
+			<div class="chapter_sidebar_scroll_column" style="display: none">
+				<div class="chapter_sidebar_scrollbar"></div>
+			</div>
 		</div>
 	</div>
 </div>

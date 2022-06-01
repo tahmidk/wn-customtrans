@@ -24,3 +24,11 @@ Sometimes, an update to this web app is accompanied by a change in the SQLAlchem
 $ flask db init
 $ flask db migrate -m "Migration description"
 $ flask db upgrade
+
+#Extra steps needed to run
+A Redis server is needed to run a Celery daemon
+	Install Redis on Windows 10: https://www.youtube.com/watch?v=_nFwPTHOMIY&ab_channel=Redis
+
+A Celery daemon is required to launch Flask without hang
+
+

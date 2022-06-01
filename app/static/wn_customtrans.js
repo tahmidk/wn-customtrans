@@ -651,22 +651,19 @@ function setupChapter(){
 
 	// Padding top = size of floating navbar + 10px so no content is hidden under the top navbar
 	$("body").css('padding-top', $("#navbar_top").outerHeight() + 20);
-    $(".section_chapter").css('transition', 'filter 0.3s');
+    $(window).resize(function() {
+        $("body").css('padding-top', $("#navbar_top").outerHeight() + 20);
+    });
 
     // Chapter progress bar
     const documentStyle = document.documentElement.style;
 	$(window).scroll(function() {
-        var startTime = performance.now();
-
 		var winTop = $(window).scrollTop();
 		var docHeight = $(document).height();
 		var winHeight = $(window).height();
 
 		var progress = (winTop / (docHeight - winHeight))*100;
         documentStyle.setProperty('--chapter_progress_var', `${progress}%`);
-
-        var endTime = performance.now()
-        console.log(`Scroll event took ${endTime - startTime} ms`);
 	});
 
     // Chapter Navbar show-hide logic
@@ -734,6 +731,7 @@ function setupChapter(){
         $("html").css("overflow", "hidden");
 	});
 
+    // Click sidebar backdrop to dismiss sidebar
     $(".chapter_sidebar_backdrop").click(function(){
         $("#chapter_sidebar_hide_btn").click();
     });

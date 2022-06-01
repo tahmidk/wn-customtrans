@@ -26,6 +26,7 @@ from flask import send_from_directory
 
 # Internal imports
 from app import db
+from app import celery
 from app import app
 from app import csrf
 
@@ -40,9 +41,17 @@ from app.models import *
 from app.scripts import utils
 from app.scripts import dictionary
 from app.scripts import hostmanager
+from app.scripts import cachemanager
 from app.scripts.custom_errors import *
 
 
+
+# Create the chapter cache
+cache_manager = cachemanager.ChapterCacheManager()
+
+@celery.task()
+def add_together(a, b):
+	return a + b
 
 # This is the route for the main page
 @app.route("/")
@@ -307,6 +316,15 @@ def library_series_chapter(series_code, ch):
 	# Get Chapter entry
 	chapter_entry = utils.getChapterDbEntry(series_entry.id, ch)
 
+	#add_together.delay(1, 2)
+
+	# Check if this chapter is cached
+	if cache_manager.hasCacheRecord(chapter_entry):
+		print("Cache found: Using cached chapter")
+		return cache_manager.getCacheRecord(chapter_entry)
+	else:
+		print("No cache found: Rendering chapter")
+
 	dict_entry = series_entry.dictionary
 	dict_fname = dict_entry.fname
 	back_href = url_for('library_series_toc', series_code=series_code)
@@ -318,7 +336,6 @@ def library_series_chapter(series_code, ch):
 	elif host_entry.host_lang == hostmanager.Language.CN:
 		dummy_text = u"假"
 	lang_code = hostmanager.Language.get_lang_code(host_entry.host_lang)
-
 
 	try:
 		chapter_data = utils.customTrans(series_entry, ch)
@@ -332,6 +349,9 @@ def library_series_chapter(series_code, ch):
 			dict_fname=dict_fname,
 			dummy_text=dummy_text,
 			chapter_data=chapter_data)
+
+		# Cache the successful chapter render
+		cache_manager.addCacheRecord(chapter_entry, chapter_render)
 	except CustomException as err:
 		flash(str(err), CRITICAL)
 		chapter_render = render_template("chapter.html",
