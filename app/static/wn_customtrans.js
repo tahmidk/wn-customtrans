@@ -646,6 +646,20 @@ function setupTableOfContents(){
 function setupChapter(){
 	const chapter_flashpanel = "#chapter_flashpanel";
 
+	// Fetch chapter information
+	const url = this.location.href;
+	const base_url = url.substring(0, url.lastIndexOf('/') + 1);
+    const ch = parseInt($(`#mdata_ch`).data("value"));
+    const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
+
+	// Previous chapter
+	const ch_prev = ch - 1;
+	const ch_prev_href = (ch_prev > 0) ? base_url + ch_prev : null;
+
+	// Next chapter
+	const ch_next = ch + 1;
+	const ch_next_href = (ch_next <= latest_ch) ? base_url + ch_next : null;
+
 	// Run the postprocessing algorithm
 	tagged_placeholders();
 
@@ -699,8 +713,6 @@ function setupChapter(){
 	});
 
 	// Chapter Sidebar
-    const ch = parseInt($(`#mdata_ch`).data("value"));
-    const latest_ch = parseInt($(`#mdata_latest_ch`).data("value"));
 	// Start the sidebar in hidden state with current chapter in view
 	$("#ch_"+ch).get(0).scrollIntoView({ block: 'center' });
 
@@ -749,23 +761,46 @@ function setupChapter(){
 
 	// Chapter Navbar
 	// Add functionality of prev, toc, and next buttons
-	const url = this.location.href;
-	if(!$('#ch_prev_btn').attr('disabled')){
-		$('#ch_prev_btn').click(function(){
-			var prev = ch - 1;
-			if(prev > 0){
-				location.href = url.substring(0, url.lastIndexOf('/') + 1) + prev;
-			}
-		});
+	if(ch_prev_href){
+		if(!$('#ch_prev_btn').attr('disabled')){
+			$('#ch_prev_btn').click(function(){
+				location.href = ch_prev_href;
+			});
+		}
+	    // Empty GET requests on previous chapter to cache it in the background
+		fetch(ch_prev_href);
 	}
-	if(!$('#ch_next_btn, .chapter_next_chapter_section').attr('disabled')){
-		$('#ch_next_btn, .chapter_next_chapter_section').click(function(){
-			var next = ch + 1;
-			if(next <= latest_ch){
-				location.href = url.substring(0, url.lastIndexOf('/') + 1) + next;
-			}
-		});
+	if(ch_next_href){
+		if(!$('#ch_next_btn, .chapter_next_chapter_section').attr('disabled')) {
+			$('#ch_next_btn, .chapter_next_chapter_section').click(function(){
+				location.href = ch_next_href;
+			});
+		}
+		// Empty GET requests on next chapter to cache it in the background
+		fetch(ch_next_href);
 	}
+
+	// Chapter keyboard navigation
+	document.onkeydown = function(e) {
+		switch(e.which) {
+			// Left Key
+			case 37:
+				if(ch_prev_href){
+					location.href = ch_prev_href;
+				}
+				break;
+			// Right Key
+			case 39:
+				if(ch_next_href){
+					location.href = ch_next_href;
+				}
+				break;
+			// Exit this handler for other keys
+			default:
+				return;
+		}
+		e.preventDefault(); // prevent the default action (scroll / move caret)
+	};
 
     // Line view button functionality
     $("#ch_lineview_btn").click(function(){

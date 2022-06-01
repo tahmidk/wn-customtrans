@@ -20,6 +20,7 @@
 	{% endif %}
 {%- endblock -%}
 
+{% set back_href = url_for('library_series_toc', series_code=series.code) %}
 {% set series_toc_url = url_for('library_series_toc', series_code=series.code) %}
 {% set series_dict_url = url_for('dictionaries_edit', dict_fname=dict_fname) %}
 {% set bookmark_url = url_for('library_series_toc_bookmark', series_code=series.code, ch=chapter.number) %}
@@ -76,9 +77,7 @@
 <!-- Main content -->
 <section class="section_chapter">
 	<!-- Navigation bar -->
-	{% if back_href is defined %}
-		{{super_navpanel(back_href)}}
-	{% endif%}
+	{{super_navpanel(back_href)}}
 
 	<!-- The chapter title and number -->
 	<div class="section_body">

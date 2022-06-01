@@ -6,8 +6,8 @@
 #  Licensed under the BSD 3-Clause license found in the LICENSE file
 #=======================================================================
 # Python imports
+import requests
 from lru import LRU
-import multiprocessing as mp
 
 # Internal imports
 from app import views
@@ -32,7 +32,7 @@ class ChapterCacheManager:
 			Return:			String hash identifying the given ChapterTable entry
 			-------------------------------------------------------------------
 		"""
-		return f"series_{chapter_entry.volume.series.id}@{chapter_entry.number}"
+		return f"{chapter_entry.id}"
 
 	def addCacheRecord(self, chapter_entry, chapter_render):
 		"""-------------------------------------------------------------------
@@ -94,34 +94,6 @@ class ChapterCacheManager:
 		if self.hasCacheRecord(chapter_entry):
 			return self.__cache[ChapterCacheManager.generateCacheKey(chapter_entry)]
 		return None
-
-	def __regenerateCacheRecord(self, cache_key):
-		"""-------------------------------------------------------------------
-			Function:		[__regenerateCacheRecord]
-			Description:	Private helper member to regenerate the cache record
-							associated with the provided key with up-to-date series
-							dictionary
-			Input:
-			  [cache_key]	Key of the cache record to regenerate
-			Return:			True on success, False otherwise
-			-------------------------------------------------------------------
-		"""
-		return True
-
-	def regenerateAllCacheRecords(self):
-		"""-------------------------------------------------------------------
-			Function:		[regenerateAllCacheRecords]
-			Description:	Regenerates the HTML of all existing cache records
-			Input: 			None
-			Return:			True on success, False otherwise
-			-------------------------------------------------------------------
-		"""
-		for cache_key in self.__cache.keys():
-			if not self.__regenerateCacheRecord(cache_key):
-				# Unable to regenerate cache, clean the cache
-				self.clearAllCacheRecords()
-				return False
-		return True
 
 	def clearAllCacheRecords(self):
 		"""-------------------------------------------------------------------

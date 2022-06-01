@@ -26,7 +26,6 @@ from flask import send_from_directory
 
 # Internal imports
 from app import db
-from app import celery
 from app import app
 from app import csrf
 
@@ -46,13 +45,12 @@ from app.scripts.custom_errors import *
 
 
 
-# Create the chapter cache
+# Create the global chapter cache
 cache_manager = cachemanager.ChapterCacheManager()
 
-@celery.task()
-def add_together(a, b):
-	return a + b
-
+#=========================================================
+# Views
+#=========================================================
 # This is the route for the main page
 @app.route("/")
 def index():
@@ -151,6 +149,7 @@ def library_update():
 					num_updates = -1
 				data['updated'].append((series_entry.abbr, num_updates, series_entry.latest_ch))
 				yield 'data: %s\n\n' % json.dumps(data)
+			cache_manager.clearAllCacheRecords()
 	return Response(update_streamer(), mimetype="text/event-stream")
 
 
@@ -194,6 +193,7 @@ def library_edit_novel(series_id):
 		dict_entry.fname = fname_new
 		db.session.commit()
 
+		cache_manager.clearAllCacheRecords()
 		flash("%s Your changes have been applied!" % SUCCESS_BOLD, SUCCESS)
 		return jsonify(status='ok')
 
@@ -255,6 +255,7 @@ def library_series_update(series_code):
 	except:
 		return jsonify(status='error')
 
+	cache_manager.clearAllCacheRecords()
 	return jsonify(status='ok', updates=num_updates)
 
 
@@ -274,6 +275,7 @@ def library_series_toc_bookmark(series_code, ch):
 
 	chapter_entry.bookmarked = True
 	db.session.commit()
+	cache_manager.removeCacheRecord(chapter_entry)
 	return jsonify(status='ok', action='add_bookmark', target_ch=ch)
 
 
@@ -291,6 +293,9 @@ def library_series_toc_setcurrent(series_code, ch):
 
 	series_entry.current_ch = ch
 	db.session.commit()
+
+	chapter_entry = utils.getChapterDbEntry(series_entry.id, ch)
+	cache_manager.removeCacheRecord(chapter_entry)
 	return jsonify(status='ok', target_ch=ch)
 
 
@@ -302,6 +307,7 @@ def library_series_toc_bookmark_all(series_code):
 		for chapter in volume:
 			chapter.bookmarked = False
 	db.session.commit()
+	cache_manager.clearAllCacheRecords()
 	return jsonify(status='ok')
 
 
@@ -316,18 +322,12 @@ def library_series_chapter(series_code, ch):
 	# Get Chapter entry
 	chapter_entry = utils.getChapterDbEntry(series_entry.id, ch)
 
-	#add_together.delay(1, 2)
-
 	# Check if this chapter is cached
 	if cache_manager.hasCacheRecord(chapter_entry):
-		print("Cache found: Using cached chapter")
 		return cache_manager.getCacheRecord(chapter_entry)
-	else:
-		print("No cache found: Rendering chapter")
 
 	dict_entry = series_entry.dictionary
 	dict_fname = dict_entry.fname
-	back_href = url_for('library_series_toc', series_code=series_code)
 
 	host_entry = HostTable.query.filter_by(id=series_entry.host_id).first()
 	host_mgr = hostmanager.createManager(host_entry.host_type)
@@ -342,7 +342,6 @@ def library_series_chapter(series_code, ch):
 		chapter_render = render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			lang_code=lang_code,
-			back_href=back_href,
 			default_theme="dark",
 			series=series_entry,
 			chapter=chapter_entry,
@@ -357,7 +356,6 @@ def library_series_chapter(series_code, ch):
 		chapter_render = render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			lang_code=lang_code,
-			back_href=back_href,
 			default_theme="dark",
 			series=series_entry,
 			chapter=chapter_entry,
@@ -417,6 +415,7 @@ def dictionaries_toggle_entry(dict_abbr):
 		"status": "ok",
 		"toggle": dict_entry.enabled
 	}
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -432,6 +431,7 @@ def dictionaries_toggleall(enable):
 		"status": "ok",
 		"toggle": master_toggle
 	}
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -463,6 +463,7 @@ def dictionaries_upload_dict(dict_fname):
 			# Flash success
 			flash("%s File has successfully uploaded and replaced %s" % \
 				(SUCCESS_BOLD, mono(dict_entry.fname)), SUCCESS)
+			cache_manager.clearAllCacheRecords()
 		except CustomException as err:
 			flash(str(err), err.severity)
 		except Exception as err:
@@ -564,6 +565,7 @@ def dictionaries_edit_save(dict_fname):
 	if not dictionary.saveContentToDict(dict_fname, content):
 		return jsonify(status='error')
 
+	cache_manager.clearAllCacheRecords()
 	return jsonify(status='ok')
 
 
@@ -599,6 +601,7 @@ def honorifics_toggle_entry(hon_id):
 		"status": "ok",
 		"toggle": hon_entry.enabled
 	}
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -614,6 +617,7 @@ def honorifics_toggleall(enable):
 		"status": "ok",
 		"toggle": master_toggle
 	}
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -632,6 +636,7 @@ def honorifics_add_entry():
 			return jsonify(status='error', msg=str(err), severity=err.severity)
 
 	data = json.dumps(add_honorific_form.errors, ensure_ascii=False)
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -650,6 +655,7 @@ def honorifics_edit_entry(hon_id):
 			return jsonify(status='error', msg=str(err), severity=err.severity)
 
 	data = json.dumps(edit_honorific_form.errors, ensure_ascii=False)
+	cache_manager.clearAllCacheRecords()
 	return jsonify(data)
 
 
@@ -663,16 +669,10 @@ def honorifics_remove_entry(hon_id):
 
 	db.session.delete(hon_entry)
 	db.session.commit()
+
 	flash("%s Honorific successfully deleted!" % SUCCESS_BOLD, SUCCESS)
-
+	cache_manager.clearAllCacheRecords()
 	return jsonify(status='ok')
-
-
-# Route for Tutorial page
-@app.route("/tutorial")
-def tutorial():
-	return render_template("tutorial.html",
-		title="Tutorial")
 
 
 # Route for user settings

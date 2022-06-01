@@ -1,17 +1,23 @@
-# wn-customtrans
+#wn-customtrans
 A web app extension to the wn-downtrans project built on the Flask framework
 
-# Setting up the development server
+#Setting up the development server (Linux)
 ##First Time Setup
+###Linux environment setup
+sudo apt-get install redis-server
+sudo apt-get install python3
+sudo apt-get install python3-dev
+sudo apt-get install build-essential
+
 ###Setup python3 virtual environment
 $ cd .../wn-customtrans
 $ python -m venv venv
-$ ./venv/Scripts/activate
+$ ./venv/bin/activate
 $ pip install -r requirements.txt
 
 ##Recurring Setup
 ###Run development server
-$ ./venv/Scripts/activate
+$ ./venv/bin/activate
 $ set FLASK_ENV=development
 $ python run.py
 
@@ -24,11 +30,3 @@ Sometimes, an update to this web app is accompanied by a change in the SQLAlchem
 $ flask db init
 $ flask db migrate -m "Migration description"
 $ flask db upgrade
-
-#Extra steps needed to run
-A Redis server is needed to run a Celery daemon
-	Install Redis on Windows 10: https://www.youtube.com/watch?v=_nFwPTHOMIY&ab_channel=Redis
-
-A Celery daemon is required to launch Flask without hang
-
-
