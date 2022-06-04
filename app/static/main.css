@@ -125,6 +125,8 @@ strong{
 }
 section{
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: fit-content;
   min-width: 75rem;
   height: auto;
@@ -137,7 +139,7 @@ section{
   text-align: justify;
 }
 .section_body{
-  margin-top: 5rem;
+  margin-top: 1rem;
 }
 /* Make some ugly webkit components disappear */
 input[type=number]::-webkit-inner-spin-button,
@@ -410,11 +412,8 @@ ion-icon .icon-inner{
 
 /*--------------------------[ Super navpanel stuff ]-------------------*/
 .super_navpanel{
-  position: absolute;
-  right: 0;
-  top: 0;
   width: fit-content;
-  padding: 0.5rem 1rem;
+  margin-left: inherit;
   color: white;
 
   /* Make it unselectable */
@@ -923,8 +922,9 @@ table.entry_info_table{
 
 /*---------------------[ Chapter Stylings ]-----------------------*/
 .section_chapter{
-  padding: 10rem 3rem;
+  padding: 0 3rem 10rem;
   max-width: 120rem;
+  transition: filter 0.3s;
 }
 .section_chapter_faded{
   filter: opacity(0.2);
@@ -936,6 +936,10 @@ table.entry_info_table{
   -webkit-user-select: none;
   -o-user-select: none;
 }
+.section_chapter .section_body{
+  margin-top: 0;
+}
+
 /* The following logic is to make the body element clickable throughout the page.
    Clicking the body is the trigger for showing/hiding the chapter navigation bar */
 .section_chapter,
@@ -959,7 +963,7 @@ table.entry_info_table{
   position: unset;
   width: fit-content;
   color: var(--chapter_maintxt_color);
-  margin: 2rem auto;
+  margin: 2rem auto 0.5rem;
   padding: 0.5rem 1rem;
   font-size: 1.3rem;
   border: 1px solid var(--chapter_maintxt_color);
@@ -1096,7 +1100,7 @@ table.entry_info_table{
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  height: 100vh;
+  height: 100%;
   width: 25vw;
   padding: 2rem;
   z-index: 3;
@@ -1116,6 +1120,13 @@ table.entry_info_table{
   top: 0;
   left: 0;
   z-index: 2;
+}
+.chapter_sidebar_wrapper{
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 .chapter_sidebar_toolbelt_button{
   float: right;
@@ -1162,12 +1173,17 @@ table.entry_info_table{
   text-align: center;
   border: solid 1px var(--chapter_maintxt_color);
 }
+.chapter_sidebar_content_section{
+  display: flex;
+  overflow: hidden;
+  flex-grow: 1;
+}
 .chapter_sidebar_content{
   position: relative;
   flex-grow: 1;
 }
 .chapter_sidebar_content_list{
-  height: 70vh;
+  height: 100%;
   margin: 0px;
   padding: 0px;
   list-style: none;
@@ -1912,9 +1928,6 @@ table.entry_info_table{
   }
 
   /* Responsive Chapter */
-  .section_chapter .super_navpanel{
-    right: 3rem;
-  }
   .chapter_sidebar{
     width: 50vw;
   }
@@ -2090,7 +2103,7 @@ table.entry_info_table{
     flex: 1;
   }
   .super_navpanel > *{
-    padding: 0 !important;
+    padding: 0.3rem 0 !important;
     border-radius: 0;
     flex-grow: 1;
   }

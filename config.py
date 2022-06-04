@@ -18,11 +18,21 @@ class BaseConfig(object):
 	# Remove CSRF token life-time restriction
 	WTF_CSRF_TIME_LIMIT = None
 
+	# Database config
+	SQLALCHEMY_DATABASE_NAME = 'database_wnct.db'
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'
+
+	# Celery config
+	CELERY_PORT_NUMBER=6666
+	CELERY_CONFIG={
+		'broker_url': 		f'redis://localhost:{CELERY_PORT_NUMBER}',
+	    'result_backend': 	f'db+{SQLALCHEMY_DATABASE_URI}'
+	}
+
 	# Security
 	SESSION_COOKIE_SECURE = True
 	SECRET_KEY = 'e0d41ebf1910b2ba'
-	SQLALCHEMY_DATABASE_NAME = 'database_wnct.db'
-	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
+
 	# Dictionary file upload constraints
 	ALLOWED_DICT_EXTENSIONS = ['DICT', 'TXT']
 	MAX_DICT_FILESIZE = 2 * 1024 * 1024
@@ -42,7 +52,7 @@ class DevelopmentConfig(BaseConfig):
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_dev.db'
-	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'
 
 # Config used in
 class TestingConfig(BaseConfig):
@@ -54,4 +64,4 @@ class TestingConfig(BaseConfig):
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_test.db'
-	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + SQLALCHEMY_DATABASE_NAME
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'

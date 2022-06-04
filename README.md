@@ -1,17 +1,23 @@
-# wn-customtrans
+#wn-customtrans
 A web app extension to the wn-downtrans project built on the Flask framework
 
-# Setting up the development server
+#Setting up the development server (Linux)
 ##First Time Setup
+###Linux environment setup
+sudo apt-get install redis-server
+sudo apt-get install python3
+sudo apt-get install python3-dev
+sudo apt-get install build-essential
+
 ###Setup python3 virtual environment
 $ cd .../wn-customtrans
 $ python -m venv venv
-$ ./venv/Scripts/activate
+$ ./venv/bin/activate
 $ pip install -r requirements.txt
 
 ##Recurring Setup
 ###Run development server
-$ ./venv/Scripts/activate
+$ ./venv/bin/activate
 $ set FLASK_ENV=development
 $ python run.py
 
