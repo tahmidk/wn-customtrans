@@ -1,0 +1,86 @@
+{% from "misc/super_navpanel.html" import super_navpanel %}
+{% from "misc/flash_alert.html" import flash_alert %}
+
+{% set back_href = url_for('index') %}
+
+{% extends 'general_layout.html' %}
+{% block hdr_theme %}var(--settings_color_primary){% endblock %}
+{% block content %}
+	<section class="section_settings">
+		<!-- Navigation bar -->
+		{{super_navpanel(back_href)}}
+
+		<!-- Main content -->
+		<div class="section_body">
+			<div class="banner" id="settings_banner">
+				<div class="banner_icon" id="settings_icon">
+					<ion-icon name="settings"></ion-icon>
+				</div>
+				<div class="banner_title" id="settings_title">Settings</div>
+			</div>
+			<div class="settings_body">
+				<div class="flashpanel" id="settings_flashpanel">
+					<!-- Flashed messages -->
+					{% with messages = get_flashed_messages(with_categories=true) %}
+						{{ flash_alert(messages) }}
+					{% endwith %}
+				</div>
+
+				<div class="mainpanel" id="settings_mainpanel">
+					<div class="settings_div">
+						<div class="setting_header"> Cache </div>
+						<!-- Setting: Clear chapter cache -->
+						{% set name = "Clear chapter cache" %}
+						{% set help = "Clear all chapter cache data" %}
+						{% call setting("clear_chapter_cache", name, help) %}
+							<button type='button' class='btn btn-danger' id='settings_clear_cache_btn' action="{{url_for('settings_clear_cache')}}" {{'disabled' if cache_empty == true}}>Clear Cache</button>
+						{% endcall %}
+						<div class="setting_header"> Color Scheme </div>
+						<!-- Setting: Chapter Theme -->
+						{% set name = "Chapter Theme" %}
+						{% set help = "Select a theme for the chapter reader UI" %}
+						{% call setting("chapter_theme", name, help) %}
+							{% for theme in chapter_themes %}
+								<div class="theme_option chapter_theme_option" id="opt_ch_{{theme}}" data-theme="{{theme}}" action="{{url_for('settings_set_chapter_theme', theme=theme)}}">
+									{{ theme|capitalize }}
+								</div>
+							{% endfor %}
+						{% endcall %}
+						<!-- Setting: Dictionary Edit Theme -->
+						{% set name = "Dictionary Edit Theme" %}
+						{% set help = "Select a theme for the dictionary edit UI" %}
+						{% call setting("dict_edit_theme", name, help) %}
+							{% for theme in dict_edit_themes %}
+								<div class="theme_option dict_edit_theme_option" id="opt_dict_edit_{{theme}}" data-theme="{{theme}}" action="{{url_for('settings_set_dict_edit_theme', theme=theme)}}">
+									{{ theme|capitalize }}
+								</div>
+							{% endfor %}
+						{% endcall %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock %}
+
+{% macro setting(class_name, name, help) %}
+<div class="setting" id="{{class_name}}_setting">
+	<div class="setting_desc_div" id="{{class_name}}_setting_desc_div">
+		<div class="setting_name" id="{{class_name}}_setting_name">
+			{{ name|safe }}
+		</div>
+		<div class="setting_help" id="{{class_name}}_setting_help">
+			{{ help|safe }}
+		</div>
+	</div>
+	<div class="setting_option" id="{{class_name}}_setting_opt">
+		{{ caller() }}
+	</div>
+</div>
+{% endmacro %}
+
+{% block script_area %}
+	$(document).ready(function() {
+		setupSettings();
+	});
+{% endblock%}

@@ -17,6 +17,7 @@ from app import app
 from app import db
 
 from app.models import *
+from app.views  import user_settings
 
 import app.scripts.utils as utils
 import app.scripts.dictionary as dictionary
@@ -47,6 +48,12 @@ def initializeDatabase():
 		db.session.add(dict_entry)
 		db.session.commit()
 
+	# Initialize SettingsTable
+	settings_entry = SettingsTable()
+	db.session.add(settings_entry)
+	db.session.commit()
+	user_settings.initialize_settings(settings_entry)
+
 	# In development and testing, we need series and honorifics to be seeded
 	# with test values
 	if app.config["ENV"] in ["development", "testing"]:
@@ -59,12 +66,18 @@ def initializeDatabase():
 			mode='overwrite')
 
 
-# By running
-if __name__ == '__main__':
+def initArgParse():
 	parser = argp.ArgumentParser()
+
+	# Host database actions
 	parser.add_argument('--reinit_hosts', required=False, action="store_true",
-		help="Drops and reinitializes the host table from seed_data/hosts.json")
-	args = parser.parse_args()
+		help="Drops and reinitializes all hosts in the database from seed_data/hosts.json")
+
+	return parser.parse_args()
+
+
+if __name__ == '__main__':
+	args = initArgParse()
 
 	db_path = os.path.join("app", app.config['SQLALCHEMY_DATABASE_NAME'])
 	if not os.path.isfile(db_path):

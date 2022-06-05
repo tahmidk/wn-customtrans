@@ -112,7 +112,8 @@ class HonorificsTable(db.Model):
 		return "Honorific(raw=%s, trans=%s, lang=%s)" % \
 			(self.raw, self.trans, self.lang)
 
-class ConfigurationTable(db.Model):
-	__tablename__ = "configuration"
+class SettingsTable(db.Model):
+	__tablename__ = "settings"
 	id = db.Column(db.Integer, primary_key=True)
-	opt_use_common = db.Column(db.Boolean, default=True)
+	theme_chapter = db.Column(db.String(40), nullable=False, default="light")
+	theme_dictionary_edit = db.Column(db.String(40), nullable=False, default="light")

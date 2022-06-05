@@ -6,14 +6,14 @@
 {% from "modals/remove_novel.html" import remove_novel_modal %}
 
 
+{% set back_href = url_for('index') %}
+
 {% extends 'general_layout.html' %}
 {% block hdr_theme %}#d83939{% endblock %}
 {% block content %}
 	<section class="section_library">
 		<!-- Navigation bar -->
-		{% if back_href is defined %}
-			{{super_navpanel(back_href)}}
-		{% endif%}
+		{{super_navpanel(back_href)}}
 
 		<!-- Set up the modals needed for this  -->
 		{{ register_novel_modal(reg_form) }}

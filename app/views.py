@@ -36,17 +36,18 @@ from app.forms import AddHonorificForm
 from app.forms import EditHonorificForm
 
 from app.models import *
+from app.settings import UserSettings
 
 from app.scripts import utils
 from app.scripts import dictionary
 from app.scripts import hostmanager
-from app.scripts import cachemanager
+from app.scripts.cachemanager import ChapterCacheManager
 from app.scripts.custom_errors import *
 
 
 
 # Create the global chapter cache
-cache_manager = cachemanager.ChapterCacheManager()
+cache_manager = ChapterCacheManager()
 
 #=========================================================
 # Views
@@ -102,7 +103,6 @@ def library():
 		entry.__dict__["dict_fname"] = dict_entry.fname
 	return render_template("library.html",
 		title="Library",
-		back_href=url_for('index'),
 		series=series_entries,
 		reg_form=register_novel_form,
 		edit_form=edit_novel_form,
@@ -241,7 +241,6 @@ def library_series_toc(series_code):
 	dict_entry = series_entry.dictionary
 	return render_template("series_toc.html",
 		title=series_entry.abbr,
-		back_href=url_for('library'),
 		series=series_entry,
 		dict_fname=dict_entry.fname)
 
@@ -337,12 +336,15 @@ def library_series_chapter(series_code, ch):
 		dummy_text = u"假"
 	lang_code = hostmanager.Language.get_lang_code(host_entry.host_lang)
 
+	# Fetch user settings
+	user_settings = UserSettings(SettingsTable.query.first())
+
 	try:
 		chapter_data = utils.customTrans(series_entry, ch)
 		chapter_render = render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			lang_code=lang_code,
-			default_theme="dark",
+			default_theme=user_settings.get_chapter_theme(),
 			series=series_entry,
 			chapter=chapter_entry,
 			dict_fname=dict_fname,
@@ -356,7 +358,7 @@ def library_series_chapter(series_code, ch):
 		chapter_render = render_template("chapter.html",
 			title="%s %d" % (series_entry.abbr, ch),
 			lang_code=lang_code,
-			default_theme="dark",
+			default_theme=user_settings.get_chapter_theme(),
 			series=series_entry,
 			chapter=chapter_entry,
 			dict_fname=dict_fname,
@@ -390,8 +392,7 @@ def dictionaries():
 
 	return render_template("dictionary.html",
 		title="Dictionary",
-		dictionaries=dictionaries,
-		back_href=url_for('index'))
+		dictionaries=dictionaries)
 
 
 # Route for enabling/disabling dictionaries
@@ -549,10 +550,10 @@ def dictionaries_edit(dict_fname):
 		flash("%s Ran into an issue opening the file %s" % \
 			(WARNING_BOLD, mono(dict_fname)), WARNING)
 
+	user_settings = UserSettings(SettingsTable.query.first())
 	return render_template("dictionary_edit.html",
 		title="Edit %s" % series_abbr,
-		back_href=url_for('dictionaries'),
-		default_theme="dark",
+		default_theme=user_settings.get_dictionary_edit_theme(),
 		series_abbr=series_abbr,
 		dict_fname=dict_fname,
 		dict_content=dict_content)
@@ -578,7 +579,6 @@ def honorifics():
 	honorifics = HonorificsTable.query.all()
 	return render_template("honorifics.html",
 		title="Honorifics",
-		back_href=url_for('dictionaries'),
 		honorifics=honorifics,
 		add_form=add_honorific_form,
 		edit_form=edit_honorific_form)
@@ -678,4 +678,37 @@ def honorifics_remove_entry(hon_id):
 # Route for user settings
 @app.route("/settings")
 def settings():
-	return "TODO: Implement Settings Page"
+	return render_template("settings.html",
+		title="Settings",
+		chapter_themes=UserSettings.chapter_themes,
+		dict_edit_themes=UserSettings.dictionary_edit_themes,
+		cache_empty=cache_manager.isCacheEmpty())
+
+@app.route("/settings/clear_cache", methods=["POST"])
+def settings_clear_cache():
+	cache_manager.clearAllCacheRecords()
+	return jsonify(status='ok')
+
+@app.route("/settings/set_chapter_theme/<theme>", methods=["POST"])
+def settings_set_chapter_theme(theme):
+	try:
+		user_settings = UserSettings(SettingsTable.query.first())
+		if user_settings.set_chapter_theme(theme):
+			cache_manager.clearAllCacheRecords()
+			return jsonify(status='ok')
+	except Exception as e:
+		pass
+
+	return jsonify(status='error')
+
+@app.route("/settings/set_dict_edit_theme/<theme>", methods=["POST"])
+def settings_set_dict_edit_theme(theme):
+	try:
+		user_settings = UserSettings(SettingsTable.query.first())
+		if user_settings.set_dictionary_edit_theme(theme):
+			cache_manager.clearAllCacheRecords()
+			return jsonify(status='ok')
+	except Exception as e:
+		pass
+
+	return jsonify(status='error')

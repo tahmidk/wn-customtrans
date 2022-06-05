@@ -2,15 +2,15 @@
 {% from "misc/flash_alert.html" import flash_alert %}
 {% from "modals/discard_dict_changes.html" import discard_dict_changes %}
 
+{% set back_href = url_for('dictionaries') %}
+
 {% extends 'general_layout.html' %}
 {% block html_theme %}{{default_theme if default_theme is defined}}{% endblock %}
 {% block hdr_theme %}#262829{% endblock %}
 {% block content %}
 	<section class="section_dictionary_edit">
 		<!-- Navigation bar -->
-		{% if back_href is defined %}
-			{{super_navpanel(back_href)}}
-		{% endif%}
+		{{super_navpanel(back_href)}}
 
 		<!-- Set up the Discard Changes modal -->
 		{{ discard_dict_changes() }}

@@ -5,14 +5,14 @@
 {% from "modals/edit_honorific.html" import edit_honorific_modal %}
 {% from "modals/remove_honorific.html" import remove_honorific_modal %}
 
+{% set back_href = url_for('index') %}
+
 {% extends 'general_layout.html' %}
 {% block hdr_theme %}#880e4f{% endblock %}
 {% block content %}
 	<section class="section_honorifics">
 		<!-- Navigation bar -->
-		{% if back_href is defined %}
-			{{super_navpanel(back_href)}}
-		{% endif%}
+		{{super_navpanel(back_href)}}
 
 		<!-- Set up the modals needed for this  -->
 		{{ add_honorific_modal(add_form) }}

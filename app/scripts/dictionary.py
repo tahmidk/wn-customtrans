@@ -40,7 +40,7 @@ COMMON_DICT_ABBR = "Common"
 # Comments can be at most 100 characters
 COMMENT_MAX_LEN = 100
 # Common tokens used to seperate first and last names in raw chapters
-NAME_SEPERATORS = ["", " ", "・"]
+NAME_SEPERATORS = ["", " ", "・", "＝"]
 # Syntactic seperator used to seperate first, last names in the @name dictionary syntax
 DICT_NAME_DIVIDER = r'|'
 # Syntactic seperator used for individual definitions in the dictionary syntac

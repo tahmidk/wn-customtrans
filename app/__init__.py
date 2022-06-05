@@ -5,12 +5,11 @@
 #  Licensed under the BSD 3-Clause license found in the LICENSE file
 #=======================================================================
 
+# Flask imports
 from flask import Flask
 from flask_wtf.csrf import CsrfProtect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
-from app.flask_celery import make_celery
 
 
 # Initialize and configure Flask app
@@ -36,10 +35,8 @@ app.add_url_rule('/user/default/<path:filename>', endpoint='user',
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Create Celery instance
-celery = make_celery(app)
-
 # Secure web app forms against CSRF
 csrf = CsrfProtect(app)
+
 
 from app import views

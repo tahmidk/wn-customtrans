@@ -95,6 +95,9 @@ class ChapterCacheManager:
 			return self.__cache[ChapterCacheManager.generateCacheKey(chapter_entry)]
 		return None
 
+	def isCacheEmpty(self):
+		return len(self.__cache.keys()) == 0
+
 	def clearAllCacheRecords(self):
 		"""-------------------------------------------------------------------
 			Function:		[clearAllCacheRecords]
