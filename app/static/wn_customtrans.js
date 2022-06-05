@@ -1367,3 +1367,103 @@ function setupHonorifics(){
 		})
 	});
 }
+
+function setupSettings(){
+	// Helper function to create successful setting message
+	function showSettingMsgDiv(where_to_show, status, message){
+		// Append to "where"
+		if($(where_to_show).find('.setting_msg').length !== 0){
+			// If the message div already exists, update it
+			var msg_div = $(where_to_show).find('.setting_msg');
+			msg_div.find('span').text(message);
+
+			msg_div.removeClass();
+			msg_div.addClass('setting_msg');
+			if(status == "success"){
+				msg_div.addClass('setting_success_msg');
+				msg_div.addClass('text-success');
+				msg_div.find('ion-icon').attr('name', 'checkmark-circle')
+			}
+			else if(status == "error"){
+				msg_div.addClass('setting_error_msg');
+				msg_div.addClass('text-danger');
+				msg_div.find('ion-icon').attr('name', 'close-circle')
+			}
+		}
+		else{
+			// If the message div dne, create it
+			var msg_div = document.createElement('div');
+			var msg_icon = document.createElement('ion-icon');
+
+			msg_div.classList.add('setting_msg');
+			if(status == "success"){
+				msg_div.classList.add('setting_success_msg');
+				msg_div.classList.add('text-success');
+				msg_icon.setAttribute('name', 'checkmark-circle')
+			}
+			else if(status == "error"){
+				msg_div.classList.add('setting_error_msg');
+				msg_div.classList.add('text-danger');
+				msg_icon.setAttribute('name', 'close-circle')
+			}
+
+
+			var msg_span = document.createElement('span');
+			msg_span.innerText = message;
+
+			// Form the HTML tree
+			$(msg_div).append(msg_icon);
+			$(msg_div).append(msg_span);
+
+			// Add new element to target
+			$(where_to_show).append(msg_div);
+		}
+
+	}
+
+	// Clear cache functionality
+	$("#settings_clear_cache_btn").click(function(){
+		var url = $(this).attr('action');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				const msg = "Chapter cache cleared!";
+				showSettingMsgDiv("#clear_chapter_cache_setting_opt", "success", msg)
+
+				// Disable this button
+				$("#settings_clear_cache_btn").attr("disabled", true);
+			}
+		})
+	});
+
+	// Set chapter theme functionality
+	$(".chapter_theme_option").click(function(){
+		var url = $(this).attr('action');
+		var theme = $(this).data('theme');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				const msg = `Set chapter reader theme to ${theme}`;
+				showSettingMsgDiv("#chapter_theme_setting_desc_div", "success", msg);
+			}
+			else{
+				const msg = "Encountered an error setting chapter theme";
+				showSettingMsgDiv("#chapter_theme_setting_desc_div", "error", msg);
+			}
+		})
+	});
+
+	// Set dictionary edit theme functionality
+	$(".dict_edit_theme_option").click(function(){
+		var url = $(this).attr('action');
+		var theme = $(this).data('theme');
+		$.post(url, function(data) {
+			if(data.status == 'ok') {
+				const msg = `Set dictionary edit reader theme to ${theme}`;
+				showSettingMsgDiv("#dict_edit_theme_setting_desc_div", "success", msg);
+			}
+			else{
+				const msg = "Encountered an error setting dictionary edit theme";
+				showSettingMsgDiv("#dict_edit_theme_setting_desc_div", "error", msg)
+			}
+		})
+	});
+}

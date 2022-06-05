@@ -1,15 +1,14 @@
 {% from "misc/super_navpanel.html" import super_navpanel %}
 {% from "misc/flash_alert.html" import flash_alert %}
 
+{% set back_href = url_for('library') %}
 
 {% extends 'general_layout.html' %}
 {% block hdr_theme %}#9e1111{% endblock %}
 {% block content %}
 	<section class="section_toc">
 		<!-- Navigation bar -->
-		{% if back_href is defined %}
-			{{super_navpanel(back_href)}}
-		{% endif%}
+		{{super_navpanel(back_href)}}
 
 		<!-- Main content -->
 		<div class="section_body">

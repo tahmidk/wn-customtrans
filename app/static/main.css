@@ -1,7 +1,24 @@
-/*---------------------------[ General Stylings ]-----------------------*/
+/*---------------------------------[ Meta ]-----------------------------*/
 :root{
   --chapter_progress_var: 0;
 }
+
+/*------------------------------[ Animations ]--------------------------*/
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/*---------------------------[ General Stylings ]-----------------------*/
 
 html{
   scroll-behavior: smooth;
@@ -16,8 +33,7 @@ html{
   /* Main page palette */
   --library_color_primary: #d83939;
   --dictionary_color_primary: #f58e38;
-  --tutorial_color_primary: #98ce4b;
-  --settings_color_primary: #648dab;
+  --settings_color_primary: #3f80c2;
 
   /* Library palette */
   --update_library_button_color: #ffc545;
@@ -40,11 +56,10 @@ html{
   /* Chapter palette */
   --chapter_maintxt_color: #242424;
   --chapter_subtxt_color: #898989;
-  --chapter_contrast_color: white;
   --chapter_day_night_toggle_btn_color: #572a80;
   --chapter_progress_bar_color: #181818;
   --chapter_word_color: #007eff;
-  --chapter_sidebar_bg_color: rgba(245, 245, 245);
+  --chapter_sidebar_bg_color: rgb(245, 245, 245);
   --chapter_sidebar_bg_color_alpha: rgba(245, 245, 245, 0);
   --chapter_hover_color: #e3e3e3;
   --chapter_navbar_bg_color: #e7e7e7;
@@ -70,23 +85,23 @@ html{
   --dictionary_edit_meta_color : #9b74ff;
 
   /* Honorifics palette */
-  --honorifics_color_primary: #880e4f;
-  --honorifics_jp_color: #ce225b;
-  --honorifics_cn_color: #226fce;
+  --honorifics_color_primary: #40b656;
+  --honorifics_jp_color: #1f8c24;
+  --honorifics_cn_color: #26abb2;
 }
 
 /* Themes */
-html[data-theme='dark']{
+html[data-theme='dark'],
+.theme_option[data-theme='dark']{
   --html_background_color: #181818;
 
   /* Chapter dark palette */
   --chapter_maintxt_color: #ebebeb;
   --chapter_subtxt_color: #6f6f6f;
-  --chapter_contrast_color: black;
   --chapter_day_night_toggle_btn_color: #bea140;
-  --chapter_progress_bar_color: white;
   --chapter_word_color: #ffd000;
-  --chapter_sidebar_bg_color: rgba(34, 34, 34);
+  --chapter_progress_bar_color: white;
+  --chapter_sidebar_bg_color: rgb(34, 34, 34);
   --chapter_sidebar_bg_color_alpha: rgba(34, 34, 34, 0);
   --chapter_hover_color: #2c2c2c;
   --chapter_navbar_bg_color: #1c1c1c;
@@ -98,6 +113,63 @@ html[data-theme='dark']{
   --dictionary_edit_codemirror_text_color: white;
   --dictionary_edit_codemirror_gutter_color: #292929;
   --dictionary_edit_comment_color: #474747;
+}
+
+html[data-theme='pharoah'],
+.theme_option[data-theme='pharoah']{
+  --html_background_color: #292416;
+
+  /* Chapter pharoah palette */
+  --chapter_maintxt_color: #ffedc9;
+  --chapter_subtxt_color: #93753f;
+  --chapter_word_color: #ffc626;
+  --chapter_progress_bar_color: #ffed45;
+  --chapter_sidebar_bg_color: rgb(48, 37, 14);
+  --chapter_sidebar_bg_color_alpha: rgba(48, 37, 14, 0);
+  --chapter_hover_color: #403219;
+  --chapter_navbar_bg_color: #322a17;
+}
+html[data-theme='blueblazar'],
+.theme_option[data-theme='blueblazar']{
+  --html_background_color: #1a2a39;
+
+  /* Chapter blueblazar palette */
+  --chapter_maintxt_color: #e1f6ff;
+  --chapter_subtxt_color: #546d7b;
+  --chapter_word_color: #00fff3;
+  --chapter_progress_bar_color: #49eaff;
+  --chapter_sidebar_bg_color: rgb(14, 30, 48);
+  --chapter_sidebar_bg_color_alpha: rgba(14, 30, 48, 0);
+  --chapter_hover_color: #13273d;
+  --chapter_navbar_bg_color: #0b202f;
+}
+html[data-theme='ubuntu'],
+.theme_option[data-theme='ubuntu']{
+  --html_background_color: #361320;
+
+  /* Chapter ubuntu palette */
+  --chapter_maintxt_color: #ffe2cb;
+  --chapter_subtxt_color: #bb6900;
+  --chapter_word_color: #ffe322;
+  --chapter_progress_bar_color: #ffbb00;
+  --chapter_sidebar_bg_color: rgb(48, 14, 27);
+  --chapter_sidebar_bg_color_alpha: rgba(48, 14, 27, 0);
+  --chapter_hover_color: #4f0d26;
+  --chapter_navbar_bg_color: #2f0b1f;
+}
+html[data-theme='phosphorescent'],
+.theme_option[data-theme='phosphorescent']{
+  --html_background_color: #1a2c2c;
+
+  /* Chapter phosphorescent palette */
+  --chapter_maintxt_color: #ecfeff;
+  --chapter_subtxt_color: #63937f;
+  --chapter_word_color: #55ff89;
+  --chapter_progress_bar_color: #89ffd6;
+  --chapter_sidebar_bg_color: rgb(14, 43, 48);
+  --chapter_sidebar_bg_color_alpha: rgba(14, 43, 48, 0);
+  --chapter_hover_color: #16393d;
+  --chapter_navbar_bg_color: #0b2c2f;
 }
 
 body{
@@ -331,6 +403,7 @@ ion-icon .icon-inner{
   flex-direction: column;
   width: 100%;
   height: auto;
+  margin-top: 2rem;
   box-sizing: border-box;
 }
 .spinner_cust{
@@ -445,6 +518,9 @@ ion-icon .icon-inner{
 #super_navpanel_honorifics_btn{
   background: var(--honorifics_color_primary);
 }
+#super_navpanel_settings_btn{
+  background: var(--settings_color_primary);
+}
 #super_navpanel_back_btn{
   padding: 0.5rem 3rem;
   margin-left: 1.5rem;
@@ -456,10 +532,6 @@ ion-icon .icon-inner{
 }
 
 /*--------------------------[ Main Page Stylings ]----------------------*/
-.section_index{
-  padding: 1rem;
-}
-
 /* Stylings for the site logo */
 .customtrans_logo_div{
   width: fit-content;
@@ -524,20 +596,18 @@ ion-icon .icon-inner{
 #menu_dictionaries:hover {
   filter: brightness(1.15);
 }
-#menu_tutorial{
+#menu_honorifics{
   color: white;
-  background-color: var(--tutorial_color_primary);
-  box-shadow: 0 0 0 0.2rem var(--tutorial_color_primary);
-  /*color: var(--tutorial_color_primary);*/
+  background-color: var(--honorifics_color_primary);
+  box-shadow: 0 0 0 0.2rem var(--honorifics_color_primary);
 }
-#menu_tutorial:hover {
+#menu_honorifics:hover {
   filter: brightness(1.1);
 }
 #menu_settings{
   color: white;
   background-color: var(--settings_color_primary);
   box-shadow: 0 0 0 0.2rem var(--settings_color_primary);
-  /*color: var(--settings_color_primary);*/
 }
 #menu_settings:hover {
   filter: brightness(1.2);
@@ -546,9 +616,6 @@ ion-icon .icon-inner{
 
 
 /*-----------------------[-Library Page Stylings ]----------------------*/
-.section_library{
-  padding: 1rem;
-}
 #library_icon{
   background: var(--library_color_primary);
 }
@@ -741,8 +808,6 @@ table.entry_info_table{
 .library_series_entry:hover .series_entry_btn{
   background: var(--series_entry_darkend_color);
 }
-
-
 .modal_cancel_btn:hover{
   background: #ff3547  !important;
   color: white !important;
@@ -800,8 +865,8 @@ table.entry_info_table{
 }
 
 /*---------------------[ Table of Contents Stylings ]-----------------------*/
-.section_toc{
-  padding: 10rem 3rem;
+.section_toc .section_body{
+  margin-top: 10rem;
 }
 
 .toc_header{
@@ -1138,7 +1203,7 @@ table.entry_info_table{
 }
 .chapter_sidebar_toolbelt_button ion-icon:hover{
   background: var(--chapter_maintxt_color);
-  color: var(--chapter_contrast_color);
+  color: var(--html_background_color);
   transition: background 0.1s, color 0.1s;
   cursor: pointer;
 }
@@ -1152,7 +1217,7 @@ table.entry_info_table{
 .chapter_sidebar_toc_title_abbr{
   margin: 1rem auto;
   padding: 0.5rem 2rem;
-  color: var(--chapter_contrast_color);
+  color: var(--html_background_color);
   background: var(--chapter_maintxt_color);
   border-radius: 10px;
   font-size: 0.9rem;
@@ -1345,7 +1410,7 @@ table.entry_info_table{
 }
 .chapter_navbar_button_section ion-icon:hover{
   background: var(--chapter_maintxt_color);
-  color: var(--chapter_contrast_color);
+  color: var(--html_background_color);
   transition: background 0.1s, color 0.1s;
   cursor: pointer;
 }
@@ -1415,9 +1480,6 @@ table.entry_info_table{
 
 
 /* Dictionary page stylings */
-.section_dictionary{
-  padding: 1rem;
-}
 #dictionary_icon{
   background: var(--dictionary_color_primary);
 }
@@ -1555,9 +1617,6 @@ table.entry_info_table{
 
 
 /* Dictionary Edit page stylings */
-.section_dictionary_edit{
-  padding: 1rem;
-}
 .dictionary_edit_body{
   margin-top: 3rem;
 }
@@ -1737,9 +1796,6 @@ table.entry_info_table{
 
 
 /* Honorifics page stylings */
-.section_honorifics{
-  padding: 1rem;
-}
 #honorifics_icon{
   background: var(--honorifics_color_primary);
 }
@@ -1786,6 +1842,9 @@ table.entry_info_table{
   color: white;
   width: fit-content;
   padding: 0.5em 1em;
+}
+.honorific_entry_enable_div ion-icon{
+  cursor: pointer;
 }
 .honorific_entry_jp .honorific_entry_enable_div{
   background: var(--honorifics_jp_color);
@@ -1846,6 +1905,107 @@ table.entry_info_table{
 .remove_honorific_modal_data_display span{
   margin: 0 1rem;
 }
+
+
+
+/* Settings page stylings */
+#settings_icon{
+  background: var(--settings_color_primary);
+}
+#settings_banner{
+  color: var(--settings_color_primary);
+}
+.settings_div{
+  width: 100%;
+  max-width: 75rem;
+  display: flex;
+  flex-direction: column;
+}
+.setting{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: 3rem;
+}
+.setting_header{
+  color: var(--settings_color_primary);
+  margin: 1rem 0;
+  font-size: 1.75rem;
+  border-bottom: 1px solid;
+}
+.setting_name{
+  width: 25%;
+  min-width: fit-content;
+  margin-right: 2rem;
+  padding-right: 1rem;
+  font-size: 1.2rem;
+}
+.setting_help{
+  font-size: 0.9rem;
+  color: #bcbcbc;
+}
+.setting_option{
+  display: flex;
+  flex-grow: 1;
+}
+.theme_option{
+  width: fit-content;
+  padding: 0.5rem 5rem;
+  margin: 0.5rem 1rem;
+  margin-left: 0;
+  color: var(--chapter_maintxt_color);
+  font-family: 'Montserrat';
+  font-variant: all-petite-caps;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 10px;
+  border: 2px solid var(--chapter_word_color);
+  background: linear-gradient(to right, var(--chapter_subtxt_color) 40px,
+                                        var(--chapter_word_color) 41px,
+                                        var(--html_background_color) 43px);
+  cursor: pointer;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.theme_option:hover{
+  transform: scale(1.05);
+}
+.theme_option:active{
+  animation: shake 0.2s;
+}
+.setting_msg{
+  font-size: 1.1rem;
+
+  /* Make it unselectable */
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+}
+.setting_success_msg ion-icon{
+  margin-right: 0.5rem;
+}
+#chapter_theme_setting_opt{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+#clear_chapter_cache_setting{
+  flex-direction: row;
+}
+#clear_chapter_cache_setting_opt{
+  flex-direction: column;
+}
+#settings_clear_cache_btn{
+  width: fit-content;
+}
+
 
 /* Media Queries - Viewport Correction CSS */
 @media only screen and (max-width: 2480px){
@@ -1949,6 +2109,7 @@ table.entry_info_table{
     min-width: unset;
   }
   body{
+    margin: 0 2rem;
     padding-top: 2rem;
   }
 
@@ -2103,9 +2264,13 @@ table.entry_info_table{
     flex: 1;
   }
   .super_navpanel > *{
-    padding: 0.3rem 0 !important;
+    padding: 0.5rem 0 !important;
     border-radius: 0;
     flex-grow: 1;
+  }
+
+  .setting{
+    margin-bottom: 5rem;
   }
 }
 

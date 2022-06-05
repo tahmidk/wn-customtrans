@@ -2,14 +2,14 @@
 {% from "misc/flash_alert.html" import flash_alert %}
 {% from "subcomponents/dictionary_entry.html" import dictionary_entry %}
 
+{% set back_href = url_for('index') %}
+
 {% extends 'general_layout.html' %}
 {% block hdr_theme %}#f58e38{% endblock %}
 {% block content %}
 	<section class="section_dictionary">
 		<!-- Navigation bar -->
-		{%- if back_href is defined -%}
-			{{ super_navpanel(back_href) }}
-		{%- endif -%}
+		{{ super_navpanel(back_href) }}
 
 		<!-- Main content -->
 		<div class="section_body">
