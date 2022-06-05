@@ -1963,6 +1963,7 @@ table.entry_info_table{
   background: linear-gradient(to right, var(--chapter_subtxt_color) 40px,
                                         var(--chapter_word_color) 41px,
                                         var(--html_background_color) 43px);
+  cursor: pointer;
 
   /* Make it unselectable */
   user-select: none;
@@ -1972,8 +1973,7 @@ table.entry_info_table{
   -o-user-select: none;
 }
 .theme_option:hover{
-  filter: brightness(1.2);
-  cursor: pointer;
+  transform: scale(1.05);
 }
 .theme_option:active{
   animation: shake 0.2s;
