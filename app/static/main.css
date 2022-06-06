@@ -173,7 +173,7 @@ html[data-theme='phosphorescent'],
 }
 
 body{
-  margin:0;
+  margin: auto;
   padding-top: 5rem;
   padding-bottom: 10rem;
   font-family:sans-serif;
@@ -291,6 +291,9 @@ ion-icon .icon-inner{
   -webkit-user-select: none;
   -o-user-select: none;
 }
+.menu_button:hover{
+  transform: scale(1.05);
+}
 .menu_button_big{
   font-size: 8rem;
   width: 30rem;
@@ -389,7 +392,7 @@ ion-icon .icon-inner{
   box-shadow: none !important;
 }
 .superpanel_menu_btn:hover{
-  filter: brightness(1.05);
+  transform: scale(1.05);
 }
 .superpanel_menu_btn ion-icon{
   margin: 0 0.2rem -0.2rem 0;
@@ -501,7 +504,7 @@ ion-icon .icon-inner{
   margin: 0;
 }
 .super_navpanel_btn:hover{
-  filter: brightness(1.1);
+  transform: scale(1.05);
 }
 .super_navpanel_btn ion-icon{
   font-size: 1rem !important;
@@ -582,35 +585,21 @@ ion-icon .icon-inner{
   color: white;
   background-color: var(--library_color_primary);
   box-shadow: 0 0 0 0.2rem var(--library_color_primary);
-  /*color: var(--library_color_primary);*/
-}
-#menu_library:hover {
-  filter: brightness(1.2);
 }
 #menu_dictionaries{
   color: white;
   background-color: var(--dictionary_color_primary);
   box-shadow: 0 0 0 0.2rem var(--dictionary_color_primary);
-  /*color: var(--dictionary_color_primary);*/
-}
-#menu_dictionaries:hover {
-  filter: brightness(1.15);
 }
 #menu_honorifics{
   color: white;
   background-color: var(--honorifics_color_primary);
   box-shadow: 0 0 0 0.2rem var(--honorifics_color_primary);
 }
-#menu_honorifics:hover {
-  filter: brightness(1.1);
-}
 #menu_settings{
   color: white;
   background-color: var(--settings_color_primary);
   box-shadow: 0 0 0 0.2rem var(--settings_color_primary);
-}
-#menu_settings:hover {
-  filter: brightness(1.2);
 }
 
 
@@ -623,11 +612,8 @@ ion-icon .icon-inner{
   color: var(--library_color_primary);
 }
 /* Library superpanel stuff */
-#menu_library_register_btn:hover{
-  filter: brightness(1.05);
-}
-#menu_library_update_btn:hover{
-  filter: brightness(1.05);
+.library_superpanel_menu_btn:hover{
+  transform: scale(1.05);
 }
 /* Progress bar stuff */
 .library_update_progress_bar_display{
@@ -893,36 +879,70 @@ table.entry_info_table{
 }
 
 .toc_body{
-  padding: 2rem;
   margin-top: 3rem;
+}
+.toc_content_list{
+  padding: 0;
+  list-style: none;
+}
+.toc_volume{
+  margin-top: 3rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid;
+}
+.toc_volume_mark{
+  width: 50px;
+  margin: 0.5rem 0.5rem 1rem 0;
+  border-bottom: 20px solid var(--series_entry_darkend_color);
+  border-right: 10px solid transparent;
+}
+.toc_volume_number{
+  color: var(--series_entry_darkend_color);
+  font-size: 1.5rem;
+  font-variant: all-petite-caps;
+}
+.toc_volume_title{
+  font-size: 2rem;
+  line-height: 2rem;
+  max-width: 65rem;
+  text-align: left;
 }
 .toc_chapter{
   position: relative;
-  margin: 1.5rem 1rem;
+  margin: 1.5rem 0;
   padding: 0.1rem 0;
+  display: flex;
+  flex: 1;
   font-size: 1.7rem;
   font-variant: all-petite-caps;
 }
 .toc_chapter:hover{
   border-bottom: 1px solid var(--white_contrast_font_color);
 }
-.toc_chapter_text{
-  width: fit-content;
-  cursor: pointer;
-  -webkit-transition: color 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  -moz-transition: color 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  -o-transition: color 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  transition: color 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+.toc_chapter_date{
+  margin-left: 1rem;
+  color: var(--chapter_subtxt_color) !important;
 }
-.toc_chapter_text:hover{
+.toc_chapter_text{
+  width: 170px;
+  transition: color 0.2s;
+}
+.toc_chapter_title{
+  height: fit-content;
+  margin: auto;
+  font-variant: none;
+  font-size: 1.2rem;
+  flex-grow: 1;
+}
+.toc_chapter_link{
+  display: flex;
+  flex: 1;
+}
+.toc_chapter_link:hover{
   filter: brightness(2);
 }
 .toc_chapter_actionbar{
-  position: absolute;
   display: flex;
-  right: 0;
-  top: 0;
-
   opacity: 0;
   visibility: hidden;
 }
@@ -975,9 +995,10 @@ table.entry_info_table{
   flex-direction: column;
 }
 .toc_menu_options{
+  display: flex;
   width: 100%;
   margin: 1rem 0;
-  padding: 1rem 0;
+  padding: 1rem 0.5rem 1rem 0;
   border-bottom: 1px solid #d2d2d2;
 }
 #rmv_all_bkmk_btn{
@@ -1034,7 +1055,7 @@ table.entry_info_table{
   border: 1px solid var(--chapter_maintxt_color);
 }
 .content_title_div{
-  border-top: 1px solid #9a9a9a;
+  border-top: 1px solid var(--chapter_subtxt_color);
 }
 .chapter_series_title_div{
   width: fit-content;
@@ -1067,7 +1088,7 @@ table.entry_info_table{
   user-select: none;
 }
 .content_section{
-  border-bottom: 1px solid #9a9a9a;
+  border-bottom: 1px solid var(--chapter_subtxt_color);
   padding: 2rem 0;
 }
 .chapter_next_chapter_section{
@@ -1132,14 +1153,6 @@ table.entry_info_table{
   margin: 1rem auto;
   padding: 10px;
   border: solid 1px var(--chapter_maintxt_color);
-}
-#day_night_toggle_btn{
-  color: white;
-  background-color: var(--chapter_day_night_toggle_btn_color);
-  border-color: var(--chapter_day_night_toggle_btn_color);
-}
-#day_night_toggle_btn:hover{
-  filter: brightness(1.1) !important;
 }
 .word{
   font-variant: petite-caps;
@@ -1253,7 +1266,6 @@ table.entry_info_table{
   padding: 0px;
   list-style: none;
   overflow-y: scroll;
-  list-style: none;
 }
 .chapter_sidebar_content_fade{
   position: absolute;
@@ -1357,6 +1369,9 @@ table.entry_info_table{
   padding: 0.5rem 0 0.3rem;
   font-size: 1rem;
 }
+.chapter_sidebar_navbar_btn:hover{
+  transform: scale(1.1);
+}
 
 /* Chapter navbar */
 .chapter_navbar{
@@ -1458,7 +1473,7 @@ table.entry_info_table{
   z-index: 0 ;
 }
 .chapter_navbar_navigation_btn:hover{
-  filter: brightness(1.1);
+  transform: scale(1.1);
 }
 #ch_dict_btn{
   background: var(--toc_dictionary_btn_color);
@@ -1513,7 +1528,7 @@ table.entry_info_table{
   display: flex;
   height: 5rem;
   margin: 0.75rem 0;
-  border: 1px solid #ff8f2c;
+  border: 1px solid var(--dictionary_color_primary);
   border-right: none;
   border-left: none;
   box-sizing: border-box;
@@ -1531,7 +1546,7 @@ table.entry_info_table{
   width: 25rem;
   color: white;
   font-weight: bolder;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-family: monospace;
   border-bottom: 5rem solid var(--dictionary_entry_color_primary);
   border-right: 1.5rem solid transparent;
@@ -1567,7 +1582,7 @@ table.entry_info_table{
   text-align: center;
   margin: auto 1px;
   padding: 0.85rem 2.3rem;
-  background: #ff7043;
+  background: var(--dictionary_color_primary);
   color: white !important;
   cursor: pointer;
 }
@@ -1877,6 +1892,9 @@ table.entry_info_table{
 .honorific_entry_action_div{
   height: fit-content;
 }
+.honorific_entry_action_div:hover{
+  transform: scale(1.1);
+}
 .honorifics_form_help{
   display: inline;
 }
@@ -1975,9 +1993,6 @@ table.entry_info_table{
 .theme_option:hover{
   transform: scale(1.05);
 }
-.theme_option:active{
-  animation: shake 0.2s;
-}
 .setting_msg{
   font-size: 1.1rem;
 
@@ -2052,13 +2067,11 @@ table.entry_info_table{
   }
   .dictionary_entry_abbr{
     width: -webkit-fill-available;
+    border-right: none;
   }
   .dictionary_entry_body{
     width: unset;
     padding-left: unset;
-  }
-  .dictionary_entry_abbr{
-    border-right: none;
   }
   .dictionary_entry_action_bar{
     visibility: visible;
@@ -2086,6 +2099,9 @@ table.entry_info_table{
   #series_dictionary_btn span{
     display: none;
   }
+  .toc_chapter_text {
+    width: 125px;
+  }
 
   /* Responsive Chapter */
   .chapter_sidebar{
@@ -2106,10 +2122,10 @@ table.entry_info_table{
   }
   section{
     width: auto;
+    margin: 1rem 2rem;
     min-width: unset;
   }
   body{
-    margin: 0 2rem;
     padding-top: 2rem;
   }
 
@@ -2181,23 +2197,42 @@ table.entry_info_table{
   .section_toc{
     padding: 2rem;
   }
+  .toc_body{
+    padding: 0;
+  }
   .toc_series_abbr_div{
-    font-size: 1.5rem;
+    font-size: 1rem;
     margin: 2rem auto;
   }
   .toc_series_title_div{
-    font-size: 3rem;
-    line-height: 3.2rem;
+    font-size: 2rem;
+    line-height: 2.1rem;
   }
   .section_toc .superpanel_menu_btn{
-    padding: 0.8rem 2rem;
-    font-size: 1.5rem;
+    padding: 0.3rem 2rem;
+    font-size: 1rem;
   }
   .section_toc .superpanel_menu_btn span{
     display: none;
   }
+  .toc_volume_title {
+    font-size: 1.25rem;
+  }
   .toc_chapter{
-    font-size: 2rem;
+    font-size: 0.9rem;
+  }
+  .toc_chapter_title{
+    font-size: 0.8rem;
+  }
+  .toc_chapter_text {
+    width: 55px;
+  }
+  .toc_chapter_date {
+    margin-left: 0.25rem;
+  }
+  .toc_chapter_actionbar{
+    opacity: 1;
+    visibility: initial;
   }
 
   /* Responsive Chapter */
@@ -2214,6 +2249,11 @@ table.entry_info_table{
   /*Responsive Honorific*/
   .section_honorifics{
     min-width: unset;
+  }
+
+  /*Responsive Settings*/
+  .section_settings{
+
   }
 }
 
@@ -2234,9 +2274,6 @@ table.entry_info_table{
     margin: 0 auto 0.5rem;
     border: none;
   }
-  .chapter_sidebar_content_list{
-    height: 50vh;
-  }
   .chapter_sidebar_content_fade{
     display: none;
   }
@@ -2249,7 +2286,7 @@ table.entry_info_table{
 }
 
 @media only screen and (max-width: 640px){
-  html, html[data-theme='dark']{
+  html{
     font-size: 0.7rem;
   }
   .chapter_navbar_navigation_btn{
@@ -2272,10 +2309,17 @@ table.entry_info_table{
   .setting{
     margin-bottom: 5rem;
   }
+
+  .toc_chapter{
+    font-size: 0.8rem;
+  }
+  .toc_chapter_title {
+    font-size: 0.7rem;
+  }
 }
 
 @media only screen and (max-width: 460px){
-  html, html[data-theme='dark']{
+  html{
     font-size: 0.6rem;
   }
 }
