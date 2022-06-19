@@ -28,6 +28,56 @@ from app.scripts.dictionary import *
 
 
 
+@app.before_first_request
+def init():
+	"""-------------------------------------------------------------------
+		Function:		[init]
+		Description:	Initializes the web server file system and database in
+						preparation for serving requests. Runs once before the first
+						server request
+		Input:			None
+		Return: 		None, initializes the database if necessary on app start
+		------------------------------------------------------------------
+	"""
+	# Create user path if it does not already exist
+	if not os.path.isdir(app.config['USER_PATH']):
+		os.makedirs(app.config['USER_PATH'])
+
+	db_path = os.path.join(app.config['USER_PATH'], app.config['SQLALCHEMY_DATABASE_NAME'])
+	if not os.path.isfile(db_path):
+		db.create_all()
+	elif os.stat(db_path).st_size == 0:
+		os.remove(db_path)
+		db.create_all()
+	else:
+		# No initialization needed
+		return
+
+	# HostTable can't be empty on execution of the flask app
+	if len(HostTable.query.all()) == 0:
+		hosts_path = os.path.join(app.config['SEED_DATA_PATH'], "hosts.json")
+		print("No hosts found in the database... Seeding hosts from disk: \'%s\'" % hosts_path)
+		seedHosts(hosts_path, mode='overwrite')
+
+	# DictionaryTable should minimally have the common dictionary registered
+	if DictionaryTable.query.filter_by(fname=COMMON_DICT_FNAME).first() is None:
+		# Add the common dictionary
+		dict_entry = DictionaryTable(fname=COMMON_DICT_FNAME)
+		db.session.add(dict_entry)
+		db.session.commit()
+
+	# Initialize SettingsTable
+	settings_entry = SettingsTable()
+	db.session.add(settings_entry)
+	db.session.commit()
+
+	# In development and testing, we need series and honorifics to be seeded
+	# with test values
+	if app.config["ENV"] in ["development", "testing"]:
+		print("Reseeding series and honorifics entries")
+		seedHonorifics(os.path.join(app.config['SEED_DATA_PATH'], "honorifics.json"), mode='overwrite')
+		seedSeries(os.path.join(app.config['SEED_DATA_PATH'], "test_series.json"), mode='overwrite')
+
 def fetchHtml(url):
 	"""-------------------------------------------------------------------
 		Function:		[fetchHtml]
