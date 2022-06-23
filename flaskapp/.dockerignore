@@ -1,0 +1,6 @@
+__pycache__/
+LICENSE
+*.md
+migrations/
+user/
+venv/

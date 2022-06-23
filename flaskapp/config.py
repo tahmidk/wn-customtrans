@@ -12,22 +12,16 @@ class BaseConfig(object):
 	TESTING = False
 
 	# Important paths
-	SEED_DATA_PATH = os.path.join(os.getcwd(), 'seed_data')
-	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'default', 'dicts')
+	SEED_DATA_PATH = os.path.join(os.path.dirname(__file__), 'seed_data')
+	USER_PATH = os.path.join(os.path.dirname(__file__), 'user', 'default')
+	DICTIONARIES_PATH = os.path.join(USER_PATH, 'dicts')
 
 	# Remove CSRF token life-time restriction
 	WTF_CSRF_TIME_LIMIT = None
 
 	# Database config
 	SQLALCHEMY_DATABASE_NAME = 'database_wnct.db'
-	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'
-
-	# Celery config
-	CELERY_PORT_NUMBER=6666
-	CELERY_CONFIG={
-		'broker_url': 		f'redis://localhost:{CELERY_PORT_NUMBER}',
-	    'result_backend': 	f'db+{SQLALCHEMY_DATABASE_URI}'
-	}
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{USER_PATH}/{SQLALCHEMY_DATABASE_NAME}'
 
 	# Security
 	SESSION_COOKIE_SECURE = True
@@ -37,31 +31,34 @@ class BaseConfig(object):
 	ALLOWED_DICT_EXTENSIONS = ['DICT', 'TXT']
 	MAX_DICT_FILESIZE = 2 * 1024 * 1024
 
+
 # Config used in production
 class ProductionConfig(BaseConfig):
 	SESSION_COOKIE_SECURE = False
 	CONFIG_NAME = "production"
+
 
 # Config used in development
 class DevelopmentConfig(BaseConfig):
 	CONFIG_NAME = "development"
 	DEBUG = True
 
-	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'dev', 'dicts')
-	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'dev', 'pages')
+	USER_PATH = os.path.join(os.path.dirname(__file__), 'user', 'dev')
+	DICTIONARIES_PATH = os.path.join(USER_PATH, 'dicts')
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_dev.db'
-	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{USER_PATH}/{SQLALCHEMY_DATABASE_NAME}'
 
-# Config used in
+
+# Config used for testing
 class TestingConfig(BaseConfig):
 	CONFIG_NAME = "testing"
 	TESTING = True
 
-	DICTIONARIES_PATH = os.path.join(os.getcwd(), 'user', 'test', 'dicts')
-	PAGE_TABLES_PATH = os.path.join(os.getcwd(), 'user', 'test', 'pages')
+	USER_PATH = os.path.join(os.path.dirname(__file__), 'user', 'test')
+	DICTIONARIES_PATH = os.path.join(USER_PATH, 'dicts')
 
 	SESSION_COOKIE_SECURE = False
 	SQLALCHEMY_DATABASE_NAME = 'database_test.db'
-	SQLALCHEMY_DATABASE_URI = f'sqlite:///{SQLALCHEMY_DATABASE_NAME}'
+	SQLALCHEMY_DATABASE_URI = f'sqlite:///{USER_PATH}/{SQLALCHEMY_DATABASE_NAME}'
