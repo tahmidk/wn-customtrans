@@ -9,7 +9,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 klepto==0.1.9
 lru-dict==1.1.7
-lxml==4.6.5
+lxml==4.9.1
 MarkupSafe==1.1.1
 pox==0.2.8
 pykakasi==2.0.1
